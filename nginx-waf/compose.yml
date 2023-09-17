@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+    nginx-waf:
+        image: custom-nginx-waf
+        container_name: nginx-waf
+        ports:
+            - '80:80'
+            - '443:443'
+        volumes:
+             - ./data/nginx/templates/conf.d/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
+             - /etc/letsencrypt:/etc/letsencrypt:ro
+        environment:
+            - PROXY=1
+            - MODSEC_AUDIT_ENGINE=On
+            - MODSEC_RULE_ENGINE=On
+        restart: always
+        privileged: true
+        build: .

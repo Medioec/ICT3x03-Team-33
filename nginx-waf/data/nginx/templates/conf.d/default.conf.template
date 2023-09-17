@@ -9,8 +9,6 @@ server {
     listen 80 default_server;
 
     server_name 3x03.redapplepie.com;
-    set $upstream http://localhost:9000;
-    set $always_redirect on;
 
     location /health {
         set $upstream http://127.0.0.1:5000/health$is_args$args;
