@@ -13,6 +13,7 @@ services:
             - PROXY=1
             - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
+            - ANOMALY_INBOUND=10
         restart: always
         privileged: true
         build: ./nginx-waf/
