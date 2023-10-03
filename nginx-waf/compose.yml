@@ -14,6 +14,7 @@ services:
             - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
+            - HEALTH=${HEALTH}
         restart: always
         privileged: true
         build: .
