@@ -7,7 +7,7 @@ services:
             - '80:80'
             - '443:443'
         volumes:
-             - ./data/nginx/templates/conf.d/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
+             - ./data/nginx/templates/:/etc/nginx/templates/
              - /etc/letsencrypt:/etc/letsencrypt:ro
         environment:
             - PROXY=1

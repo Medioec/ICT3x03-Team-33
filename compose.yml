@@ -7,13 +7,14 @@ services:
             - '80:80'
             - '443:443'
         volumes:
-             - ./nginx-waf/data/nginx/templates/conf.d/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
+             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/
              - /etc/letsencrypt:/etc/letsencrypt:ro
         environment:
             - PROXY=1
             - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
+            - HEALTH=${HEALTH}
         restart: always
         privileged: true
         build: ./nginx-waf/
