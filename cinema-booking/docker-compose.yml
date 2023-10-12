@@ -1,0 +1,43 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:8080"
+
+# ports for services exposed to test the containers
+# will remove ports once we implement the APIs
+  identity:
+    build: ./identity
+    ports:
+      - "8081:8081"
+
+  movie:
+    build: ./movie
+    ports:
+      - "8082:8082"
+  
+  booking:
+    build: ./booking
+    ports:
+      - "8083:8083"
+
+  payment:
+    build: ./payment
+    ports:
+      - "8084:8084"
+
+  database:
+    build:
+      context: ./database
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_container:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_container:
