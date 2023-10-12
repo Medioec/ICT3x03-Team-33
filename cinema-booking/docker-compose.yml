@@ -40,6 +40,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
+      - ./sql_files:/sql_files
       - postgres_container:/var/lib/postgresql/data
     ports:
       - "5432:5432"
