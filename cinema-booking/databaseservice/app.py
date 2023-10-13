@@ -44,7 +44,8 @@ def add_user():
         return jsonify({"error": str(e)}), 500
 #####     End of add user     #####    
 
-##### Checks if username is taken #####    
+##### Checks if username is taken #####
+@app.route('/databaseservice/check_user', methods=['POST'])    
 def check_user():
     try:
         # Get data from the request
