@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint
 import os
 import psycopg2
 
