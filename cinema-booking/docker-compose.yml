@@ -29,6 +29,11 @@ services:
 
   databaseservice:
     build: ./databaseservice
+    environment:
+      - DB_HOST=database
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
     ports:
       - "8085:8085"
 
@@ -40,6 +45,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_container:/var/lib/postgresql/data
     ports:
       - "5432:5432"
