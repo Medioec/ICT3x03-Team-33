@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from argon2 import PasswordHasher
 from email_validator import validate_email, EmailNotValidError
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 
 # member registration
