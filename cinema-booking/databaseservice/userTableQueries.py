@@ -27,8 +27,8 @@ def add_user():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        # Insert data into the "user" table
-        insert_query = "INSERT INTO user (userId, email, username, passwordHash, userRole) VALUES (%s, %s, %s, %s, %s)"
+        # Insert data into the "cinemauser" table
+        insert_query = "INSERT INTO cinemauser (userId, email, username, passwordHash, userRole) VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(insert_query, (userId, email, username, passwordHash, userRole))
         conn.commit()
 
@@ -56,7 +56,7 @@ def check_user():
         cursor = conn.cursor()
 
         # Check if the user exists in the "user" table
-        select_query = "SELECT username FROM user WHERE username = %s"
+        select_query = "SELECT username FROM cinemauser WHERE username = %s"
         cursor.execute(select_query, (username,))
         user = cursor.fetchone()
 
@@ -88,7 +88,7 @@ def check_email():
         cursor = conn.cursor()
 
         # Check if the email exists in the "user" table
-        select_query = "SELECT email FROM user WHERE email = %s"
+        select_query = "SELECT email FROM cinemauser WHERE email = %s"
         cursor.execute(select_query, (email,))
         user = cursor.fetchone()
 
