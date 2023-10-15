@@ -44,7 +44,7 @@ def add_user():
 #####     End of add user     #####    
 
 ##### Checks if username is taken #####
-@user_bp.route('/check_user', methods=['GET'])    
+@user_bp.route('/check_user', methods=['POST'])    
 def check_user():
     try:
         # Get data from the request
@@ -76,7 +76,7 @@ def check_user():
 #####   End of check user     #####
 
 #####   Checks if email is taken     #####
-@user_bp.route('/check_email', methods=['GET'])
+@user_bp.route('/check_email', methods=['POST'])
 def check_email():
     try:
         # Get data from the request
