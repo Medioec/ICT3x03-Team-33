@@ -1,3 +1,7 @@
 Flask==2.1.0
 flask-cors==3.0.10
 Werkzeug==2.0.2
+email-validator==2.0.0.post2
+argon2-cffi==23.1.0
+cryptography==41.0.4
+requests==2.31.0
