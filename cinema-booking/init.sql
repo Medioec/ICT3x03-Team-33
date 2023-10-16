@@ -3,7 +3,6 @@ CREATE TABLE CinemaUser (
     email VARCHAR(255) UNIQUE NOT NULL,
     username VARCHAR(255) UNIQUE NOT NULL,
     passwordHash VARCHAR(255) NOT NULL,
-    -- salt VARCHAR(255) NOT NULL,
     userRole VARCHAR(255) UNIQUE NOT NULL
 );
 
