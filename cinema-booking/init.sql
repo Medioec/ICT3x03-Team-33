@@ -9,6 +9,7 @@ CREATE TABLE CinemaUser (
 CREATE TABLE UserSessions (
     sessionId UUID PRIMARY KEY NOT NULL,
     userId UUID NOT NULL,
+    privateKey VARCHAR(255) NOT NULL, 
     expiryTimestamp TIMESTAMP NOT NULL,
     currStatus VARCHAR(255) NOT NULL,
     FOREIGN KEY (userId) REFERENCES CinemaUser(userId)
