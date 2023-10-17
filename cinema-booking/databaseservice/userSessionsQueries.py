@@ -61,7 +61,8 @@ def get_key_hash():
             SELECT cu.passwordHash, us.privateKey
             FROM CinemaUser cu
             JOIN UserSessions us ON cu.userId = us.userId
-            WHERE us.sessionId = '%s'; """
+            WHERE us.sessionId = %s;
+        """
         cursor.execute(select_data_query, (sessionId,))
         data_result = cursor.fetchall()
 
@@ -83,4 +84,40 @@ def get_key_hash():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-#####   End of check user     #####
+#####   End of pw hash and private key retrieval   #####
+
+##### Updates private key and expiry timestamp into database #####
+@user_sessions_bp.route('/update_key_timestamp', methods=['PUT'])
+def update_key_timestamp():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        sessionId = data['sessionId']
+        newPrivateKey = data['privateKey']
+        newExpiryTimestamp = data['expiryTimestamp']
+        
+        if sessionId is None or newPrivateKey is None or newExpiryTimestamp is None:
+            return jsonify({"error": "Missing data in the request"}), 400
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        update_data_query = """
+        UPDATE UserSessions
+        SET privateKey = %s, expiryTimestamp = %s
+        WHERE sessionId = %s
+        """
+        cursor.execute(update_data_query, (newPrivateKey, newExpiryTimestamp, sessionId))
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            conn.close()
+            return jsonify({"error": "Session not found"}), 404
+
+        conn.close()
+        return jsonify({"message": "Session updated successfully"}), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+#####   End of updating keys and expiry   #####
