@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
 from argon2 import PasswordHasher
+from cryptography.hazmat.primitives.asymmetric import ec
 from email_validator import validate_email, EmailNotValidError
-import requests
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
 import user_utils
 
 app = Flask(__name__)
@@ -12,9 +13,10 @@ CORS(app)
 @app.route("/register", methods=["POST"])
 def register():
     # get data from registration form
-    email = request.form.get("email")
-    username = request.form.get("username")
-    password = request.form.get("password")
+    data = request.get_json()
+    email = data['email']
+    username = data['username']
+    password = data['password']
 
     if not email or not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -34,7 +36,6 @@ def register():
         ph = PasswordHasher()
         hash = ph.hash(password)
 
-        salt = "blah"
         role = "member"
         userId = user_utils.generateUUID()
 
@@ -55,7 +56,7 @@ def register():
 
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
+
         
-    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
