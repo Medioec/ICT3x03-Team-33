@@ -58,6 +58,3 @@ def generateRandomNumber(length):
 # generate uuid for inserting into db
 def generateUUID():
     return str(uuid.uuid4())
-
-def fields_are_missing(email, username, password):
-    return not (email and username and password)    
