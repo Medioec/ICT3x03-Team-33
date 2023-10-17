@@ -57,6 +57,33 @@ def register():
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
 
+@app.route("/generate_ecdh", methods=["POST"])
+def generateECDHKey():
+    # get data from login form
+    data = request.get_json()
+    username = data['username']
+
+    # if username does not exist in db
+    if user_utils.isUsernameAvailable(username):
+        return jsonify({"message": "Username or password was incorrect"}), 404 
+    
+    # if username exsits in db
+    # generate ECDH key pair and session ID
+    privateKey = ec.generate_private_key() 
+    publicKey = privateKey.public_key()
+    sessionID = user_utils.generateUUID()
+
+    # generate session expirty time
+
+    # TODO: insert username session id, session expiry and private key into database
+    
+    # TODO:  if db insert successful, return data
+
+    # return session ID and public key
+    return jsonify({
+        "sessionID": sessionID,
+        "publicKey": publicKey
+    }), 200
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
