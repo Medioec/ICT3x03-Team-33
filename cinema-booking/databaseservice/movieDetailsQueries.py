@@ -12,7 +12,7 @@ db_config = {
 }
 
 #####     Create a new movie entry in the database     #####
-@movie_details_bp.route('/movies', methods=['POST'])
+@movie_details_bp.route('/create_movie', methods=['POST'])
 def create_movie():
     try:
         data = request.get_json()
@@ -43,7 +43,7 @@ def create_movie():
 
 
 #####     Retrieve a movie by its ID     #####
-@movie_details_bp.route('/movies/<int:movie_id>', methods=['GET'])
+@movie_details_bp.route('/get_movie_by_id/<int:movie_id>', methods=['GET'])
 def get_movie_by_id(movie_id):
     try:
         conn = psycopg2.connect(**db_config)
@@ -76,7 +76,7 @@ def get_movie_by_id(movie_id):
 #####     End of retrieve movie by ID     #####
 
 #####     Retrieve all movies from the database     #####
-@movie_details_bp.route('/movies', methods=['GET'])
+@movie_details_bp.route('/get_all_movies', methods=['GET'])
 def get_all_movies():
     try:
         conn = psycopg2.connect(**db_config)
@@ -110,7 +110,7 @@ def get_all_movies():
 #####     End of retrieve all movies     #####
 
 #####     Update a movie entry by its ID     #####
-@movie_details_bp.route('/movies/<int:movie_id>', methods=['PUT'])
+@movie_details_bp.route('/update_movie_by_id/<int:movie_id>', methods=['PUT'])
 def update_movie_by_id(movie_id):
     try:
         data = request.get_json()
@@ -140,7 +140,7 @@ def update_movie_by_id(movie_id):
 
 
 #####     Delete a movie entry by its ID     #####
-@movie_details_bp.route('/movies/<int:movie_id>', methods=['DELETE'])
+@movie_details_bp.route('/delete_movie_by_id/<int:movie_id>', methods=['DELETE'])
 def delete_movie_by_id(movie_id):
     try:
         conn = psycopg2.connect(**db_config)
