@@ -28,8 +28,7 @@ def create_user_session():
 
         # Insert data into the UserSessions table
         insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(insert_query, (sessionId, userId,
-                       privateKey, expiryTimestamp, currStatus))
+        cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus))
         conn.commit()
 
         cursor.close()
