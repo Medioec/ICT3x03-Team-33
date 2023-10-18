@@ -1,11 +1,15 @@
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors')
+const bodyParser = require('body-parser');
+// const cors = require('cors')
+
 
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(cors());
+// app.use(cors());
+app.use(bodyParser.json());
+
 app.use(express.static(__dirname)); // Serve static files from the root directory
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html'); // Serve the index.html from the root directory
@@ -25,13 +29,17 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         // send POST request from login form to identity service
-        const response = await axios.post('http://identity:8081/generate_ecdh', req.body);
+        const response = await axios.post('http://identity:8081/login', req.body, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
         // Handle the response from the identity service
         res.send(response.data);
 
     } catch (error) {
         // Handle errors here and send an error response
-        res.status(500).send('Error while processing the request.');
+        console.error(error.message);
     }
 });

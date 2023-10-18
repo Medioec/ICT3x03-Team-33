@@ -1,6 +1,7 @@
 version: '3'
 services:
   frontend:
+    container_name: frontend
     build: ./frontend
     ports:
       - "8080:8080"
@@ -8,6 +9,7 @@ services:
 # ports for services exposed to test the containers
 # will remove ports once we implement the APIs
   identity:
+    container_name: identity
     build: ./identity
     ports:
       - "8081:8081"
@@ -18,16 +20,19 @@ services:
       - "8082:8082"
   
   booking:
+    container_name: booking
     build: ./booking
     ports:
       - "8083:8083"
 
   payment:
+    container_name: payment
     build: ./payment
     ports:
       - "8084:8084"
 
   databaseservice:
+    container_name: databaseservice
     build: ./databaseservice
     environment:
       - DB_HOST=database
@@ -38,6 +43,7 @@ services:
       - "8085:8085"
 
   database:
+    container_name: database
     build:
       context: ./database
     environment:

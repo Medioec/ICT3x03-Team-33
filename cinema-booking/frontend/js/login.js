@@ -16,17 +16,20 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(data)
 
         // Send a POST request with JSON data to the identity service
-        fetch("/generate_ecdh", { 
+        fetch("/login", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             body: JSON.stringify(data),
         })
 
         .then(response => {
             console.error(`Response status: ${response.status}`);
+            console.log("Response text:", response.text());
             return response.json();
+            // return response.json();
         })
 
         // Handle the response from the server
