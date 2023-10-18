@@ -2,7 +2,7 @@ from flask import request, jsonify, Blueprint
 import os
 import psycopg2
 
-user_sessions_bp = Blueprint("user", __name__)
+user_sessions_bp = Blueprint("user_sessions", __name__)
 
 db_config = {
     "dbname": os.getenv("DB_NAME"),
