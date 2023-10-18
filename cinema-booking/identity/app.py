@@ -9,7 +9,7 @@ import requests
 import user_utils
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/login": {"origins": "http://frontend:8080"}})
+CORS(app)
 
 # member registration
 @app.route("/register", methods=["POST"])
@@ -78,26 +78,26 @@ def login():
     response_headers = {"Content-Type": "application/json"}
 
     if not username or not password:
-        return jsonify({"message": "Please fill in all form data"}), 400, response_headers
+        return jsonify({"message": "Please fill in all form data"}), 400
     
     # if username does not exist in db
     if user_utils.isUsernameAvailable(username):
-        return jsonify({"message": "Username or password was incorrect"}), 404, response_headers
+        return jsonify({"message": "Username or password was incorrect"}), 404
 
-    # get password hash and role from db where username = ?
-    reqData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_hash_role", json=reqData, headers=response_headers)
-    print(response)
-    if response.status_code != 200:
-        return jsonify({"message": response.reason}), 500, response_headers
+    # # get password hash and role from db where username = ?
+    # reqData = {"username": username}
+    # response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_hash_role", json=reqData, headers=response_headers)
+    # print(response)
+    # if response.status_code != 200:
+    #     return jsonify({"message": response.reason}), 500, response_headers
     
-    else:
-        # hash password from login form and verify that hashes match
-        ph = PasswordHasher()
-        newHash = ph.hash(password)
-        return jsonify({"message": "Test"}), 200, response_headers
-        # if (response.data != newHash):
-        #     return jsonify({"message": "Username or password was incorrect"}), 404
+    # else:
+    #     # hash password from login form and verify that hashes match
+    #     ph = PasswordHasher()
+    #     newHash = ph.hash(password)
+    #     return jsonify({"message": "Test"}), 200, response_headers
+    #     # if (response.data != newHash):
+    #     #     return jsonify({"message": "Username or password was incorrect"}), 404
         
 
         # if hashes match, login successful

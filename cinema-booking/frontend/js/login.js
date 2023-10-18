@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(data)
 
         // Send a POST request with JSON data to the identity service
-        fetch("/login", { 
+        fetch("/loginRequest", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => {
             console.error(`Response status: ${response.status}`);
             console.log("Response text:", response.text());
+            console.log("Response json:", response.json());
             return response.json();
             // return response.json();
         })

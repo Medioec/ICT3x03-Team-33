@@ -68,6 +68,7 @@ def check_user():
             return jsonify({"message": "User found"}), 200
         else:
             # User not found, return HTTP 404 Not Found
+            print("User not found")
             return jsonify({"message": "User not found"}), 404
 
     except Exception as e:
