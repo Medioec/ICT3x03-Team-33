@@ -19,7 +19,6 @@ def create_user_session():
         data = request.get_json()
         sessionId = data['sessionId']
         userId = data['userId']
-        privateKey = data['privateKey']
         expiryTimestamp = data['expiryTimestamp']
         currStatus = data['currStatus']
 
@@ -28,7 +27,7 @@ def create_user_session():
         cursor = conn.cursor()
 
         # Insert data into the UserSessions table
-        insert_query = "INSERT INTO usersessions (sessionId, userId, privateKey, expiryTimestamp, currStatus) VALUES (%s, %s, %s, %s, %s)"
+        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus) VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(insert_query, (sessionId, userId,
                        privateKey, expiryTimestamp, currStatus))
         conn.commit()
@@ -44,26 +43,21 @@ def create_user_session():
         return jsonify({"error": str(e)}), 500
 #####     End of create session     #####
 
-##### Retrieves password hash and private key from database #####
-@user_sessions_bp.route('/get_key_hash', methods=['POST'])
+##### Retrieves password hash and user role from database #####
+@user_sessions_bp.route('/get_hash_role', methods=['POST'])
 def get_key_hash():
     try:
         # Get data from the request
         data = request.get_json()
-        sessionId = data['sessionId']
+        username = data['username']
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        # Construct the SQL query to retrieve the password hash and private key using session id
-        select_data_query = """
-            SELECT cu.passwordHash, us.privateKey
-            FROM CinemaUser cu
-            JOIN UserSessions us ON cu.userId = us.userId
-            WHERE us.sessionId = %s;
-        """
-        cursor.execute(select_data_query, (sessionId,))
+        # Construct the SQL query to retrieve the password hash and user role using username
+        select_data_query = "SELECT username, passwordHash FROM CinemaUser WHERE username = %s "
+        cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 
         # Close the cursor and the database connection
@@ -73,10 +67,10 @@ def get_key_hash():
         # Separate the data into two attributes in a JSON response
         if data_result:
             # Assuming there's one result
-            passwordHash, privateKey = data_result[0]
+            passwordHash, userRole = data_result[0]
             response_data = {
                 "passwordHash": passwordHash,
-                "privateKey": privateKey
+                "userRole": userRole
             }
             return jsonify(response_data), 200
         else:
@@ -84,19 +78,18 @@ def get_key_hash():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-#####   End of pw hash and private key retrieval   #####
+#####   End of pw hash retrieval   #####
 
 ##### Updates private key and expiry timestamp into database #####
-@user_sessions_bp.route('/update_key_timestamp', methods=['PUT'])
+@user_sessions_bp.route('/update_timestamp', methods=['PUT'])
 def update_key_timestamp():
     try:
         # Get data from the request
         data = request.get_json()
         sessionId = data['sessionId']
-        newPrivateKey = data['privateKey']
         newExpiryTimestamp = data['expiryTimestamp']
         
-        if sessionId is None or newPrivateKey is None or newExpiryTimestamp is None:
+        if sessionId is None or newExpiryTimestamp is None:
             return jsonify({"error": "Missing data in the request"}), 400
 
         # Connect to the database
@@ -105,10 +98,10 @@ def update_key_timestamp():
         
         update_data_query = """
         UPDATE UserSessions
-        SET privateKey = %s, expiryTimestamp = %s
+        SET expiryTimestamp = %s
         WHERE sessionId = %s
         """
-        cursor.execute(update_data_query, (newPrivateKey, newExpiryTimestamp, sessionId))
+        cursor.execute(update_data_query, (newExpiryTimestamp, sessionId))
         conn.commit()
         
         if cursor.rowcount == 0:
