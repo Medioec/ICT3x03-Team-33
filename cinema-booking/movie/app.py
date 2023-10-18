@@ -112,7 +112,19 @@ def update_movie_by_id(movie_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500    
 #####     End of update movie by ID     #####   
-    
+
+#####     Delete a movie entry in the database     #####
+@app.route('/delete_movie_by_id/<int:movie_id>', methods=["DELETE"])
+def update_movie_by_id(movie_id):
+    try:
+        response = requests.delete("http://databaseservice:8085/databaseservice/movieDetails/delete_movie_by_id/"+ movie_id)
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({"message": "Get movie with id: " + str(movie_id) + " failed"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+#####     End of delete movie by ID     #####
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8082)
-    
