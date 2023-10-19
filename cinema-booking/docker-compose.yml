@@ -17,6 +17,7 @@ services:
     build: ./identity
     networks:
       - frontend-to-identity
+      - identity-to-payment
       - identity-to-databaseservice
     ports:
       - "8081:8081"
@@ -44,6 +45,7 @@ services:
     container_name: payment
     build: ./payment
     networks:
+      - identity-to-payment
       - booking-to-payment
       - payment-to-databaseservice
     ports:
@@ -91,6 +93,8 @@ networks:
     driver: bridge
   booking-to-payment:
     driver: bridge
+  identity-to-payment:
+    driver: bridge  
   identity-to-databaseservice:
     driver: bridge
   movie-to-databaseservice:
