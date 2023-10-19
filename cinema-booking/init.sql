@@ -117,4 +117,17 @@ VALUES
 UPDATE MovieDetails
 SET subtitles = 'Chinese';
 
+-- Prints in console the contents of the MovieDetails table
 SELECT * FROM MovieDetails;
+
+-- Insert 1 fake user data for testing
+INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+VALUES (
+    '550e8400-e29b-41d4-a716-446655440000', -- Replace with a generated UUID
+    'fakeuser123@example.com', -- Replace with a fake email address
+    'fake_user123', -- Replace with a fake username
+    'fake_password_hash', -- Replace with a fake password hash
+    'user' -- Replace with the desired user role
+);
+
+

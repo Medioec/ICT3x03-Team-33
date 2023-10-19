@@ -44,7 +44,7 @@ def create_user_session():
 
 ##### Retrieves password hash and user role from database #####
 @user_sessions_bp.route('/get_hash_role', methods=['POST'])
-def get_key_hash():
+def get_hash_role():
     try:
         # Get data from the request
         data = request.get_json()
@@ -81,7 +81,7 @@ def get_key_hash():
 
 ##### Updates private key and expiry timestamp into database #####
 @user_sessions_bp.route('/update_timestamp', methods=['PUT'])
-def update_key_timestamp():
+def update_timestamp():
     try:
         # Get data from the request
         data = request.get_json()

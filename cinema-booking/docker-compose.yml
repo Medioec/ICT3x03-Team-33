@@ -4,7 +4,9 @@ services:
     container_name: frontend
     build: ./frontend
     networks:
-      - front-to-back
+      - frontend-to-identity
+      - frontend-to-booking
+      - frontend-to-movie
     ports:
       - "8080:8080"
 
@@ -14,7 +16,8 @@ services:
     container_name: identity
     build: ./identity
     networks:
-      - front-to-back
+      - frontend-to-identity
+      - identity-to-databaseservice
     ports:
       - "8081:8081"
 
@@ -22,7 +25,8 @@ services:
     container_name: movie
     build: ./movie
     networks:
-      - front-to-back
+      - frontend-to-movie
+      - movie-to-databaseservice
     ports:
       - "8082:8082"
   
@@ -30,7 +34,9 @@ services:
     container_name: booking
     build: ./booking
     networks:
-      - front-to-back
+      - frontend-to-booking
+      - booking-to-payment
+      - booking-to-databaseservice
     ports:
       - "8083:8083"
 
@@ -38,7 +44,8 @@ services:
     container_name: payment
     build: ./payment
     networks:
-      - front-to-back
+      - booking-to-payment
+      - payment-to-databaseservice
     ports:
       - "8084:8084"
 
@@ -46,7 +53,11 @@ services:
     container_name: databaseservice
     build: ./databaseservice
     networks:
-      - front-to-back
+      - identity-to-databaseservice
+      - movie-to-databaseservice
+      - payment-to-databaseservice
+      - booking-to-databaseservice
+      - databaseservice-to-database
     environment:
       - DB_HOST=database
       - DB_NAME=${DB_NAME}
@@ -60,7 +71,7 @@ services:
     build:
       context: ./database
     networks:
-      - front-to-back  
+      - databaseservice-to-database
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -72,7 +83,24 @@ services:
       - "5432:5432"
 
 networks:
-  front-to-back:
+  frontend-to-identity:
     driver: bridge
+  frontend-to-booking:
+    driver: bridge  
+  frontend-to-movie:
+    driver: bridge
+  booking-to-payment:
+    driver: bridge
+  identity-to-databaseservice:
+    driver: bridge
+  movie-to-databaseservice:
+    driver: bridge
+  payment-to-databaseservice:
+    driver: bridge
+  booking-to-databaseservice:
+    driver: bridge
+  databaseservice-to-database:
+    driver: bridge        
+
 volumes:
   postgres_container:
