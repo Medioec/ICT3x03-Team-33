@@ -1,6 +1,7 @@
 # Use the official PostgreSQL image as the base image
 FROM postgres:latest
 
+
 # Set the environment variable for the PostgreSQL password
 ENV POSTGRES_PASSWORD=mysecretpassword
 
