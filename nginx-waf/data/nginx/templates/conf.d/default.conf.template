@@ -41,8 +41,8 @@ server {
     server_name 3x03.redapplepie.com;
     set $upstream http://localhost:9000;
 
-    ssl_certificate /etc/nginx/ssl/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+    ssl_certificate /ssl-certs/fullchain.pem;
+    ssl_certificate_key /ssl-certs/privkey.pem;
     ssl_session_timeout 1d;
     ssl_session_cache shared:MozSSL:10m;
     ssl_session_tickets off;
