@@ -60,7 +60,7 @@ services:
     build:
       context: ./database
     networks:
-      - front-to-back
+      - front-to-back  
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -73,6 +73,6 @@ services:
 
 networks:
   front-to-back:
-
+    driver: bridge
 volumes:
   postgres_container:
