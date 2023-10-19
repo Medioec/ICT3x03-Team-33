@@ -41,8 +41,8 @@ server {
     server_name 3x03.redapplepie.com;
     set $upstream http://localhost:9000;
 
-    ssl_certificate ${CONTAINER_SSL_CERT_PATH};
-    ssl_certificate_key ${CONTAINER_SSL_CERT_PATH};
+    ssl_certificate /etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem;
     ssl_session_timeout 1d;
     ssl_session_cache shared:MozSSL:10m;
     ssl_session_tickets off;
