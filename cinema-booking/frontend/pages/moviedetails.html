@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- nts. replace with MovieDetails title -->
+    <title>Movie Details</title>
+
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/css/nav.css" />
+    <link rel="stylesheet" href="/css/legends.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <div id="navbar"></div>
+
+    <main>
+      <section id="movieDetails">
+        <div class="container">
+          <h1>Saw X</h1>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="showcase-box">
+                <img src="/images/movies/sawx.jpg" alt="poster" />
+              </div>
+            </div>
+            <div class="col-md-8">
+              <h2 class="showcase-heading">Details</h2>
+              <div class="row">
+                <div class="col-md-4">Genre</div>
+                <div class="col-md-8">
+                  <!-- nts. replace with MovieDetails genre -->
+                  Genre here
+                </div>
+                <div class="col-md-4">Content Rating</div>
+                <div class="col-md-8">
+                  <!-- nts. replace with MovieDetails contentRating -->
+                  Content Rating here
+                </div>
+                <div class="col-md-4">Language</div>
+                <div class="col-md-8">
+                  <!-- nts. replace with MovieDetails lang -->
+                  Language here
+                </div>
+                <div class="col-md-4">Subtitles</div>
+                <div class="col-md-8">
+                  <!-- nts. replace with MovieDetails subtitles -->
+                  Subtitles here
+                </div>
+                <div class="row">
+                  <h2 class="showcase-heading">Synopsis</h2>
+                </div>
+                <div class="row">
+                  <!-- nts. replace with MovieDetails synopsis -->
+                  Synopsis here
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="showtimes">
+        <div class="container">
+          <h2 class="showcase-heading">Showtimes</h2>
+
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="legend-box">
+                  <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <div class="legend-text">AVAILABLE</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color filling-up"></div>
+                    <div class="legend-text">FILLING UP</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color selling-out"></div>
+                    <div class="legend-text">SELLING OUT</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color sold-out"></div>
+                    <div class="legend-text">SOLD OUT</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3">
+                <h2 class="showcase-heading">Select a Cinema</h2>
+                <ul id="cinema-list">
+                  <!-- Cinema options will be dynamically generated here -->
+                </ul>
+              </div>
+              <div class="col-md-9">
+                <h2 class="showcase-heading">Select a time slot</h2>
+                <div id="time-slots">
+                  <!-- Time slots will be populated here based on cinema selection -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/nav.js"></script>
+    <script src="/js/moviedetails.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

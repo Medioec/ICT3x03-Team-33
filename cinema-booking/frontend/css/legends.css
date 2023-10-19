@@ -1,0 +1,35 @@
+.legend-box {
+  display: flex;
+  align-items: center;
+  width: max-content;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-size: 13px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.available {
+  background-color: green;
+}
+
+.filling-up {
+  background-color: orange;
+}
+
+.selling-out {
+  background-color: red;
+}
+
+.sold-out {
+  background-color: grey;
+}
