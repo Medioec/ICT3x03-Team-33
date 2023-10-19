@@ -3,6 +3,8 @@ services:
   frontend:
     container_name: frontend
     build: ./frontend
+    networks:
+      - front-to-back
     ports:
       - "8080:8080"
 
@@ -11,30 +13,40 @@ services:
   identity:
     container_name: identity
     build: ./identity
+    networks:
+      - front-to-back
     ports:
       - "8081:8081"
 
   movie:
     container_name: movie
     build: ./movie
+    networks:
+      - front-to-back
     ports:
       - "8082:8082"
   
   booking:
     container_name: booking
     build: ./booking
+    networks:
+      - front-to-back
     ports:
       - "8083:8083"
 
   payment:
     container_name: payment
     build: ./payment
+    networks:
+      - front-to-back
     ports:
       - "8084:8084"
 
   databaseservice:
     container_name: databaseservice
     build: ./databaseservice
+    networks:
+      - front-to-back
     environment:
       - DB_HOST=database
       - DB_NAME=${DB_NAME}
@@ -47,6 +59,8 @@ services:
     container_name: database
     build:
       context: ./database
+    networks:
+      - front-to-back  
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -57,5 +71,8 @@ services:
     ports:
       - "5432:5432"
 
+networks:
+  front-to-back:
+    driver: bridge
 volumes:
   postgres_container:

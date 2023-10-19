@@ -66,7 +66,7 @@ def get_movie_by_id(movie_id):
                 "lang": movie[5],
                 "subtitles": movie[6]
             }
-            return jsonify(movie_details)
+            return jsonify(movie_details), 200
         else:
             return jsonify({"message": "Movie not found"}), 404
 
@@ -102,7 +102,7 @@ def get_all_movies():
             }
             movie_list.append(movie_details)
 
-        return jsonify(movie_list)
+        return jsonify(movie_list), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -120,19 +120,35 @@ def update_movie_by_id(movie_id):
         content_rating = data.get('contentRating')
         lang = data.get('lang')
         subtitles = data.get('subtitles')
-
+        
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
-
-        update_query = "UPDATE MovieDetails SET title = %s, synopsis = %s, genre = %s, contentRating = %s, lang = %s, subtitles = %s WHERE movieId = %s"
-        cursor.execute(update_query, (title, synopsis, genre, content_rating, lang, subtitles, movie_id))
-        conn.commit()
+        
+        # Checks to see if movie exists
+        select_query = "SELECT * FROM MovieDetails WHERE movieId = %s"
+        
+        cursor.execute(select_query, (movie_id,))
+        movie = cursor.fetchone()
 
         cursor.close()
         conn.close()
-
-        return jsonify({"message": "Movie updated successfully"})
-
+        
+        # Update movie if it exists
+        if movie:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+            
+            update_query = "UPDATE MovieDetails SET title = %s, synopsis = %s, genre = %s, contentRating = %s, lang = %s, subtitles = %s WHERE movieId = %s"
+            cursor.execute(update_query, (title, synopsis, genre, content_rating, lang, subtitles, movie_id))
+            conn.commit()
+            
+            cursor.close()
+            conn.close()
+            
+            return jsonify({"message": "Movie updated successfully"}), 200            
+        else:
+            # Movie does not exist
+            return jsonify({"message": "Movie not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -145,16 +161,32 @@ def delete_movie_by_id(movie_id):
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
-
-        delete_query = "DELETE FROM MovieDetails WHERE movieId = %s"
-        cursor.execute(delete_query, (movie_id))
-        conn.commit()
+        
+        # Checks to see if movie exists
+        select_query = "SELECT * FROM MovieDetails WHERE movieId = %s"
+        
+        cursor.execute(select_query, (movie_id,))
+        movie = cursor.fetchone()
 
         cursor.close()
         conn.close()
+        
+        # Delete movie if it exists
+        if movie:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
 
-        return jsonify({"message": "Movie deleted successfully"})
+            delete_query = "DELETE FROM MovieDetails WHERE movieId = %s"
+            cursor.execute(delete_query, (movie_id,))
+            conn.commit()
 
+            cursor.close()
+            conn.close()
+            
+            return jsonify({"message": "Movie deleted successfully"}), 200
+        else:
+            # Movie does not exist
+            return jsonify({"message": "Movie not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
