@@ -6,7 +6,6 @@
 import requests
 import re
 import secrets 
-import string
 import uuid
 
 # check if username is available/does not exist in db
@@ -55,13 +54,11 @@ def validatePassword(password):
     else:
         return False
     
-# generate random number of a given length
-def generateRandomNumber(length):
-    digits = string.digits
-    random_string = ''.join(secrets.choice(digits) for _ in range(length))
-
-    return random_string
-
 # generate uuid for inserting into db
 def generateUUID():
     return str(uuid.uuid4())
+
+# generate 32 bytes for a 256-bit key
+def generateSecretKey():
+    secret_key = secrets.token_bytes(32) 
+    return secret_key

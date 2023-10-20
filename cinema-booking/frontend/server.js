@@ -28,10 +28,11 @@ app.post('/loginRequest', async (req, res) => {
         // send POST request from login form to identity service
          const response = await axios.post('http://identity:8081/login', req.body, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         });
-        console.log("Returning from backend " + response.data)
+
         // Handle the response from the identity service
         res.send(response.data);
 
@@ -52,10 +53,11 @@ app.post('/registerRequest', async (req, res) => {
         // send POST request from login form to identity service
          const response = await axios.post('http://identity:8081/register', req.body, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         });
-        console.log("Returning from backend " + response.data)
+
         // Handle the response from the identity service
         res.send(response.data);
 

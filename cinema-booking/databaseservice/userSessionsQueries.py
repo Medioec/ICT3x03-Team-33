@@ -42,8 +42,8 @@ def create_user_session():
         return jsonify({"error": str(e)}), 500
 #####     End of create session     #####
 
-##### Retrieves password hash and user role from database #####
-@user_sessions_bp.route('/get_hash_role', methods=['POST'])
+##### Retrieves userId, password hash and user role from database #####
+@user_sessions_bp.route('/get_userId_hash_role', methods=['POST'])
 def get_hash_role():
     try:
         # Get data from the request
@@ -55,7 +55,7 @@ def get_hash_role():
         cursor = conn.cursor()
 
         # Construct the SQL query to retrieve the password hash and user role using username
-        select_data_query = "SELECT username, passwordHash FROM CinemaUser WHERE username = %s "
+        select_data_query = "SELECT userId, username, passwordHash FROM CinemaUser WHERE username = %s "
         cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 
@@ -66,8 +66,9 @@ def get_hash_role():
         # Separate the data into two attributes in a JSON response
         if data_result:
             # Assuming there's one result
-            passwordHash, userRole = data_result[0]
+            userId, passwordHash, userRole = data_result[0]
             response_data = {
+                "userId": userId,
                 "passwordHash": passwordHash,
                 "userRole": userRole
             }

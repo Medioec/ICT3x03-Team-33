@@ -5,11 +5,16 @@ from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import flask_jwt_extended as jwt
+import json
 import requests
 import user_utils
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
+jwt = jwt.JWTManager(app)
+
 
 # member registration
 @app.route("/register", methods=["POST"])
@@ -60,8 +65,17 @@ def register():
 
         if response.status_code == 201:
             return jsonify({"message": "Registration successful"}), 200
+        
+        # if insert unsuccessful, return error message from databaseservice
         else:
-            return jsonify({"message": "Error occurred"}), 500
+            try:
+                response_json = response.json()
+                # get error message from response. if no message, use default "Error occurred"
+                error_message = response_json.get("message", "Error occurred")
+                return jsonify({"message": error_message}), response.status_code
+        
+            except json.JSONDecodeError as e:
+                return jsonify({"message": "JSON response decode error"}), 500
 
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
@@ -80,28 +94,52 @@ def login():
     if user_utils.isUsernameAvailable(username):
         return jsonify({"message": "Username or password was incorrect"}), 404
 
-    # get password hash and role from db where username = ?
-    reqData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_hash_role", json=reqData)
+    # get password hash and role from db
+    requestData = {"username": username}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_hash_role", json=requestData)
 
     if response.status_code != 200:
-        return jsonify({"message": response.reason}), 500
+        # get error message from response. if no message, use default "Error occurred"
+        try:
+            response_json = response.json()
+            # get error message from response. if no message, use default "Error occurred"
+            error_message = response_json.get("message", "Error occurred")
+            return jsonify({"message": error_message}), response.status_code
+    
+        except json.JSONDecodeError as e:
+            return jsonify({"message": "JSON response decode error"}), 500
+    
     else:
         # hash password from login form and verify that hashes match
         ph = PasswordHasher()
         newHash = ph.hash(password)
-        return jsonify(response.json()), 200
-        # if (response.data != newHash):
-        #     return jsonify({"message": "Username or password was incorrect"}), 404
+        dbHash = response.json()["passwordHash"]
+
+        if (dbHash != newHash):
+            return jsonify({"message": "Username or password was incorrect"}), 404
         
-
         # if hashes match, login successful
-        # generate session token BASED ON ROLE
-        # insert session token and expiry into db
-        # return session token
+        else:
+            # generate session token. by default, expires in 15 minutes
+            sessionToken = jwt.create_access_token(identity=username)
 
-        # JWT SIGN TOKEN INTEGRITY - NOT ENABLED ON DEFAULT
+            # insert session token and expiry into db
+            requestData = {
+                "sessionId": sessionToken,
+                "userId": response.json()["userId"],
+                "expiryTimestamp": jwt.get_expiration_time(sessionToken),
+                "currStatus": "active"
+            }
+            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_session", json=requestData)
 
+            if response.status_code != 201:
+                # get error message from response. if no message, use default "Error occurred"
+                error_message = response.json().get("message", "Error occurred")
+                return jsonify({"message": error_message}), response.status_code
+            
+            else:
+                # return session token to client 
+                return jsonify({"sessionToken": sessionToken}), 200
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
