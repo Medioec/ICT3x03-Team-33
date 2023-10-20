@@ -18,7 +18,11 @@
   margin-right: 5px;
 }
 
-.available {
+.available, .filling-up, .selling-out, .sold-out{
+  border-style: solid;
+}
+
+.available{
   background-color: green;
 }
 
@@ -32,4 +36,11 @@
 
 .sold-out {
   background-color: grey;
+}
+
+
+.booking-box {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
 }
