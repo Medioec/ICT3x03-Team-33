@@ -25,6 +25,7 @@
   text-transform: uppercase;
   font-size: 1.2rem;
   color: #1a1a1a;
+  margin: 10px;
 }
 
 .container {
@@ -89,3 +90,8 @@
   vertical-align: sub;
 }
 
+.booking-box {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+}

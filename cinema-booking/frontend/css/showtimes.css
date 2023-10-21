@@ -1,0 +1,87 @@
+/* showtimes.html styles */
+
+h1{
+    font-size: 1rem;
+}
+
+h4{
+    font-size: 0.8rem;
+}
+
+.subtitles, .ratings{
+    text-decoration: none;
+    font-size: 0.7rem;
+    color: black;
+}
+
+.dateButton{
+    background-color: grey;
+    color: white;
+    border: solid;
+    border-radius: 0px;
+}
+
+.container{
+    margin-top: 20px;
+}
+
+.movieRow{
+    margin: 20px 0px 10px 0px;
+    border-top: solid;
+    padding-top: 10px;;
+}
+
+.dateTab{
+    display: inline-flex;
+}
+
+/* moviedetails.html styles */
+
+.cinemaSection{
+    background-color: #949494;
+}
+
+.cinemaBtn{
+    text-align: left;
+}
+
+.flex-container {
+    border-bottom: solid;
+    border-color: black;
+    margin-bottom: 5px;
+    padding-top: 10px;
+}
+
+.showtimeSection{
+    background-color: #D3D3D3;
+}
+
+.movieTitle{
+    text-decoration: none;
+    font-size: 0.8rem;
+    width: auto;
+    margin-left: -15px;
+}
+
+.showtimeHeader{
+    font-size: 0.9rem;
+    width: auto;
+}
+
+.showtimeRow {
+    border-bottom: solid;
+    border-color: grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 0px 15px 0px;
+}
+
+.dayDate{
+    font-size: 0.8rem;
+}
+
+.btn-primary{
+    width: max-content;
+    margin: 5px;
+}

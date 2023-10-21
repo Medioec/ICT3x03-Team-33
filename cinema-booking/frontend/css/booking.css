@@ -105,3 +105,8 @@ p.text {
   margin: 5px 0;
 }
 
+.seatNumbers {
+    height: 26px;
+    width: 32px;
+    margin: 5px;
+  }
