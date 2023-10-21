@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Frontend Service for Cinema Booking",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.17.1"
   },
