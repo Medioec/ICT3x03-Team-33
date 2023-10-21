@@ -19,6 +19,8 @@ services:
       - frontend-to-identity
       - identity-to-payment
       - identity-to-databaseservice
+    environment:
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8081:8081"
 
@@ -28,6 +30,8 @@ services:
     networks:
       - frontend-to-movie
       - movie-to-databaseservice
+    environment:
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8082:8082"
   
@@ -38,6 +42,8 @@ services:
       - frontend-to-booking
       - booking-to-payment
       - booking-to-databaseservice
+    environment:
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8083:8083"
 
@@ -48,6 +54,8 @@ services:
       - identity-to-payment
       - booking-to-payment
       - payment-to-databaseservice
+    environment:
+      - PYTHONUNBUFFERED=1  
     ports:
       - "8084:8084"
 
@@ -61,6 +69,7 @@ services:
       - booking-to-databaseservice
       - databaseservice-to-database
     environment:
+      - PYTHONUNBUFFERED=1
       - DB_HOST=database
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
