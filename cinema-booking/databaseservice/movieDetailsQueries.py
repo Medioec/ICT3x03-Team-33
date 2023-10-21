@@ -89,20 +89,23 @@ def get_all_movies():
         cursor.close()
         conn.close()
 
-        movie_list = []
-        for movie in movies:
-            movie_details = {
-                "movieId": movie[0],
-                "title": movie[1],
-                "synopsis": movie[2],
-                "genre": movie[3],
-                "contentRating": movie[4],
-                "lang": movie[5],
-                "subtitles": movie[6]
-            }
-            movie_list.append(movie_details)
+        if movies:
+            movie_list = []
+            for movie in movies:
+                movie_details = {
+                    "movieId": movie[0],
+                    "title": movie[1],
+                    "synopsis": movie[2],
+                    "genre": movie[3],
+                    "contentRating": movie[4],
+                    "lang": movie[5],
+                    "subtitles": movie[6]
+                }
+                movie_list.append(movie_details)
 
-        return jsonify(movie_list), 200
+            return jsonify(movie_list), 200
+        else:
+            return jsonify({"message": "No movies found"}), 404
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
