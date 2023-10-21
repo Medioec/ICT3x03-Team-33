@@ -1,4 +1,9 @@
-+ function($) {
+(function($) {
+  function isUsernameValid(username) {
+    var pattern = /^[a-zA-Z0-9]{3,16}$/;
+    return pattern.test(username);
+  }
+
   $('.palceholder').click(function() {
     $(this).siblings('input').focus();
   });
@@ -23,23 +28,27 @@
     rules: {
       userName: {
         required: true,
-        minlength: 6
+        minlength: 3,  
+        customUsernameValidation: true  
       },
       userPassword: {
-        required: true,
-        minlength: 6
+        required: true
       }
     },
     messages: {
       userName: {
         required: "Please enter your username.",
-        minlength: "Please provide valid username."
+        minlength: "Username must be at least 3 characters.",
+        customUsernameValidation: "Please provide a valid username."
       },
       userPassword: {
-        required: "Please enter your password.",
-        minlength: "Incorrect login or password."
+        required: "Please enter your password."
       }
     }
   });
 
-}(jQuery);
+  $.validator.addMethod("customUsernameValidation", function(value, element) {
+    return isUsernameValid(value);
+  }, "Please provide a valid username.");
+
+})(jQuery);
