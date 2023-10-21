@@ -7,30 +7,23 @@ git rm -rf --cached .
 git reset --hard HEAD
 ```
 
-## Deployment in local dev environment
-Run the dev scripts in scripts/ directory from the repo base directory to build and deploy.
-
-### Example
-#### Windows
-```.\scripts\dev-build.bat```
-#### Linux
-```./scripts/dev-build.sh```
-
-## Docker containers setup
-**All instructions are for windows powershell/cmd**
-For now, the environment variables are ran before `docker-compose`. Credentials are in our telechat group ;)
+## Deploying containers in local dev environment
 1. Download Docker Desktop
 From this link: https://docs.docker.com/get-docker/
 
 2. Command to run all containers:
-Ensure you are in repository directory `cd cinema-booking` 
-then, run these commands in a batch
+Ensure you are in repository base directory (directory with README.md)
+then, run the dev scripts in the scripts/ directory
 
+#### Windows
 ```
-$Env:DB_NAME = <insert db name from tele>
-$Env:DB_USER = <insert db user from tele>
-$Env:DB_PASSWORD = <insert db password from tele>
-docker-compose up -d
+.\scripts\dev-build.bat
+.\scripts\dev-deploy.bat
+```
+#### Linux
+```
+./scripts/dev-build.sh
+./scripts/dev-deploy.sh
 ```
 
 3. Check if containers are running:
@@ -42,7 +35,9 @@ On Docker Desktop
 Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.
 
 4. Stop containers before building & making changes
-On CLI, use these commands:
+On CLI, use the dev-build and dev-deploy convenience scripts for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.
+or
+Use these commands:
 `docker stop [container name]` (e.g., docker stop cinema-booking-database-1)\
 or
 `docker-compose down --volumes` (This removes all containers and database information. Remove `--volumes` if u want to keep database information. Keep if you want to reset database from init.sql) 
