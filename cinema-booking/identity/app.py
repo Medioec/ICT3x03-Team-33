@@ -133,7 +133,6 @@ def login():
     
         # generate session token
         try:
-                
             # set token expiration to 15 minutes and get expiry timestamp in iso format
             expirationTime = timedelta(minutes=15)
             current_time = datetime.utcnow()
@@ -161,7 +160,6 @@ def login():
         }
 
         response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
-        print("post create session", response.status_code)
 
         # get error message from response if insert unsuccessful
         if response.status_code != 201:
@@ -169,6 +167,7 @@ def login():
             return jsonify({"message": error_message}), response.status_code
         
         else:
+            print("token generated successfully", sessionToken)
             # return session token to client 
             return jsonify({"sessionToken": sessionToken}), 200
 ############################## END OF LOGIN #########################################

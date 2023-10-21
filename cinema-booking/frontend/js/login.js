@@ -24,8 +24,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         .then(response => response.json())
         .then(data => {
-            console.log(data.message);
-            document.getElementById("error-message").textContent = data.message;
+            // extract expiration time from jwt token
+            const jwtToken = data.sessionToken;
+
+            const decodedToken = JSON.parse(atob(jwtToken.split('.')[1])); // decode jwt payload
+            const expiryDelta = decodedToken.exp - decodedToken.iat; // calculate expiration delta
+            const expiryDate = new Date(decodedToken.exp * 1000);
+            console.log(decodedToken);
+            console.log(expiryDelta);
+
+            // set httponly cookie with the token and expiry
+            document.cookie = `token=${jwtToken};
+                                expires=${expiryDate}
+                                path=/;
+                                `;
+            console.log(document.cookie);
+            // TODO REPLACE WITH LOGIN SUCCESS CODE
+            document.getElementById("error-message").textContent = "Login successful!";
         })
     });
 });
