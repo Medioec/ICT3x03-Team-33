@@ -39,7 +39,7 @@ server {
     listen 443 ssl;
 
     server_name 3x03.redapplepie.com;
-    set $upstream http://localhost:9000;
+    set $upstream http://frontend:8080;
 
     ssl_certificate /etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem;

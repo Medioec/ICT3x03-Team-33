@@ -2,20 +2,136 @@ version: '3.3'
 services:
     nginx-waf:
         image: custom-nginx-waf
-        container_name: ${NGINX_HOST}
+        networks:
+            - waf-to-frontend
         ports:
             - '${HTTP_PORT}:80'
             - '${HTTPS_PORT}:443'
         volumes:
-             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/
-             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
-             - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem:ro
+            - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
+            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem:ro
         environment:
             - PROXY=1
             - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
             - HEALTH=${HEALTH}
+            - HTTPS_PORT=${HTTPS_PORT}
         restart: always
         privileged: true
         build: ./nginx-waf/
+
+    frontend:
+        build: ./cinema-booking/frontend
+        networks:
+            - waf-to-frontend
+            - frontend-to-identity
+            - frontend-to-booking
+            - frontend-to-movie
+        ports:
+            - "8080:8080"
+
+    # ports for services exposed to test the containers
+    # will remove ports once we implement the APIs
+    identity:
+        build: ./cinema-booking/identity
+        networks:
+            - frontend-to-identity
+            - identity-to-payment
+            - identity-to-databaseservice
+        environment:
+            - PYTHONUNBUFFERED=1  
+        ports:
+            - "8081:8081"
+
+    movie:
+        build: ./cinema-booking/movie
+        networks:
+            - frontend-to-movie
+            - movie-to-databaseservice
+        environment:
+            - PYTHONUNBUFFERED=1
+        ports:
+            - "8082:8082"
+    
+    booking:
+        build: ./cinema-booking/booking
+        networks:
+            - frontend-to-booking
+            - booking-to-payment
+            - booking-to-databaseservice
+        environment:
+            - PYTHONUNBUFFERED=1
+        ports:
+            - "8083:8083"
+
+    payment:
+        build: ./cinema-booking/payment
+        networks:
+            - identity-to-payment
+            - booking-to-payment
+            - payment-to-databaseservice
+        environment:
+            - PYTHONUNBUFFERED=1
+        ports:
+            - "8084:8084"
+
+    databaseservice:
+        build: ./cinema-booking/databaseservice
+        networks:
+            - identity-to-databaseservice
+            - movie-to-databaseservice
+            - payment-to-databaseservice
+            - booking-to-databaseservice
+            - databaseservice-to-database
+        environment:
+            - PYTHONUNBUFFERED=1
+            - DB_HOST=database
+            - DB_NAME=${DB_NAME}
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+        ports:
+            - "8085:8085"
+
+    database:
+        build:
+            context: ./cinema-booking/database
+        networks:
+        - databaseservice-to-database
+        environment:
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - postgres_container:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+
+networks:
+  waf-to-frontend:
+    driver: bridge
+  frontend-to-identity:
+    driver: bridge
+  frontend-to-booking:
+    driver: bridge  
+  frontend-to-movie:
+    driver: bridge
+  booking-to-payment:
+    driver: bridge
+  identity-to-payment:
+    driver: bridge  
+  identity-to-databaseservice:
+    driver: bridge
+  movie-to-databaseservice:
+    driver: bridge
+  payment-to-databaseservice:
+    driver: bridge
+  booking-to-databaseservice:
+    driver: bridge
+  databaseservice-to-database:
+    driver: bridge        
+
+volumes:
+  postgres_container:
