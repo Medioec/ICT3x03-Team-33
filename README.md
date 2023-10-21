@@ -7,7 +7,7 @@ git rm -rf --cached .
 git reset --hard HEAD
 ```
 
-## Deployment in dev environment
+## Deployment in local dev environment
 Run the dev scripts in scripts/ directory from the repo base directory to build and deploy.
 
 ### Example
