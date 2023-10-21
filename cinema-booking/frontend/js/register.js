@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const email = document.getElementById("email").value;
         const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+        const password = document.getElementById("userPassword").value;
         
         // Create an object with the data to be sent as JSON
         const data = {

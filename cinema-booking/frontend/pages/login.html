@@ -9,6 +9,7 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js'></script>
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
 
   <link rel="stylesheet" href="/css/nav.css" />
@@ -26,30 +27,36 @@
       <h2 class="title">Login to your account</h2>
       <form action="" id="formvalidate">
         <div class="input-group">
-          <label class="palceholder" for="userName">Username</label>
+          <label class="palceholder" for="userName" style="margin: -4px;">Username</label>
           <input class="form-control" name="userName" id="userName" type="text" placeholder="" />
           <span class="lighting"></span>
         </div>
-        <div class="input-group">
-          <label class="palceholder" for="userPassword">Password</label>
+  
+        <div class="input-group" id="passwordInputGroup">
+          <label class="palceholder" for="userPassword" style="margin: -4px;">Password</label>
+          <span id="togglePassword" class="toggle-password" onclick="togglePasswordVisibility()"><i class="bi bi-eye"></i></span>
           <input class="form-control" name="userPassword" id="userPassword" type="password" placeholder="" />
           <span class="lighting"></span>
         </div>
-
+        
         <button type="submit" id="login">Login</button>
         <div class="clearfix supporter">
+
           <a class="forgot" href="#">Forgot Password?</a>
         </div>
       </form>
+      <p id="error-message"></p>
     </div>
     <div class="signup-wrapper text-center">
       <a href="../pages/register.html">Don't have an account? <span class="text-primary">Create One</span></a>
     </div>
   </div>
 
+
   <script src="/js/login.js"></script>
   <script src="/js/nav.js"></script>
   <script src="/js/app.js"></script>
+  <script src="/js/passwordtoggle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
