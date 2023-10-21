@@ -1,8 +1,11 @@
 from flask import Flask
-app = Flask(__name__)
+from flask_cors import CORS
+app = Flask(__name__)  
+CORS(app)
 
 @app.route('/')
 def hello_geek():
+    print("Hello from Payment Service")
     return '<h1>Hello from Payment Service</h2>'
 
 if __name__ == "__main__":
