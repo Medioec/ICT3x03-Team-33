@@ -1,8 +1,6 @@
 const express = require('express');
-const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors')
-
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -19,52 +17,50 @@ app.get('/', (req, res) => {
 // ############################## IDENTITY SERVICE #########################################
 // handle GET request from login.html
 app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/login.html'); // Serve the index.html from the root directory
+    res.sendFile(__dirname + '/login.html');
 });
 
 // handle POST request from login.html
 app.post('/loginRequest', async (req, res) => {
-    try {
-        // send POST request from login form to identity service
-         const response = await axios.post('http://identity:8081/login', req.body, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
+    // send POST request from login form to identity service
+    const response = await fetch("http://identity:8081/login", { 
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(req.body),
+    });
 
-        // Handle the response from the identity service
-        res.send(response.data);
+    // parse the JSON data received from identity service
+    const data = await response.json();
 
-    } catch (error) {
-        // Handle errors here and send an error response
-        console.error(error.message);
-    }
+    // send the parsed data as a response
+    res.send(data);
 });
 
 // handle GET request from register.html
 app.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/register.html'); // Serve the index.html from the root directory
+    res.sendFile(__dirname + '/register.html');
 });
 
 // handle POST request from register.html
 app.post('/registerRequest', async (req, res) => {
-    try {
-        // send POST request from login form to identity service
-         const response = await axios.post('http://identity:8081/register', req.body, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
+    // send POST request from register form to identity service
+    const response = await fetch("http://identity:8081/register", { 
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(req.body),
+    });
 
-        // Handle the response from the identity service
-        res.send(response.data);
+    // parse the JSON data received from identity service
+    const data = await response.json();
 
-    } catch (error) {
-        // Handle errors here and send an error response
-        console.error(error.message);
-    }
+    // send the parsed data as a response
+    res.send(data);
 });
 // ############################## END OF IDENTITY SERVICE #########################################
 
