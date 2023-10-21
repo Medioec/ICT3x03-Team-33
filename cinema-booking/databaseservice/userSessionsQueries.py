@@ -27,7 +27,7 @@ def create_user_session():
         cursor = conn.cursor()
 
         # Insert data into the UserSessions table
-        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus) VALUES (%s, %s, %s, %s, %s)"
+        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus) VALUES (%s, %s, %s, %s)"
         cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus))
         conn.commit()
 
@@ -55,7 +55,7 @@ def get_hash_role():
         cursor = conn.cursor()
 
         # Construct the SQL query to retrieve the password hash and user role using username
-        select_data_query = "SELECT userId, username, passwordHash FROM CinemaUser WHERE username = %s "
+        select_data_query = "SELECT userId, passwordHash, userRole FROM CinemaUser WHERE username = %s "
         cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 

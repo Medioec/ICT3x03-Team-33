@@ -1,10 +1,12 @@
 from argon2 import PasswordHasher
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
+from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import flask_jwt_extended as jwt
+from flask_jwt_extended import (JWTManager, create_access_token,
+                                get_jwt_identity, jwt_required)
 import json
 import requests
 import user_utils
@@ -13,10 +15,10 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
-jwt = jwt.JWTManager(app)
 
+jwt = JWTManager(app)
 
-# member registration
+############################## REGISTRATION #########################################
 @app.route("/register", methods=["POST"])
 def register():
     # get data from registration form
@@ -62,7 +64,7 @@ def register():
         }
 
         response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
-
+        
         if response.status_code == 201:
             return jsonify({"message": "Registration successful"}), 200
         
@@ -76,10 +78,15 @@ def register():
         
             except json.JSONDecodeError as e:
                 return jsonify({"message": "JSON response decode error"}), 500
+            
 
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
+    
+############################## END OF REGISTRATION #########################################
 
+
+############################## LOGIN #########################################
 @app.route("/login", methods=["POST"])
 def login():
     # get data from login form
@@ -96,7 +103,7 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_hash_role", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role", json=requestData)
 
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
@@ -108,38 +115,63 @@ def login():
     
         except json.JSONDecodeError as e:
             return jsonify({"message": "JSON response decode error"}), 500
+        
     
     else:
-        # hash password from login form and verify that hashes match
-        ph = PasswordHasher()
-        newHash = ph.hash(password)
+        # hash password from login form
         dbHash = response.json()["passwordHash"]
 
-        if (dbHash != newHash):
-            return jsonify({"message": "Username or password was incorrect"}), 404
+        try:
+            # verify password
+            ph = PasswordHasher()
+            ph.verify(dbHash, password)
         
-        # if hashes match, login successful
+        # if password hashes do not match, throw error
+        except Exception as e:
+            print(f"Exception during password verification: {e}")
+            return jsonify({"message": "Username or password was incorrect"}), 404
+    
+        # generate session token
+        try:
+                
+            # set token expiration to 15 minutes and get expiry timestamp in iso format
+            expirationTime = timedelta(minutes=15)
+            current_time = datetime.utcnow()
+            expirationTimestamp = current_time + expirationTime
+            expirationTimestamp = expirationTimestamp.isoformat()
+
+            # get user role
+            userRole = response.json()["userRole"]
+            additional_claims = {"userRole": userRole}
+
+            # generate session token storing username + user role
+            sessionToken = create_access_token(identity=username, expires_delta=expirationTime, additional_claims=additional_claims)
+        except:
+            return jsonify({"message": "Token generation error"}), 500
+        
+        # generate session id
+        sessionId = user_utils.generateUUID()
+
+        # insert session token and expiry into db
+        requestData = {
+            "sessionId": sessionId,
+            "userId": response.json()["userId"],
+            "expiryTimestamp": expirationTimestamp,
+            "currStatus": "active"
+        }
+
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+        print("post create session", response.status_code)
+
+        # get error message from response if insert unsuccessful
+        if response.status_code != 201:
+            error_message = response.json().get("message", "Error occurred")
+            return jsonify({"message": error_message}), response.status_code
+        
         else:
-            # generate session token. by default, expires in 15 minutes
-            sessionToken = jwt.create_access_token(identity=username)
-
-            # insert session token and expiry into db
-            requestData = {
-                "sessionId": sessionToken,
-                "userId": response.json()["userId"],
-                "expiryTimestamp": jwt.get_expiration_time(sessionToken),
-                "currStatus": "active"
-            }
-            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_session", json=requestData)
-
-            if response.status_code != 201:
-                # get error message from response. if no message, use default "Error occurred"
-                error_message = response.json().get("message", "Error occurred")
-                return jsonify({"message": error_message}), response.status_code
-            
-            else:
-                # return session token to client 
-                return jsonify({"sessionToken": sessionToken}), 200
+            # return session token to client 
+            return jsonify({"sessionToken": sessionToken}), 200
+############################## END OF LOGIN #########################################
         
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
