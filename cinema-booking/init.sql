@@ -11,6 +11,7 @@ CREATE TABLE UserSessions (
     sessionId UUID PRIMARY KEY NOT NULL,
     userId UUID NOT NULL,
     expiryTimestamp TIMESTAMP NOT NULL,
+    privateKey VARCHAR(255) NOT NULL,
     currStatus VARCHAR(255) NOT NULL
 );
 
