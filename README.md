@@ -26,21 +26,21 @@ then, run the dev scripts in the scripts/ directory
 ./scripts/dev-deploy.sh
 ```
 
-3. Check if containers are running:
-On CLI, use these commands:
-`docker ps` (lists running containers)
+3. Check if containers are running:\
+On CLI, use these commands:\
+`docker ps` (lists running containers)\
 Then, navigate to the port number on your browser (e.g., `localhost:8080` for frontend)\
 **OR** \
-On Docker Desktop
-Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.
+On Docker Desktop\
+Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
-4. Stop containers before building & making changes
-On CLI, use the dev-build and dev-deploy convenience scripts for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.
-or
-Use these commands:
+4. Stop containers before building & making changes\
+On CLI, use the dev-build and dev-deploy convenience scripts for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.\
+or\
+Use these commands:\
 `docker stop [container name]` (e.g., docker stop cinema-booking-database-1)\
-or
-`docker-compose down --volumes` (This removes all containers and database information. Remove `--volumes` if u want to keep database information. Keep if you want to reset database from init.sql) 
+or\
+`docker-compose down --volumes` (This removes all containers and database information. Remove `--volumes` if u want to keep database information. Keep if you want to reset database from init.sql)\
 **OR** \
-On Docker Desktop
+On Docker Desktop\
 Press the stop button on the "cinema-booking" main container
