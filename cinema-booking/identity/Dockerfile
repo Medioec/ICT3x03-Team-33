@@ -16,6 +16,15 @@ RUN apt-get update
 # Install ping utility
 RUN apt-get install -y iputils-ping
 
+# Install wget
+RUN apt-get install -y wget
+
+# Create a directory for the wordlist
+RUN mkdir /app/wordlist
+
+# Download the blacklistedPW
+RUN wget -O /app/wordlist/blacklistedPW.txt https://raw.githubusercontent.com/danielmiessler/SecLists/aad07ff/Passwords/10_million_password_list_top_100000.txt
+
 # Make port 80 available to the world outside this container
 EXPOSE 8081
 
