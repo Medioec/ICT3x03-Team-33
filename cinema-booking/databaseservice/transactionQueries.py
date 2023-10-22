@@ -12,7 +12,7 @@ db_config = {
     "host": os.getenv("DB_HOST"),
 }
 
-##### Create a new ticket price entry in the database #####
+##### Create a new transaction entry in the database #####
 @transaction_bp.route('/create_transaction', methods=['POST'])
 def create_transaction():
     try:
@@ -42,7 +42,7 @@ def create_transaction():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-##### End of create ticket price entry #####
+##### End of create transaction entry #####
 
 #####     Retrieve all transaction by userId     #####
 @transaction_bp.route('/get_all_transactions_by_userId/<int:userId>', methods=['GET'])
