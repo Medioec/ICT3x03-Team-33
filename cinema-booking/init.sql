@@ -70,7 +70,7 @@ CREATE TABLE TicketPrice (
 
 CREATE TABLE Transaction (
     transactionId UUID PRIMARY KEY NOT NULL,
-    creditCardId VARCHAR(255) NOT NULL,
+    creditCardId INT NOT NULL,
     transcationDateTime TIMESTAMP NOT NULL
 );
 
@@ -104,7 +104,7 @@ ADD CONSTRAINT fk_booking_details_userId
 FOREIGN KEY (userId) REFERENCES CinemaUser(userId);
 
 ALTER TABLE Transaction
-ADD CONSTRAINT fk_transation_transactionId
+ADD CONSTRAINT fk_transaction_transactionId
 FOREIGN KEY (creditCardId) REFERENCES CreditCard(creditCardId);
 
 -- Insert 1 fake user data for testing
