@@ -35,7 +35,7 @@ On Docker Desktop\
 Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
 4. Stop containers before building & making changes\
-On CLI, use the dev-build and dev-deploy convenience scripts for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.\
+On CLI, use the dev-deploy convenience script for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.\
 or\
 Use these commands:\
 `docker stop [container name]` (e.g., docker stop cinema-booking-database-1)\
