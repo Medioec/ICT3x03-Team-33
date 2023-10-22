@@ -16,6 +16,7 @@ pipeline {
                     snykInstallation: 'Snyk',
                     snykTokenId: 'snyk-token',
                     // place other parameters here
+                    additionalArguments: '--all-projects',
                 )
                 sh './scripts/dev-kill.sh'
             }
