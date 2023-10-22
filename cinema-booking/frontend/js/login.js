@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $("#login-button").click(async function (event) {
       event.preventDefault();
   
-      if ($("#formvalidate").valid()) {
+      if ($("#login-form").valid()) {
         const username = $("#userName").val();
         const password = $("#userPassword").val();
   
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
       errorClass: 'validate-tooltip'
     });
   
-    $("#formvalidate").validate({
+    $("#login-form").validate({
       rules: {
         userName: {
           required: true,

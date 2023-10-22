@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
       if ($("#formvalidate").valid()) {
         const email = $("#email").val();
-        const username = $("#username").val();
+        const username = $("#userName").val();
         const password = $("#userPassword").val();
   
         // Validate using custom functions
