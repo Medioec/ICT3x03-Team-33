@@ -5,16 +5,27 @@ map $http_upgrade $connection_upgrade {
     '' close;
 }
 
+# Defining rate limiting zone 
+limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+
 server {
     listen 80 default_server;
 
     server_name 3x03.redapplepie.com;
-    
-    add_header X-Content-Type-Options "nosniff";
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
-    add_header X-Download-Options "noopen";
-    add_header Feature-Policy "geolocation 'self'; camera 'none'";
+    	# Instructs the browser not to override the response's Content-Type header
+    	add_header X-Content-Type-Options "nosniff";
+
+	# Page can only be framed by other pages on the same domain
+    	add_header X-Frame-Options "SAMEORIGIN";
+
+	# Enables the built-in XSS (Cross-Site Scripting) protection
+    	add_header X-XSS-Protection "1; mode=block";
+
+	# Informs the browser not to open files that are considered safe by the browser's security settings directly
+	add_header X-Download-Options "noopen";
+    	
+	#  Allows a website to specify which browser features and APIs it intends to use and from where
+	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
 	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
@@ -56,6 +67,27 @@ server {
         root /usr/share/nginx/html;
     }
 
+    # Apply rate limiting to /login.html
+    location /login.html {
+        client_max_body_size 0;
+
+        include includes/proxy_backend.conf;
+	index login.html login.htm;
+	root /usr/share/nginx/html;
+	limit_req zone=one;
+    }
+
+    # Apply rate limiting to /register.html
+    location /register.html {
+	client_max_body_size 0;
+
+        include includes/proxy_backend.conf;
+	index register.html register.htm;
+	root /usr/share/nginx/html;
+	limit_req zone=one;
+
+    }
+
     include includes/location_common.conf;
 
 }
@@ -84,11 +116,20 @@ server {
     ssl_verify_client off;
 
     # Headers usually for HTTP to secure content and interaction within web app. Can remove if need be
-    add_header X-Content-Type-Options "nosniff";
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
-    add_header X-Download-Options "noopen";
-    add_header Feature-Policy "geolocation 'self'; camera 'none'";
+    	# Instructs the browser not to override the response's Content-Type header
+    	add_header X-Content-Type-Options "nosniff";
+
+	# Page can only be framed by other pages on the same domain
+    	add_header X-Frame-Options "SAMEORIGIN";
+
+	# Enables the built-in XSS (Cross-Site Scripting) protection
+    	add_header X-XSS-Protection "1; mode=block";
+
+	# Informs the browser not to open files that are considered safe by the browser's security settings directly
+	add_header X-Download-Options "noopen";
+    	
+	#  Allows a website to specify which browser features and APIs it intends to use and from where
+	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
 	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
@@ -112,12 +153,6 @@ server {
         client_max_body_size 0;
 
         include includes/proxy_backend.conf;
-
-        add_header X-Content-Type-Options "nosniff";
-        add_header X-Frame-Options "SAMEORIGIN";
-        add_header X-XSS-Protection "1; mode=block";
-        add_header X-Download-Options "noopen";
-        add_header Feature-Policy "geolocation 'self'; camera 'none'";
 
         index index.html index.htm;
         root /usr/share/nginx/html;
@@ -150,11 +185,20 @@ server {
     ssl_verify_client off;
 
     # Headers usually for HTTP to secure content and interaction within web app. Can remove if need be
-    add_header X-Content-Type-Options "nosniff";
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-XSS-Protection "1; mode=block";
-    add_header X-Download-Options "noopen";
-    add_header Feature-Policy "geolocation 'self'; camera 'none'"
+    	# Instructs the browser not to override the response's Content-Type header
+    	add_header X-Content-Type-Options "nosniff";
+
+	# Page can only be framed by other pages on the same domain
+    	add_header X-Frame-Options "SAMEORIGIN";
+
+	# Enables the built-in XSS (Cross-Site Scripting) protection
+    	add_header X-XSS-Protection "1; mode=block";
+
+	# Informs the browser not to open files that are considered safe by the browser's security settings directly
+	add_header X-Download-Options "noopen";
+    	
+	#  Allows a website to specify which browser features and APIs it intends to use and from where
+	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
 	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
@@ -179,14 +223,29 @@ server {
 
         include includes/proxy_backend.conf;
 
-        add_header X-Content-Type-Options "nosniff";
-        add_header X-Frame-Options "SAMEORIGIN";
-        add_header X-XSS-Protection "1; mode=block";
-        add_header X-Download-Options "noopen";
-        add_header Feature-Policy "geolocation 'self'; camera 'none'";
-
         index index.html index.htm;
         root /usr/share/nginx/html;
+    }
+
+    # Apply rate limiting to /login.html
+    location /login.html {
+        client_max_body_size 0;
+
+        include includes/proxy_backend.conf;
+	index login.html login.htm;
+	root /usr/share/nginx/html;
+	limit_req zone=one;
+    }
+
+    # Apply rate limiting to /register.html
+    location /register.html {
+	client_max_body_size 0;
+
+        include includes/proxy_backend.conf;
+	index register.html register.htm;
+	root /usr/share/nginx/html;
+	limit_req zone=one;
+
     }
 
     include includes/location_common.conf;
