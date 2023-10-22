@@ -27,7 +27,9 @@ def register():
     username = data['username']
     password = data['password']
 
-    # TODO SANITIZE EMAIL & USERNAME
+    # Sanitize email and username
+    email = html.escape(email)
+    username = html.escape(username)
 
     if not email or not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400

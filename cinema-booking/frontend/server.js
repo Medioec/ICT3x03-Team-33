@@ -15,6 +15,14 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html'); // Serve the index.html from the root directory
 });
 
+//Headers checks, preventing content type attack/request forgery
+function checkHeaders(req, res, next) {
+    if (req.headers['content-type'] !== 'application/json' || req.headers['accept'] !== 'application/json') {
+        return res.status(400).send('Server expects application/json data');
+    }
+    next();
+}
+
 
 // ############################## IDENTITY SERVICE #########################################
 // handle GET request from login.html
@@ -22,8 +30,8 @@ app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/login.html');
 });
 
-// handle POST request from login.html
-app.post('/loginRequest', async (req, res) => {
+// handle POST request from login.html with header checks
+app.post('/loginRequest', checkHeaders, async (req, res) => {
     // send POST request from login form to identity service
     const response = await fetch("http://identity:8081/login", { 
         method: "POST",
@@ -65,8 +73,8 @@ app.get('/register', (req, res) => {
     res.sendFile(__dirname + '/register.html');
 });
 
-// handle POST request from register.html
-app.post('/registerRequest', async (req, res) => {
+// handle POST request from register.html with header checks
+app.post('/registerRequest', checkHeaders, async (req, res) => {
     // send POST request from register form to identity service
     const response = await fetch("http://identity:8081/register", { 
         method: "POST",
