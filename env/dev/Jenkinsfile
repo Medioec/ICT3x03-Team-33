@@ -1,11 +1,11 @@
 pipeline {
-    agent { label 'host' }
+    agent { label 'builtin' }
 
     stages {
         stage('Build') {
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/stg-build.sh'
+                sh './scripts/dev-build.sh'
             }
         }
         stage('OWASP DependencyCheck') {
@@ -18,11 +18,6 @@ pipeline {
                 sh './scripts/dev-deploy.sh'
                 echo 'Add test step here'
                 sh './scripts/dev-kill.sh'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                sh './scripts/stg-deploy.sh'
             }
         }
     }
