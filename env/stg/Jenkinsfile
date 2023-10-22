@@ -14,7 +14,7 @@ pipeline {
                 echo "Add test step here"
                 snykSecurity(
                     snykInstallation: 'Snyk',
-                    snykTokenId: 'd3c397ce-d278-4da3-9ec4-a8cb545c3921',
+                    snykTokenId: 'snyk-token',
                     // place other parameters here
                 )
                 sh './scripts/dev-kill.sh'
