@@ -1,32 +1,46 @@
 # ICT3x03-Team-33
-## Docker containers setup
-**All instructions are for windows powershell/cmd**
-For now, the environment variables are ran before `docker-compose`. Credentials are in our telechat group ;)
+## Important note for Windows environment
+### Fixing problems with CRLF
+Github Desktop changes LF to CRLF for linux .sh files which will break app functionality. Run the following commands in repository base directory when checking out the branch to fix CRLF problems.
+```
+git rm -rf --cached .
+git reset --hard HEAD
+```
+
+## Deploying containers in local dev environment
 1. Download Docker Desktop
 From this link: https://docs.docker.com/get-docker/
 
 2. Command to run all containers:
-Ensure you are in repository directory `cd cinema-booking` 
-then, run these commands in a batch
+Ensure you are in repository base directory (directory with README.md)
+then, run the dev scripts in the scripts/ directory
 
+#### Windows
 ```
-$Env:DB_NAME = <insert db name from tele>
-$Env:DB_USER = <insert db user from tele>
-$Env:DB_PASSWORD = <insert db password from tele>
-docker-compose up -d
+.\scripts\dev-build.bat
+.\scripts\dev-deploy.bat
+```
+#### Linux
+```
+./scripts/dev-build.sh
+./scripts/dev-deploy.sh
 ```
 
-3. Check if containers are running:
-On CLI, use these commands:
-`docker ps` (lists running containers)
+3. Check if containers are running:\
+On CLI, use these commands:\
+`docker ps` (lists running containers)\
 Then, navigate to the port number on your browser (e.g., `localhost:8080` for frontend)\
 **OR** \
-On Docker Desktop
-Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.
+On Docker Desktop\
+Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
-4. Stop containers before building & making changes
-On CLI, use these commands:
+4. Stop containers before building & making changes\
+On CLI, use the dev-build and dev-deploy convenience scripts for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.\
+or\
+Use these commands:\
 `docker stop [container name]` (e.g., docker stop cinema-booking-database-1)\
+or\
+`docker-compose down --volumes` (This removes all containers and database information. Remove `--volumes` if u want to keep database information. Keep if you want to reset database from init.sql)\
 **OR** \
-On Docker Desktop
+On Docker Desktop\
 Press the stop button on the "cinema-booking" main container
