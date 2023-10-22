@@ -45,7 +45,7 @@ def create_transaction():
 ##### End of create transaction entry #####
 
 #####     Retrieve all transaction by userId     #####
-@transaction_bp.route('/get_all_transactions_by_userId/<int:userId>', methods=['GET'])
+@transaction_bp.route('/get_all_transactions_by_userId/<uuid:userId>', methods=['GET'])
 def get_ticket_price_by_id(userId):
     try:
         conn = psycopg2.connect(**db_config)
