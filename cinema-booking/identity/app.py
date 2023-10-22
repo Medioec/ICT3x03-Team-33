@@ -139,17 +139,18 @@ def login():
             expirationTimestamp = current_time + expirationTime
             expirationTimestamp = expirationTimestamp.isoformat()
 
+            # generate session id
+            sessionId = user_utils.generateUUID()
+
             # get user role
             userRole = response.json()["userRole"]
-            additional_claims = {"userRole": userRole}
+            additional_claims = {"sessionId": sessionId,
+                                "userRole": userRole}
 
             # generate session token storing username + user role
             sessionToken = create_access_token(identity=username, expires_delta=expirationTime, additional_claims=additional_claims)
         except:
             return jsonify({"message": "Token generation error"}), 500
-        
-        # generate session id
-        sessionId = user_utils.generateUUID()
 
         # insert session token and expiry into db
         requestData = {
