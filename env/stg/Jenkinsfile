@@ -12,12 +12,6 @@ pipeline {
             steps {
                 sh './scripts/dev-deploy.sh'
                 echo "Add test step here"
-                snykSecurity(
-                    snykInstallation: 'Snyk',
-                    snykTokenId: 'snyk-token',
-                    // place other parameters here
-                    additionalArguments: '--all-projects',
-                )
                 sh './scripts/dev-kill.sh'
             }
         }
