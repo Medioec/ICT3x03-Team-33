@@ -68,7 +68,8 @@ def getMovieById(movie_id):
     try:
         #ensure movie_id is an integer
         validateInt = int(movie_id)
-        response = requests.get("http://databaseservice:8085/databaseservice/moviedetails/get_movie_by_id/"+ str(validateInt))
+        url = f"http://databaseservice:8085/databaseservice/moviedetails/get_movie_by_id/{validateInt}"
+        response = requests.get(url)
         if response.status_code == 200:
             return jsonify(response.json()), 200
         elif response.status_code == 404:
@@ -115,8 +116,8 @@ def updateMovieById(movie_id):
             "lang": lang,
             "subtitles": subtitles
         }
-        
-        response = requests.put("http://databaseservice:8085/databaseservice/moviedetails/update_movie_by_id/"+ str(validateInt), json=data)
+        url = f"http://databaseservice:8085/databaseservice/moviedetails/update_movie_by_id/{validateInt}"
+        response = requests.put(url)
         
         if response.status_code == 200:
             return jsonify({"message": "Update movie successful" }), 200
@@ -135,7 +136,8 @@ def deleteMovieById(movie_id):
         #ensure movie_id is an integer, throws exception otherwise
         validateInt = int(movie_id)
         
-        response = requests.delete("http://databaseservice:8085/databaseservice/moviedetails/delete_movie_by_id/"+ str(validateInt))
+        url = f"http://databaseservice:8085/databaseservice/moviedetails/delete_movie_by_id/{validateInt}"
+        response = requests.delete(url)
         if response.status_code == 200:
             return jsonify({"message": "Movie deleted successfully"}), 200
         elif response.status_code == 404:
