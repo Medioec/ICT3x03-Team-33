@@ -11,7 +11,6 @@ CREATE TABLE UserSessions (
     sessionId UUID PRIMARY KEY NOT NULL,
     userId UUID NOT NULL,
     expiryTimestamp TIMESTAMP NOT NULL,
-    privateKey VARCHAR(255) NOT NULL,
     currStatus VARCHAR(255) NOT NULL
 );
 
@@ -59,7 +58,20 @@ CREATE TABLE BookingDetails (
     showtimeId INT NOT NULL,
     userId UUID NOT NULL UNIQUE,
     ticketId INT UNIQUE NOT NULL,
+    ticketPriceId INT NOT NULL,
     PRIMARY KEY(seatId, showtimeId)
+);
+
+CREATE TABLE TicketPrice (
+    ticketPriceId SERIAL PRIMARY KEY NOT NULL,
+    ticketPriceCategory VARCHAR(255) NOT NULL,
+    ticketPriceValue NUMERIC(5,2) NOT NULL
+);
+
+CREATE TABLE Transaction (
+    transactionId UUID PRIMARY KEY NOT NULL,
+    creditCardId VARCHAR(255) NOT NULL,
+    transcationDateTime TIMESTAMP NOT NULL
 );
 
 -- Add foreign keys
@@ -90,6 +102,10 @@ FOREIGN KEY (showtimeId) REFERENCES Showtimes(showtimeId);
 ALTER TABLE BookingDetails
 ADD CONSTRAINT fk_booking_details_userId
 FOREIGN KEY (userId) REFERENCES CinemaUser(userId);
+
+ALTER TABLE Transaction
+ADD CONSTRAINT fk_transation_transactionId
+FOREIGN KEY (creditCardId) REFERENCES CreditCard(creditCardId);
 
 -- Insert 1 fake user data for testing
 INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
@@ -997,3 +1013,11 @@ VALUES
 
 -- Prints in console the contents of the Seat table
 SELECT * FROM Seat;
+
+-- Insert ticket prices into the TicketPrice table
+INSERT INTO TicketPrice (ticketPriceCategory, ticketPriceValue)
+VALUES
+('Adult', 10.50);
+
+-- Prints in console the contents of the TicketPrice table
+SELECT * FROM TicketPrice;

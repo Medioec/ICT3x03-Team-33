@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     <link rel="stylesheet" type="text/css" href="css/login.css">
 </head>
 <body>
-    <h1>Test Login</h1>
+    <h1>Test Register</h1>
 
-    <form id="login-form">
+    <form id="registration-form">
+        <label for="email"><b>Email</b></label>
+        <input type="text" id="email" placeholder="Enter Email" name="email" required>
+        <br>
+
         <label for="username"><b>Username</b></label>
         <input type="text" id="username" placeholder="Enter Username" name="username" required>
         <br>
@@ -18,11 +22,11 @@
         <input type="password" id="password" placeholder="Enter Password" name="password" required>
         <br>
 
-        <button id="login-button" type="submit">Login</button>
+        <button id="register-button" type="submit">Register</button>
         <br>
         <p id="error-message"></p>
     </form>
 
-    <script src="js/login.js"></script>
+    <script src="js/register.js"></script>
 </body>
 </html>
