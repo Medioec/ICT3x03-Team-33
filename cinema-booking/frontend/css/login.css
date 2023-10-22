@@ -161,7 +161,7 @@ span.validate-tooltip {
 }
 
 .wrapper {
-  width: 320px;
+  width: 504px;
   background: #fff;
   margin: 20px auto;
   min-height: 200px;
@@ -195,11 +195,11 @@ span.validate-tooltip {
   margin-right: 5px;
   margin-top: 2px;
   cursor: pointer;
-} */
+}
 
 .wrapper label[for="rememberMe"] {
   cursor: pointer;
-}
+} */
 
 .wrapper .signup-wrapper {
   padding: 10px;
@@ -248,4 +248,9 @@ span.validate-tooltip {
   z-index: 10;
 }
 
-  
+.guidelines{
+  text-decoration: none;
+  font-size: 0.6rem;
+  margin: 5px;
+  color: #8E8E8E;
+}
