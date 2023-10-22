@@ -12,14 +12,15 @@ server {
     listen 80 default_server;
 
     server_name 3x03.redapplepie.com;
-    	# Instructs the browser not to override the response's Content-Type header
-    	add_header X-Content-Type-Options "nosniff";
+
+    # Instructs the browser not to override the response's Content-Type header
+    add_header X-Content-Type-Options "nosniff";
 
 	# Page can only be framed by other pages on the same domain
-    	add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Frame-Options "SAMEORIGIN";
 
 	# Enables the built-in XSS (Cross-Site Scripting) protection
-    	add_header X-XSS-Protection "1; mode=block";
+    add_header X-XSS-Protection "1; mode=block";
 
 	# Informs the browser not to open files that are considered safe by the browser's security settings directly
 	add_header X-Download-Options "noopen";
@@ -95,77 +96,8 @@ server {
 server {
     listen 443 ssl;
 
-    server_name jenkins.3x03.redapplepie.com;
-    set $upstream http://jenkins:8080;
-
-    ssl_certificate /etc/letsencrypt/live/jenkins.3x03.redapplepie.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/jenkins.3x03.redapplepie.com/privkey.pem;
-    ssl_session_timeout 1d;
-    ssl_session_cache shared:MozSSL:10m;
-    ssl_session_tickets off;
-
-    ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-    ssl_prefer_server_ciphers off;
-
-    ssl_stapling on;
-    ssl_stapling_verify on;
-
-    ssl_verify_client off;
-
-    # Headers usually for HTTP to secure content and interaction within web app. Can remove if need be
-    	# Instructs the browser not to override the response's Content-Type header
-    	add_header X-Content-Type-Options "nosniff";
-
-	# Page can only be framed by other pages on the same domain
-    	add_header X-Frame-Options "SAMEORIGIN";
-
-	# Enables the built-in XSS (Cross-Site Scripting) protection
-    	add_header X-XSS-Protection "1; mode=block";
-
-	# Informs the browser not to open files that are considered safe by the browser's security settings directly
-	add_header X-Download-Options "noopen";
-    	
-	#  Allows a website to specify which browser features and APIs it intends to use and from where
-	add_header Feature-Policy "geolocation 'self'; camera 'none'";
-	
-	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
-	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
-
-	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
-	add_header Referrer-Policy "strict-origin";
-
-	# Ensures the browser only interacts with the server over HTTPS, reducing the risk of man-in-the-middle attacks.
-	add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
-
-	# Allows only geolocation access, restricting camera and microphone for enhanced user privacy.
-	add_header Permissions-Policy "geolocation=*, camera=(), microphone=()";
-
-	# Protects your site from being loaded in an iframe or object tag on another site, reducing risk of data leaks.
-	add_header Cross-Origin-Embedder-Policy require-corp;
-
-	# Ensures that newly opened windows (or tabs) originating from your site are not granted access back to the opening page, improving isolation.
-	add_header Cross-Origin-Opener-Policy same-origin;
-
-    location / {
-        client_max_body_size 0;
-
-        include includes/proxy_backend.conf;
-
-        index index.html index.htm;
-        root /usr/share/nginx/html;
-    }
-
-    include includes/location_common.conf;
-}
-
-server {
-    listen 443 ssl;
-
     server_name 3x03.redapplepie.com;
-    set $upstream http://localhost:9000;
+    set $upstream http://frontend:8080;
 
     ssl_certificate /etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem;

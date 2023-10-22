@@ -1,0 +1,24 @@
+pipeline {
+    agent { label 'host' }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'chmod 700 -R scripts/'
+                sh './scripts/prod-build.sh'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh './scripts/dev-deploy.sh'
+                echo "Add test step here"
+                sh './scripts/dev-kill.sh'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh './scripts/prod-deploy.sh'
+            }
+        }
+    }
+}

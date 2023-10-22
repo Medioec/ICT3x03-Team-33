@@ -27,66 +27,46 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
-        ports:
-            - "8080:8080"
 
     # ports for services exposed to test the containers
     # will remove ports once we implement the APIs
     identity:
-        build: 
-            context: ./cinema-booking
-            dockerfile: ./identity/Dockerfile
+        build: ./cinema-booking/identity
         networks:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
         environment:
-            - PYTHONUNBUFFERED=1  
-        ports:
-            - "8081:8081"
+            - PYTHONUNBUFFERED=1
 
     movie:
-        build: 
-            context: ./cinema-booking
-            dockerfile: ./movie/Dockerfile
+        build: ./cinema-booking/movie
         networks:
             - frontend-to-movie
             - movie-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
-        ports:
-            - "8082:8082"
     
     booking:
-        build: 
-            context: ./cinema-booking
-            dockerfile: ./booking/Dockerfile
+        build: ./cinema-booking/booking
         networks:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
-        ports:
-            - "8083:8083"
 
     payment:
-        build: 
-            context: ./cinema-booking
-            dockerfile: ./payment/Dockerfile
+        build: ./cinema-booking/payment
         networks:
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
-        ports:
-            - "8084:8084"
 
     databaseservice:
-        build: 
-            context: ./cinema-booking
-            dockerfile: ./databaseservice/Dockerfile
+        build: ./cinema-booking/databaseservice
         networks:
             - identity-to-databaseservice
             - movie-to-databaseservice
@@ -99,8 +79,6 @@ services:
             - DB_NAME=${DB_NAME}
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
-        ports:
-            - "8085:8085"
 
     database:
         build:
@@ -114,8 +92,6 @@ services:
         volumes:
             - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
-        ports:
-            - "5432:5432"
 
 networks:
   waf-to-frontend:
