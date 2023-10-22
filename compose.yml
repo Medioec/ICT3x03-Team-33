@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     nginx-waf:
-        image: custom-nginx-waf
+        build: ./nginx-waf/
         networks:
             - waf-to-frontend
         ports:
@@ -19,7 +19,6 @@ services:
             - HEALTH=${HEALTH}
         restart: always
         privileged: true
-        build: ./nginx-waf/
 
     frontend:
         build: ./cinema-booking/frontend
