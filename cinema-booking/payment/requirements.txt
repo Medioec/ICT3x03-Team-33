@@ -2,3 +2,5 @@ Flask==3.0.0
 flask-cors==4.0.0
 Werkzeug==3.0.0
 requests==2.31.0
+pycryptodome==3.19.0
+requests==2.31.0

@@ -5,7 +5,7 @@ FROM python:3.8-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY booking/requirements.txt /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
@@ -15,6 +15,12 @@ RUN apt-get update
 
 # Install ping utility
 RUN apt-get install -y iputils-ping
+
+# Copy common files
+COPY common/ /app
+
+# Copy app directory contents into the container at /app
+COPY booking/ /app
 
 # Make port 80 available to the world outside this container
 EXPOSE 8083
