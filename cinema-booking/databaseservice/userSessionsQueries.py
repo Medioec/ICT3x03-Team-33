@@ -114,3 +114,38 @@ def update_timestamp():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 #####   End of updating keys and expiry   #####
+
+##### Store encryption key associated with SessionID, for testing purpose, almost duplicate of user session #####
+@user_sessions_bp.route('/store_key_in_database', methods=['POST'])
+def store_key_in_database():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        userId = data['userId']
+        expiryTimestamp = data['expiryTimestamp']
+        currStatus = data['currStatus']
+        encryptionKey = data['fernet_key']
+        sessionId = data['sessionId']
+        
+        
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus, encryptionKey) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus, encryptionKey))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        # login result and encrypted hash, expiry timestamp
+        return jsonify({
+            "loginResult": "Success",  # This can be dynamic based on your login logic
+            "expiryTimestamp": expiryTimestamp,
+            "message" : "your mother pass, passaway"
+            }), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"error": str(e),
+                        "message":"your mother failure"}), 500
+##### End of Store encryption key associated with SessionID #####    
+
