@@ -1,17 +1,19 @@
 from argon2 import PasswordHasher
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes
+from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required)
+import os
 import json
 import requests
 import user_utils
-from credit_card import CreditCard
-from api_crypto import decrypt_gcm_to_bytes
+import base64
 
 app = Flask(__name__)
 CORS(app)
@@ -29,7 +31,9 @@ def register():
     username = data['username']
     password = data['password']
 
-    # TODO SANITIZE EMAIL & USERNAME
+    # Sanitize email and username
+    #email = html.escape(email)
+    #username = html.escape(username)
 
     if not email or not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -95,6 +99,11 @@ def login():
     data = request.get_json()
     username = data['username']
     password = data['password']
+    
+    #Generating userPW with salted that will be used for will be used to encrypt/decrypt user info
+    fix_salt = b'\x00' * 16
+    phlogin = PasswordHasher(parallelism=1, memory_cost=1048576, time_cost=4, salt_len=16)
+    loginhash = phlogin.hash(password, salt = fix_salt)
 
     if not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -120,9 +129,31 @@ def login():
         
     
     else:
-        # hash password from login form
+        # hash password from DB
         dbHash = response.json()["passwordHash"]
+        ph = PasswordHasher()
+        
+        # Generate a Fernet encryption key using the salted password hash
+        phkeylogin = PasswordHasher(memory_cost=1048576, parallelism=2, salt_len=16, hash_len=32)
+        key_material = phkeylogin.hash(loginhash)
 
+        km_byte = key_material.encode('utf-8')
+        fernet_key = base64.urlsafe_b64encode(km_byte[:32])
+        fernet_str = base64.urlsafe_b64encode(km_byte[:32]).decode()
+        # Create dictionary with encoded, then serialize the dictionary
+        #fernet_json = json.dumps({"fernet_key": fernet_str})
+        cipher_suite = Fernet(fernet_key)
+        
+
+        # Example of Encryption 
+        # encrypted_data = cipher_suite.encrypt(b"Sensitive Data")
+        
+        # Encrypt the user_passwordhash_salted
+        encrypted_dbHash = cipher_suite.encrypt(loginhash.encode())
+        
+        # Example of Decryption
+        # decrypted_data = cipher_suite.decrypt(encrypted_data)
+        
         try:
             # verify password
             ph = PasswordHasher()
@@ -143,7 +174,8 @@ def login():
 
             # generate session id
             sessionId = user_utils.generateUUID()
-
+            
+            
             # get user role
             userRole = response.json()["userRole"]
             additional_claims = {"sessionId": sessionId,
@@ -153,16 +185,20 @@ def login():
             sessionToken = create_access_token(identity=username, expires_delta=expirationTime, additional_claims=additional_claims)
         except:
             return jsonify({"message": "Token generation error"}), 500
-
-        # insert session token and expiry into db
+        
+        # After generating the encryption key (fernet_key)
+        # insert session token, sessionID, encryption_key and expiry into db
         requestData = {
+            "fernet_key": fernet_str,
             "sessionId": sessionId,
             "userId": response.json()["userId"],
             "expiryTimestamp": expirationTimestamp,
-            "currStatus": "active"
+            "currStatus": "active",
+            #"encrypted_dbHash": encrypted_dbHash  # Store the encrypted hash
         }
-
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+        
+        #response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/store_key_in_database", json=requestData)
 
         # get error message from response if insert unsuccessful
         if response.status_code != 201:
