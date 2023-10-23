@@ -1,6 +1,6 @@
 from api_crypto import *
 import base64
-import fernet
+from cryptography.fernet import Fernet
 
 class CreditCard:
     card_num: str
@@ -15,14 +15,14 @@ class CreditCard:
     @classmethod
     def decrypt_from_b64_blob(cls, b64: str, hash: bytes, encryption_key: bytes):
         """Use the encrypted hash in JWT and encryption key to decrypt a b64 blob. Returns class object."""
-        f = fernet.Fernet(encryption_key)
-        key = f.decrypt(hash)
+        f = Fernet(encryption_key)
+        key = base64.b64decode(f.decrypt(hash) + b"===")
         return cls.decrypt_from_gcm(b64, key)
     
     def encrypt_to_b64_blob(self, hash: bytes, encryption_key: bytes):
         """Use the encrypted hash in JWT and encryption key to encrypt to a b64 blob."""
-        f = fernet.Fernet(encryption_key)
-        key = f.decrypt(hash)
+        f = Fernet(encryption_key)
+        key = base64.b64decode(f.decrypt(hash) + b"===")
         return self.encrypt_card_to_gcm(key)
     
     @classmethod

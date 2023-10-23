@@ -9,7 +9,6 @@ CORS(app)
 
 @app.route('/makePayment', methods=["POST"])
 def makePayment():
-    app.logger.info()
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
@@ -28,14 +27,14 @@ def makePayment():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690001"})
     if response.status_code != 200:
         return jsonify({"error": "690002"})
     
     b64key = response.json()["encryptionKey"]
-    encryption_key = base64.b64decode(b64key)
+    encryption_key = b64key.encode()
     
     # decrypt card blob with encryption key and hash
     card = CreditCard.decrypt_from_b64_blob(blob, hash, encryption_key)
@@ -106,14 +105,14 @@ def addCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690101"})
     if response.status_code != 200:
         return jsonify({"error": "690102"})
     
     b64key = response.json()["encryptionKey"]
-    encryption_key = base64.b64decode(b64key)
+    encryption_key = b64key.encode()
         
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
     card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
@@ -158,15 +157,49 @@ def getCreditCard(userId, creditCardId):
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit card"}), 500
     
-@app.route('/getAllCreditCards/<uuid:userId>', methods=["GET"])
+@app.route('/getAllCreditCards/<uuid:userId>', methods=["POST"])
 def getAllCreditCards(userId):
+    data = request.get_json()
+    userId = data['userId']
+    # TODO - Will need to pass in session information in POST request. To take from JWT
+    sessionId = data['sessionId']
+    hash = data['hash']
+    
     # Make an HTTP GET request to the databaseservice to retrieve all credit cards
     url = f"http://databaseservice:8085/databaseservice/creditcard/get_all_credit_cards/{userId}"
     response = requests.get(url)
     
     if response.status_code == 200:
         # Credit cards were retrieved successfully, return the response from the databaseservice
-        return response.json(), 200
+        cc_list = response.json()
+        # Get session encryption key from db here
+        payload = {
+            "sessionId": sessionId
+        }
+        try:
+            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+        except:
+            return jsonify({"error": "690201"})
+        if response.status_code != 200:
+            return jsonify({"error": "690202"})
+        
+        b64key = response.json()["encryptionKey"]
+        encryption_key = b64key.encode()
+        
+        response_list = []
+        for card in cc_list:
+            creditCardId = card["creditCardId"]
+            blob = card["blob"]
+            dec_card = CreditCard.decrypt_from_b64_blob(blob, hash, encryption_key)
+            dictobj = {
+                "creditCardId": creditCardId,
+                "creditCardNumber": dec_card.card_num,
+                "creditCardName": dec_card.name,
+                "creditCardExpiry": dec_card.expiry
+            }
+            response_list.append(dictobj)
+        
+        return jsonify(response_list), 200
     elif response.status_code == 404:
         # No credit cards found, return HTTP 404 Not Found
         return jsonify({"message": "No credit cards found"}), 404
@@ -202,14 +235,14 @@ def updateOneCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
     except:
-        return jsonify({"error": "690201"})
+        return jsonify({"error": "690301"})
     if response.status_code != 200:
-        return jsonify({"error": "690202"})
+        return jsonify({"error": "690302"})
     
     b64key = response.json()["encryptionKey"]
-    encryption_key = base64.b64decode(b64key)
+    encryption_key = b64key.encode()
     
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
     card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)

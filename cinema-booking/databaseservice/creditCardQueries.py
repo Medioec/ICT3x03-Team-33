@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 import os
 import psycopg2
+import psycopg2.extras
 import base64
 from psycopg2 import IntegrityError 
 
@@ -12,6 +13,8 @@ db_config = {
     "password": os.getenv("DB_PASSWORD"),
     "host": os.getenv("DB_HOST"),
 }
+
+psycopg2.extras.register_uuid()
 
 #####     Create a new credit card entry for user in the database     #####
 @credit_card_bp.route('/add_credit_card', methods=['POST'])

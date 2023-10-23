@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 import os
 import psycopg2
+import datetime
 
 user_sessions_bp = Blueprint("user_sessions", __name__)
 
@@ -57,7 +58,7 @@ def get_user_session():
 
         # Query session data
         select_query = "SELECT userId, expiryTimestamp, currStatus, encryptionKey FROM UserSessions WHERE sessionId = %s"
-        cursor.execute(select_query, (sessionId))
+        cursor.execute(select_query, (sessionId,))
         conn.commit()
         data_result = cursor.fetchall()
 

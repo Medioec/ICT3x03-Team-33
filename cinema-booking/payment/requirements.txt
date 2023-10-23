@@ -4,3 +4,4 @@ Werkzeug==3.0.0
 requests==2.31.0
 pycryptodome==3.19.0
 requests==2.31.0
+cryptography==41.0.4
