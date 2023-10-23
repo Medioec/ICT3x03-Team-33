@@ -42,6 +42,46 @@ def create_user_session():
         return jsonify({"error": str(e)}), 500
 #####     End of create session     #####
 
+
+#####     Get session info given a sessionId     #####
+@user_sessions_bp.route('/get_user_session', methods=['POST'])
+def get_user_session():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        sessionId = data['sessionId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Query session data
+        select_query = "SELECT userId, expiryTimestamp, currStatus, encryptionKey FROM UserSessions WHERE sessionId = %s"
+        cursor.execute(select_query, (sessionId))
+        conn.commit()
+        data_result = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # Separate the data into two attributes in a JSON response
+        if data_result:
+            userId, expiryTimestamp, currStatus, encryptionKey = data_result[0]
+            response_data = {
+                "userId": userId,
+                "expiryTimestamp": expiryTimestamp,
+                "currStatus": currStatus,
+                "encryptionKey": encryptionKey
+            }
+            return jsonify(response_data), 200
+        else:
+            return jsonify({"message": "No data found"}), 404
+
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        return jsonify({"error": str(e)}), 500
+#####     End of create session     #####
+
 ##### Retrieves userId, password hash and user role from database #####
 @user_sessions_bp.route('/get_userId_hash_role', methods=['POST'])
 def get_hash_role():

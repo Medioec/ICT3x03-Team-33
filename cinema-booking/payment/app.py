@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import user_utils
+from credit_card import *
+
 app = Flask(__name__)  
 CORS(app)
 
 @app.route('/makePayment', methods=["POST"])
 def makePayment():
+    app.logger.info()
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
@@ -14,15 +17,35 @@ def makePayment():
     creditCardName = data['creditCardName']
     creditCardExpiry = data['creditCardExpiry']
     cvv = data['cvv']
+    # TODO - Will need to pass in session information in POST request. To take from JWT
+    sessionId = data['sessionId']
+    hash = data['hash']
     
-    # TODO - decrypt information?
+    # TODO - decrypt information
+    # TODO - clarify if need to get the blob from db first? How does make payment work? FOLLOW UP
+    # Get session encryption key from db here
+    payload = {
+        "sessionId": sessionId
+    }
+    try:
+        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+    except:
+        return jsonify({"error": "690001"})
+    if response.status_code != 200:
+        return jsonify({"error": "690002"})
+    
+    b64key = response.json()["encryptionKey"]
+    encryption_key = base64.b64decode(b64key)
+    
+    # decrypt card blob with encryption key and hash
+    card = CreditCard.decrypt_from_b64_blob(blob, hash, encryption_key)
     
     # validate cc information
-    if not user_utils.validateCreditCardNumber(blob):
+    if not user_utils.validateCreditCardNumber(card.card_num):
         return jsonify({"message": "Invalid credit card number"}), 400
-    if not user_utils.validateCreditCardName(creditCardName):
+    if not user_utils.validateCreditCardName(card.name):
         return jsonify({"message": "Invalid credit card name"}), 400
-    if not user_utils.validateCreditCardExpiry(creditCardExpiry):
+    if not user_utils.validateCreditCardExpiry(card.expiry):
         return jsonify({"message": "Invalid credit card expiry date"}), 400
     if not user_utils.validateCvv(cvv):
         return jsonify({"message": "Invalid CVV"}), 400
@@ -58,15 +81,18 @@ def makePayment():
 def addCreditCard():
     # Retrieve credit card details from request
     data = request.get_json()
-    # Credit card number is named as blob in the request. Also stored as raw bytes in the database.
-    blob = data['blob']
+    creditCardNumber = data['creditCardNumber']
     creditCardName = data['creditCardName']
     creditCardExpiry = data['creditCardExpiry']
     cvv = data['cvv']
     userId = data['userId']
+    # TODO - Will need to pass in session information in POST request. To take from JWT
+    sessionId = data['sessionId']
+    hash = data['hash']
+    
     
     # validate cc information
-    if not user_utils.validateCreditCardNumber(blob):
+    if not user_utils.validateCreditCardNumber(creditCardNumber):
         return jsonify({"message": "Invalid credit card number"}), 400
     if not user_utils.validateCreditCardName(creditCardName):
         return jsonify({"message": "Invalid credit card name"}), 400
@@ -75,13 +101,28 @@ def addCreditCard():
     if not user_utils.validateCvv(cvv):
         return jsonify({"message": "Invalid CVV"}), 400
     
-    # TODO - Perform cryptography on information
+    # Get session encryption key from db here
+    payload = {
+        "sessionId": sessionId
+    }
+    try:
+        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+    except:
+        return jsonify({"error": "690101"})
+    if response.status_code != 200:
+        return jsonify({"error": "690102"})
+    
+    b64key = response.json()["encryptionKey"]
+    encryption_key = base64.b64decode(b64key)
+        
+    # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
     
     # Form JSON data to be sent to the databaseservice
-    # TODO - change blob varaiable to ones that have cryptography applied
     credit_card_data = {
         "userId": userId,
-        "blob": blob, # need change this one IS peeps
+        "blob": b64,
         # cvv not stored in database
     }
     
@@ -137,15 +178,17 @@ def getAllCreditCards(userId):
 def updateOneCreditCard():
     # Retrieve credit card details from request
     data = request.get_json()
-    # Credit card number is named as blob in the request. Also stored as raw bytes in the database.
-    blob = data['blob']
+    creditCardNumber = data['creditCardNumber']
     creditCardName = data['creditCardName']
     creditCardExpiry = data['creditCardExpiry']
     cvv = data['cvv']
     userId = data['userId']
+    # TODO - Will need to pass in session information in POST request. To take from JWT
+    sessionId = data['sessionId']
+    hash = data['hash']
     
     # validate cc information
-    if not user_utils.validateCreditCardNumber(blob):
+    if not user_utils.validateCreditCardNumber(creditCardNumber):
         return jsonify({"message": "Invalid credit card number"}), 400
     if not user_utils.validateCreditCardName(creditCardName):
         return jsonify({"message": "Invalid credit card name"}), 400
@@ -154,15 +197,28 @@ def updateOneCreditCard():
     if not user_utils.validateCvv(cvv):
         return jsonify({"message": "Invalid CVV"}), 400
     
-    # TODO - Perform cryptography on information.
-    # cc number, name, expiry should be transformed into one blob of typebytea aka. raw bytes
+    # Get session encryption key from db here
+    payload = {
+        "sessionId": sessionId
+    }
+    try:
+        response = requests.post("http://databaseservice:8085/databaseservice/creditcard/get_user_session", json=payload)
+    except:
+        return jsonify({"error": "690201"})
+    if response.status_code != 200:
+        return jsonify({"error": "690202"})
     
-    # Form JSON data to be sent to the databaseservice
-    # TODO - change blob variable to the one that have cryptography applied
-        
+    b64key = response.json()["encryptionKey"]
+    encryption_key = base64.b64decode(b64key)
+    
+    # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
+    
+    # Form JSON data to be sent to the databaseservice        
     updated_credit_card_data = {
         "userId": userId,
-        "blob": blob, # need change this one IS peeps
+        "blob": b64, # need change this one IS peeps
         # cvv not stored in database
     }
         
