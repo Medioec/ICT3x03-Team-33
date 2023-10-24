@@ -157,8 +157,8 @@ def getCreditCard(userId, creditCardId):
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit card"}), 500
     
-@app.route('/getAllCreditCards/<uuid:userId>', methods=["POST"])
-def getAllCreditCards(userId):
+@app.route('/getAllCreditCards', methods=["POST"])
+def getAllCreditCards():
     data = request.get_json()
     userId = data['userId']
     # TODO - Will need to pass in session information in POST request. To take from JWT
