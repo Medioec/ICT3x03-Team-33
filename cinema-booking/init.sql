@@ -58,6 +58,7 @@ CREATE TABLE BookingDetails (
     seatId VARCHAR(255) NOT NULL,
     showtimeId INT NOT NULL,
     userId UUID NOT NULL UNIQUE,
+    transactionId UUID NOT NULL,
     ticketId INT UNIQUE NOT NULL,
     ticketPriceId INT NOT NULL,
     PRIMARY KEY(seatId, showtimeId)
@@ -69,7 +70,7 @@ CREATE TABLE TicketPrice (
     ticketPriceValue NUMERIC(5,2) NOT NULL
 );
 
-CREATE TABLE Transaction (
+CREATE TABLE Transactions (
     transactionId UUID PRIMARY KEY NOT NULL,
     creditCardId INT NOT NULL,
     transcationDateTime TIMESTAMP NOT NULL
@@ -104,8 +105,12 @@ ALTER TABLE BookingDetails
 ADD CONSTRAINT fk_booking_details_userId
 FOREIGN KEY (userId) REFERENCES CinemaUser(userId);
 
-ALTER TABLE Transaction
-ADD CONSTRAINT fk_transaction_transactionId
+ALTER TABLE BookingDetails
+ADD CONSTRAINT fk_booking_details_transactionId
+FOREIGN KEY (transactionId) REFERENCES Transactions(transactionId);
+
+ALTER TABLE Transactions
+ADD CONSTRAINT fk_transaction_creditCardId
 FOREIGN KEY (creditCardId) REFERENCES CreditCard(creditCardId);
 
 -- Insert 1 fake user data for testing
