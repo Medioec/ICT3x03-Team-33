@@ -3,6 +3,7 @@ services:
     nginx-waf:
         build: ./nginx-waf/
         networks:
+            - internet-access
             - waf-to-frontend
         ports:
             - '${HTTP_PORT}:80'
@@ -28,8 +29,6 @@ services:
             - frontend-to-booking
             - frontend-to-movie
 
-    # ports for services exposed to test the containers
-    # will remove ports once we implement the APIs
     identity:
         build: ./cinema-booking/identity
         networks:
@@ -94,28 +93,41 @@ services:
             - postgres_container:/var/lib/postgresql/data
 
 networks:
+  internet-access:
+    driver: bridge
   waf-to-frontend:
     driver: bridge
+    internal: true
   frontend-to-identity:
     driver: bridge
+    internal: true
   frontend-to-booking:
-    driver: bridge  
+    driver: bridge
+    internal: true
   frontend-to-movie:
     driver: bridge
+    internal: true
   booking-to-payment:
     driver: bridge
+    internal: true
   identity-to-payment:
-    driver: bridge  
+    driver: bridge
+    internal: true
   identity-to-databaseservice:
     driver: bridge
+    internal: true
   movie-to-databaseservice:
     driver: bridge
+    internal: true
   payment-to-databaseservice:
     driver: bridge
+    internal: true
   booking-to-databaseservice:
     driver: bridge
+    internal: true
   databaseservice-to-database:
-    driver: bridge        
+    driver: bridge
+    internal: true    
 
 volumes:
   postgres_container:
