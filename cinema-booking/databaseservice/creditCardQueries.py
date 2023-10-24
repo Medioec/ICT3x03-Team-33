@@ -61,7 +61,7 @@ def get_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == userId:
+        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
             # If the user owns the credit card, retrieve it
             select_query = "SELECT * FROM CreditCard WHERE creditCardId = %s"
             cursor.execute(select_query, (creditCardId,))
@@ -141,7 +141,7 @@ def update_credit_card():
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == newUserId:
+        if owner_id and str(owner_id[0]) == newUserId:
             # If the user owns the credit card, update it
             update_query = "UPDATE CreditCard SET userId = %s, blob = %s WHERE creditCardId = %s"
             cursor.execute(update_query, (newUserId, newBlob, creditCardId))
@@ -170,7 +170,7 @@ def delete_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == userId:
+        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
             # If the user owns the credit card, delete it
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()

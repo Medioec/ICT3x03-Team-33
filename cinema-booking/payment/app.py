@@ -84,7 +84,6 @@ def addCreditCard():
     creditCardName = data['creditCardName']
     creditCardExpiry = data['creditCardExpiry']
     cvv = data['cvv']
-    userId = data['userId']
     # TODO - Will need to pass in session information in POST request. To take from JWT
     sessionId = data['sessionId']
     hash = data['hash']
@@ -111,8 +110,11 @@ def addCreditCard():
     if response.status_code != 200:
         return jsonify({"error": "690102"})
     
-    b64key = response.json()["encryptionKey"]
+    rjson = response.json()
+    b64key = rjson["encryptionKey"]
     encryption_key = b64key.encode()
+    
+    userId = rjson['userId']
         
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
     card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
@@ -211,11 +213,11 @@ def getAllCreditCards():
 def updateOneCreditCard():
     # Retrieve credit card details from request
     data = request.get_json()
+    creditCardId = data['creditCardId']
     creditCardNumber = data['creditCardNumber']
     creditCardName = data['creditCardName']
     creditCardExpiry = data['creditCardExpiry']
     cvv = data['cvv']
-    userId = data['userId']
     # TODO - Will need to pass in session information in POST request. To take from JWT
     sessionId = data['sessionId']
     hash = data['hash']
@@ -241,8 +243,11 @@ def updateOneCreditCard():
     if response.status_code != 200:
         return jsonify({"error": "690302"})
     
-    b64key = response.json()["encryptionKey"]
+    rjson = response.json()
+    b64key = rjson["encryptionKey"]
     encryption_key = b64key.encode()
+    
+    userId = rjson['userId']
     
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
     card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
@@ -251,6 +256,7 @@ def updateOneCreditCard():
     # Form JSON data to be sent to the databaseservice        
     updated_credit_card_data = {
         "userId": userId,
+        "creditCardId": creditCardId,
         "blob": b64, # need change this one IS peeps
         # cvv not stored in database
     }
