@@ -20,7 +20,6 @@ pipeline {
             steps {
                 sh 'chmod 700 -R scripts/'
                 sh './scripts/stg-build.sh'
-                sh './scripts/stg-kill-volumes.sh'
                 sh './scripts/stg-deploy.sh'
             }
         }
