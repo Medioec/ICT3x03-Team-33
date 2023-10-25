@@ -8,19 +8,12 @@ import re
 # Validate credit card number
 def validateCreditCardNumber(creditCardNumber):
     # Check if the card number has a valid length
-    if len(creditCardNumber) != 16:
+    if not (13 <= len(creditCardNumber) <= 19):
         return False
 
-    # Perform Luhn algorithm (Modulus 10 check)
-    digits = [int(digit) for digit in creditCardNumber]
-    checksum = 0
-    for i in range(len(digits) - 2, -1, -2):
-        double_digit = digits[i] * 2
-        if double_digit > 9:
-            double_digit -= 9
-        digits[i] = double_digit
-    checksum = sum(digits) % 10
-    return checksum == 0
+    return True
+
+
 
 # Validate credit card name
 def validateCreditCardName(creditCardName):

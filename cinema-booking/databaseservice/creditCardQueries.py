@@ -1,6 +1,8 @@
 from flask import request, jsonify, Blueprint
 import os
 import psycopg2
+import psycopg2.extras
+import base64
 from psycopg2 import IntegrityError 
 
 credit_card_bp = Blueprint("credit_card", __name__)
@@ -12,6 +14,8 @@ db_config = {
     "host": os.getenv("DB_HOST"),
 }
 
+psycopg2.extras.register_uuid()
+
 #####     Create a new credit card entry for user in the database     #####
 @credit_card_bp.route('/add_credit_card', methods=['POST'])
 def add_credit_card():
@@ -19,13 +23,16 @@ def add_credit_card():
         data = request.get_json()
         userId = data['userId']
         blob = data['blob']
+        
+        # convert blob to bytes
+        blob_bytes = base64.b64decode(blob)
 
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
         insert_query = "INSERT INTO CreditCard (userId, blob) VALUES (%s, %s)"
         try:
-            cursor.execute(insert_query, (userId, blob))
+            cursor.execute(insert_query, (userId, blob_bytes))
             conn.commit()
             cursor.close()
             conn.close()
@@ -54,7 +61,7 @@ def get_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == userId:
+        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
             # If the user owns the credit card, retrieve it
             select_query = "SELECT * FROM CreditCard WHERE creditCardId = %s"
             cursor.execute(select_query, (creditCardId,))
@@ -64,7 +71,7 @@ def get_credit_card_by_id(userId, creditCardId):
                 one_credit_card = {
                     "creditCardId": credit_card[0],
                     "userId": credit_card[1],
-                    "blob": credit_card[2]
+                    "blob": base64.b64encode(credit_card[2]).decode() # encode to b64 string
                 }
                 return jsonify(one_credit_card), 200
             else:
@@ -100,7 +107,7 @@ def get_all_credit_cards(userId):
                     one_credit_card = {
                         "creditCardId": credit_card[0],
                         "userId": credit_card[1],
-                        "blob": credit_card[2]
+                        "blob": base64.b64encode(credit_card[2]).decode() # encode to b64 string
                     }
                     all_credit_cards_list.append(one_credit_card)
 
@@ -123,6 +130,9 @@ def update_credit_card():
         newUserId = data.get('userId')
         newBlob = data.get('blob')
         
+        # convert blob to bytes
+        blob_bytes = base64.b64decode(newBlob)
+        
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
         
@@ -131,7 +141,7 @@ def update_credit_card():
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == newUserId:
+        if owner_id and str(owner_id[0]) == newUserId:
             # If the user owns the credit card, update it
             update_query = "UPDATE CreditCard SET userId = %s, blob = %s WHERE creditCardId = %s"
             cursor.execute(update_query, (newUserId, newBlob, creditCardId))
@@ -160,7 +170,7 @@ def delete_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and owner_id[0] == userId:
+        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
             # If the user owns the credit card, delete it
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()

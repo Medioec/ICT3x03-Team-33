@@ -5,7 +5,7 @@ FROM python:3.8-slim
 WORKDIR /app
 
 # Copy requirements.txt
-COPY requirements.txt /app
+COPY movie/requirements.txt /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
@@ -16,8 +16,11 @@ RUN apt-get update
 # Install ping utility
 RUN apt-get install -y iputils-ping
 
-# Copy the rest of the files
-COPY . /app
+# Copy common files
+COPY common/ /app
+
+# Copy app directory contents into the container at /app
+COPY movie/ /app
 
 # Make port 80 available to the world outside this container
 EXPOSE 8082
