@@ -1,0 +1,36 @@
+version: '3.3'
+services:
+    ubuntu:
+        image: ubuntu
+        networks:
+            - cinema-test_waf-to-frontend
+            - cinema-test_frontend-to-identity
+            - cinema-test_frontend-to-booking
+            - cinema-test_booking-to-payment
+            - cinema-test_frontend-to-movie
+            - cinema-test_databaseservice-to-database
+        command: bash -c 'cat nonexistent'
+
+networks:
+  cinema-test_waf-to-frontend:
+    external: true
+  cinema-test_frontend-to-identity:
+    external: true
+  cinema-test_frontend-to-booking:
+    external: true 
+  cinema-test_frontend-to-movie:
+    external: true
+  cinema-test_booking-to-payment:
+    external: true
+  cinema-test_identity-to-payment:
+    external: true
+  cinema-test_identity-to-databaseservice:
+    external: true
+  cinema-test_movie-to-databaseservice:
+    external: true
+  cinema-test_payment-to-databaseservice:
+    external: true
+  cinema-test_booking-to-databaseservice:
+    external: true
+  cinema-test_databaseservice-to-database:
+    external: true

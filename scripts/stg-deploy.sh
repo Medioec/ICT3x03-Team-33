@@ -3,5 +3,6 @@
 cp env/stg/.env .env
 docker compose -p cinema-stg -f secure-compose.yml down --volumes
 docker compose -p cinema-stg -f secure-compose.yml up -d --force-recreate
-
+status=$?
 rm .env
+exit=$status
