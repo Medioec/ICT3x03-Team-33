@@ -87,7 +87,10 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     volumes:
+      - ./init-user-db.sh/docker-entrypoint-initdb.d/init-user-db.sh
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_container:/var/lib/postgresql/data
     ports:

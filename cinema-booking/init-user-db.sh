@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+DB_PASSWORD = $DB_PASSWORD
+
+psql -v ON_ERROR_STOP=1 --username "$DB_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+	CREATE USER cinema_user WITH ENCRYPTED PASSWORD '$DB_PASSWORD';
+	CREATE DATABASE cinema_db;
+    ALTER ROLE cinema_user SET SESSION AUTHORIZATION cinema_user;
+	GRANT CONNECT ON DATABASE cinema_db TO cinema_db;
+	GRANT USAGE ON SCHEMA public TO cinema_db;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO cinema_db;
+EOSQL
