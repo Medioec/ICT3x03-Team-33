@@ -1,3 +1,4 @@
+import html
 from argon2 import PasswordHasher
 from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
@@ -28,8 +29,8 @@ def register():
     password = data['password']
 
     # Sanitize email and username
-    #email = html.escape(email)
-    #username = html.escape(username)
+    email = html.escape(email)
+    username = html.escape(username)
 
     if not email or not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -135,7 +136,7 @@ def login():
     
     # Generate a Fernet encryption key using password
     fix_salt = b'\x00' * 16
-    phlogin = PasswordHasher(parallelism=1, memory_cost=1048576, time_cost=4, salt_len=16)
+    phlogin = PasswordHasher(parallelism=1, memory_cost=262144, time_cost=4, salt_len=16)
     loginhash = phlogin.hash(password, salt = fix_salt)
     
     # Extract hash only from raw hash raw-> $argon2i$v=19$m=16,t=2,p=1$YXNmYXNmc2E$lDi8mox+g9cUyEIcC/NDFqZlJmLvZ4doW16LzRiHMVU
