@@ -56,7 +56,9 @@ app.post('/loginRequest', checkHeaders, async (req, res) => {
         res.cookie('token', data.sessionToken, { 
             path: '/', // set the cookie path to root, so that it is accessible for all routes
             maxAge: expiryDelta, // set the cookie expiry time
-            httpOnly: true, // make the cookie accessible only through HTTP(S) requests
+            httpOnly: true, // ensures that the cookie is only accessible by the server and not by client-side scripts running in the browser
+			// TODO: Uncomment the following line when HTTPS is enabled
+			//secure: true,
         });
 
         res.send({'message': 'Login successful!'});
@@ -67,6 +69,14 @@ app.post('/loginRequest', checkHeaders, async (req, res) => {
         res.send(data);
     }
 });
+
+// TODO: Uncomment the following line when HTTPS is enabled
+// Implement the HTTP Strict Transport Security (HSTS) header
+// app.use((req, res, next) => {
+    // res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    // next();
+// });
+
 
 // handle GET request from register.html
 app.get('/register', (req, res) => {
