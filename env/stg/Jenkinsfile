@@ -9,23 +9,18 @@ pipeline {
                 sh './scripts/dev-kill.sh'
             }
         }
-        stage('Build') {
-            agent { label 'host' }
-            steps {
-                sh 'chmod 700 -R scripts/'
-                sh './scripts/stg-build.sh'
-            }
-        }
         stage('OWASP DependencyCheck') {
             agent { label 'host' }
             steps {
                 dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
-        stage('Deploy') {
+        stage('Build and Deploy') {
             agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
+                sh './scripts/stg-build.sh'
+                sh './scripts/stg-kill-volumes.sh'
                 sh './scripts/stg-deploy.sh'
             }
         }
