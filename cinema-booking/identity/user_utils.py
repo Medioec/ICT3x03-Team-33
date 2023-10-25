@@ -18,8 +18,11 @@ def isUsernameAvailable(username):
         return True 
     
      # username is taken
-    else:
+    elif response.status_code == 200:
         return False 
+    
+    else:
+        raise Exception("Error occurred")
 
 # check if email is available/does not exist in db
 def isEmailAvailable(email):
@@ -30,9 +33,12 @@ def isEmailAvailable(email):
     if response.status_code == 404:
         return True 
     
-     # username is taken
-    else:
+     # email is taken
+    elif response.status_code == 200:
         return False 
+
+    else:
+        raise Exception("Error occurred")
 
 # ensure that username is 3 - 16 characters, and only alphanumeric
 def validateUsername(username):
