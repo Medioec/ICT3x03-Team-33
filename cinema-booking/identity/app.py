@@ -5,7 +5,7 @@ from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
-                                get_jwt, jwt_required)
+                                jwt_required, get_jwt_identity)
 import json
 import requests
 import user_utils
@@ -47,7 +47,7 @@ def register():
             return jsonify({"message": "Username is already taken"}), 409
     
     except Exception as e:
-        return jsonify({"message": {e}}), 500
+        return jsonify({"message": {str(e)}}), 500
     
     # check if email address is valid
     try:
@@ -61,7 +61,7 @@ def register():
         if not user_utils.isEmailAvailable(email):
             return jsonify({"message": "Email is already in use"}), 409
     except Exception as e:
-        return jsonify({"message": {e}}), 500
+        return jsonify({"message": {str(e)}}), 500
 
     ph = PasswordHasher()
     hash = ph.hash(password)
@@ -112,7 +112,7 @@ def login():
         if user_utils.isUsernameAvailable(username):
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
-        return jsonify({"message": {e}}), 500
+        return jsonify({"message": {str(e)}}), 500
 
 
     # get password hash and role from db
@@ -216,6 +216,8 @@ def login():
         # return session token to client 
         return jsonify({"sessionToken": sessionToken}), 200
 ############################## END OF LOGIN #########################################
-       
+
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
