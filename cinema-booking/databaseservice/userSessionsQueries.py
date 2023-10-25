@@ -190,3 +190,48 @@ def store_key_in_database():
                         "message":"your mother failure"}), 500
 ##### End of Store encryption key associated with SessionID #####    
 
+#####     Delete a user session by its ID     #####
+@user_sessions_bp.route('/delete_session_by_id', methods=['DELETE'])
+def delete_session_by_id():
+    try:
+        # get sessionId from json
+        data = request.get_json()
+        sessionId = data['sessionId']
+        print(sessionId)
+
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if session exists
+        select_query = "SELECT * FROM usersessions WHERE sessionId = %s"
+        
+        cursor.execute(select_query, (sessionId,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+        print("select query pass")
+
+        # Delete session if it exists
+        if session:
+            print("session exists")
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            delete_query = "DELETE FROM usersessions WHERE sessionId = %s"
+            cursor.execute(delete_query, (sessionId,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            print("delete success")
+            return jsonify({"message": "Session deleted successfully"}), 200
+        else:
+            # Movie does not exist
+            print("session not found")
+            return jsonify({"message": "Session not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+#####     End of delete user session by ID     #####

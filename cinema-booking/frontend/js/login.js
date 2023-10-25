@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
-          console.log(document.cookie);
           // TODO: REPLACE WITH LOGIN SUCCESS CODE
           document.getElementById("error-message").textContent = data.message;
         });
@@ -77,5 +76,27 @@ document.addEventListener("DOMContentLoaded", function () {
       var pattern = /^[a-zA-Z0-9]{3,16}$/;
       return pattern.test(value);
     }, "Please provide a valid username.");
+
+    $("#logout-button").click(async function () {
+      try {
+          const response = await fetch("/logout", {
+              method: "DELETE", 
+              headers: {
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+              },
+          });
+          
+          if (response.ok) {
+              // TODO LOGOUT SUCCESS CODE (e.g. redirect)
+          } else {
+              // Handle error or show a message to the user
+              console.error('Logout failed');
+          }
+      } catch (error) {
+          console.error('An error occurred during logout', error);
+      }
+  });
+
   })(jQuery);
   

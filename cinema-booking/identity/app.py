@@ -217,7 +217,26 @@ def login():
         return jsonify({"sessionToken": sessionToken}), 200
 ############################## END OF LOGIN #########################################
 
+############################## LOGOUT #########################################
+@app.route("/logout", methods=["DELETE"])
+@jwt_required() # verifies jwt integrity
+def logout():
+    # get sessionId from jwt
+    sessionId = get_jwt_identity()
 
+    if not sessionId:
+        return jsonify({"message": "Error: No token sent"}), 500
+    
+    # delete session in db
+    print(sessionId)
+    requestData = {"sessionId": sessionId}
+    response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
+
+    if response.status_code == 200:
+        return jsonify({"message": "Logout successful"}), 200
+    else:
+        return jsonify({"message": "Database error"}), 500
+############################## END OF LOGOUT #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
