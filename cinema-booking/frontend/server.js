@@ -11,7 +11,8 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(__dirname)); // Serve static files from the root directory
 
-app.set('view engine', 'ejs'); // for conditional rendering
+app.set('view engine', 'ejs');
+app.set('views', __dirname); // Assuming your EJS files are in a folder named 'views'
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html'); // Serve the index.html from the root directory
@@ -28,60 +29,52 @@ function checkHeaders(req, res, next) {
 // ############################## TESTING AUTH PAGE REDIRECTION #########################################
 
 // testing basicAuth (check if jwt token is valid)
+// used for basic pages that users can access without logging in (e.g. homepage, movie listings)
+// only diff is the rendering of the navbar
 app.get('/test', async (req, res) => {
-    userRole = "admin";
-    res.render('test', { userRole });
+    try {
+        // get cookie
+        const token = req.cookies.token;
     
-    // res.sendFile(__dirname + '/pages/movielistings.html');
+        // if token exists, query identity service to check if token is valid
+        if (token) {
+            const response = await fetch("http://identity:8081/basicAuth", { 
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
 
-    // try {
-    //     // get cookie
-    //     const token = req.cookies.token;
-    
-    //     // if token exists, query identity service to check if token is valid
-    //     if (token) {
-    //         const response = await fetch("http://identity:8081/basicAuth", { 
-    //             method: "POST",
-    //             headers: {
-    //                 "Accept": "application/json",
-    //                 "Content-Type": "application/json",
-    //                 "Authorization": `Bearer ${token}`
-    //             }
-    //         });
+            console.log('Response:', response);
 
-    //         console.log('Response:', response);
-
-    //         // get result of token validation
-    //         if (response.status === 200) {
-    //             // If the token is valid
-    //             console.log('Token is valid');
-
-    //             // TODO: REPLACE WITH LOGGED IN CODE (e.g. logged in navbar)
-    //         } 
+            // get result of token validation
+            if (response.status === 200) {
+                // If the token is valid, user is logged in
+                loggedIn = true;
+                res.render('test.ejs', { loggedIn });
+            } 
           
-    //         //  if token is invalid
-    //         else {
-    //             // TODO: REPLACE WITH LOGIC FOR HANDLING THIS CASE 
-
-    //             // FOR TESTING: if token invalid, redirect to login page
-    //             console.log('Token is invalid');
-    //             res.redirect('/login');
-    //         }
-    //     } 
+            // if token invalid, redirect to login page
+            else {
+                res.redirect('/login');
+            }
+        }
         
-    //     // if token is not present
-    //     else {
-    //         // TODO: REPLACE WITH LOGIC FOR HANDLING THIS CASE 
-    //         console.log("Token not present");
-    //     }
+        // if token is not present, user is not logged in
+        else {
+            loggedIn = false;
+            res.render('test.ejs', { loggedIn });
+        }
 
-    //     res.sendFile(__dirname + '/pages/movielistings.html');
+        res.sendFile(__dirname + '/pages/movielistings.html');
 
-    // } catch (error) {
-    //     // Handle any errors that might occur during the process
-    //     console.error('Error:', error);
-    //     res.status(500).send('Internal Server Error');
-    // }
+    } catch (error) {
+        // Handle any errors that might occur during the process
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.get('/moviedetails', (req, res) => {

@@ -8,10 +8,11 @@
 <body>
   <h1>Welcome</h1>
   
-  <% if (userRole === 'admin') { %>
-    <p>You have admin privileges.</p>
+  <!-- to replace with logged in and normal navbar display -->
+  <% if (loggedIn === true) { %>
+    <p>You are logged in.</p>
   <% } else { %>
-    <p>You have regular user privileges.</p>
+    <p>You are not logged in.</p>
   <% } %>
 
   <!-- Other content of your dashboard -->
