@@ -231,3 +231,46 @@ def delete_session_by_id():
         return jsonify({"error": str(e)}), 500
 
 #####     End of delete user session by ID     #####
+
+#####     Update a user session status by its ID     #####
+@user_sessions_bp.route('/update_session_status_by_id', methods=['PUT'])
+def update_session_status_by_id():
+    try:
+        # get sessionId from json
+        data = request.get_json()
+        sessionId = data['sessionId']
+        currStatus = data['currStatus']
+
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if session exists
+        select_query = "SELECT * FROM usersessions WHERE sessionId = %s"
+        
+        cursor.execute(select_query, (sessionId,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+
+        # Delete session if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            delete_query = "UPDATE usersessions SET currStatus = %s WHERE sessionId = %s"
+            cursor.execute(delete_query, (currStatus, sessionId,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "Session status updated successfully"}), 200
+        else:
+            # Session does not exist
+            return jsonify({"message": "Session not found"}), 404
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+#####     End of update user session status by ID     #####
