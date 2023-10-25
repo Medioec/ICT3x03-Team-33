@@ -29,8 +29,12 @@ services:
             - frontend-to-booking
             - frontend-to-movie
 
+    # ports for services exposed to test the containers
+    # will remove ports once we implement the APIs
     identity:
-        build: ./cinema-booking/identity
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./identity/Dockerfile
         networks:
             - frontend-to-identity
             - identity-to-payment
@@ -39,7 +43,9 @@ services:
             - PYTHONUNBUFFERED=1
 
     movie:
-        build: ./cinema-booking/movie
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./movie/Dockerfile
         networks:
             - frontend-to-movie
             - movie-to-databaseservice
@@ -47,7 +53,9 @@ services:
             - PYTHONUNBUFFERED=1
     
     booking:
-        build: ./cinema-booking/booking
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./booking/Dockerfile
         networks:
             - frontend-to-booking
             - booking-to-payment
@@ -56,7 +64,9 @@ services:
             - PYTHONUNBUFFERED=1
 
     payment:
-        build: ./cinema-booking/payment
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./payment/Dockerfile
         networks:
             - identity-to-payment
             - booking-to-payment
@@ -65,7 +75,9 @@ services:
             - PYTHONUNBUFFERED=1
 
     databaseservice:
-        build: ./cinema-booking/databaseservice
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./databaseservice/Dockerfile
         networks:
             - identity-to-databaseservice
             - movie-to-databaseservice
