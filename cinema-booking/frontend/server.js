@@ -68,8 +68,6 @@ app.get('/test', async (req, res) => {
             res.render('test.ejs', { loggedIn });
         }
 
-        res.sendFile(__dirname + '/pages/movielistings.html');
-
     } catch (error) {
         // Handle any errors that might occur during the process
         console.error('Error:', error);
