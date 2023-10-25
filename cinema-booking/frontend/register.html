@@ -41,7 +41,7 @@
           <span class="lighting"></span>
         </div>
 
-        <a class="guidelines">Password must be 8 - 32 characters long with at least 1 uppercase, 1 lowercase, 1
+        <a class="guidelines">Password must be 12 - 32 characters long with at least 1 uppercase, 1 lowercase, 1
           special character and 1 number.</a>
   
         <div class="input-group" id="passwordInputGroup">
@@ -51,7 +51,13 @@
           <span class="lighting"></span>
         </div>
         
-        <button type="submit" id="register-button">Register</button>
+        <div class="recaptcha-error">
+          <!-- using localhost sitekey, need to generate a new once deployed on server -->
+          <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdDtsooAAAAAHj_xBabr_6QUfmu3cUnSSQSnKTP"
+            data-callback="onSuccess" data-action="action"></div>
+        </div>
+
+        <button type="submit" id="register-button" disabled>Register</button>
 
       </form>
       <br>
@@ -65,6 +71,7 @@
     </div>
   </div>
 
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
   <script src="/js/register.js"></script>
   <script src="/js/nav.js"></script>
