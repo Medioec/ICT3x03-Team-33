@@ -26,6 +26,63 @@ function checkHeaders(req, res, next) {
     next();
 }
 
+// ############################## AUTHENTICATION MIDDLEWARE #########################################
+// function to check if the user has the required role to access the page
+async function checkUserRole(requiredRole) {
+    return async (req, res, next) => {
+        try {
+            // get cookie
+            const token = req.cookies.token;
+
+            // if user is not logged in, redirect to login page
+            if (!token) {
+                res.redirect('/login');
+                return res.status(401).send('Unauthorized');
+            }
+
+            // get user role from cookie
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.userRole;
+
+            // if user doesn't have permission, send forbidden error
+            if (userRole !== requiredRole) {
+                return res.status(403).send('Access Forbidden');
+            }
+
+            // verify their role using identity service
+            try {
+                const response = await fetch("http://identity:8081/enhancedAuth", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                const responseData = await response.json();
+
+                console.log(responseData);
+
+                // if validation fails, user doesn't have permissions
+                if (response.status !== 200) {
+                    return res.status(403).send('Access Forbidden');
+                }
+
+                // if validation passes, call next middleware
+                next();
+            } catch (error) {
+                console.error('Error in checkUserRole middleware:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        } catch (error) {
+            console.error('Error in checkUserRole middleware:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    };
+}
+// ############################## END OF AUTHENTICATION MIDDLEWARE #########################################
+
 // ############################## TESTING AUTH PAGE REDIRECTION #########################################
 
 // testing basicAuth (check if jwt token is valid)
@@ -50,7 +107,7 @@ app.get('/test', async (req, res) => {
             console.log('Response:', response);
 
             // get result of token validation
-            if (response.status === 200) {
+            if (response.status == 200) {
                 // If the token is valid, user is logged in
                 loggedIn = true;
                 res.render('test.ejs', { loggedIn });
@@ -75,10 +132,26 @@ app.get('/test', async (req, res) => {
     }
 });
 
-app.get('/moviedetails', (req, res) => {
-    res.sendFile(__dirname + '/pages/moviedetails.html');
+// testing enhancedAuth (check if jwt token is valid and user has the required role)
+app.get('/user', async (req, res, next) => {
+    try {
+        // ensure that user has role = member
+        const isMember = await checkUserRole('member');
+  
+        if (isMember) {
+            loggedIn = true;
+            res.send('Welcome to the user page!');
+            res.render('roleAuth.ejs', { loggedIn });
+        } 
+        
+        else {
+            res.status(403).send('Forbidden: Access denied');
+        }
+        } catch (error) {
+        console.error('Error checking user role:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
-
 // ############################## END OF TESTING AUTH PAGE REDIRECTION #########################################
 
 // ############################## IDENTITY SERVICE #########################################

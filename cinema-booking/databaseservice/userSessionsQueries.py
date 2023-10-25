@@ -288,9 +288,9 @@ def get_role_by_id():
         cursor = conn.cursor()
 
         # Construct the SQL query to retrieve the user role using userId
-        select_data_query = "SELECT userRole FROM usersessions WHERE userId = %s "
+        select_data_query = "SELECT userRole FROM cinemauser WHERE userId = %s "
         cursor.execute(select_data_query, (userId,))
-        data_result = cursor.fetchall()
+        data_result = cursor.fetchone()
 
         # Close the cursor and the database connection
         cursor.close()
@@ -300,6 +300,7 @@ def get_role_by_id():
         if data_result:
             # Assuming there's one result
             userRole = data_result[0]
+
             response_data = {
                 "userRole": userRole
             }
