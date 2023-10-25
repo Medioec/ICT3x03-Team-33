@@ -1,28 +1,30 @@
 pipeline {
     agent none
     stages {
-        stage('Build') {
-            parallel {
-                stage('Build Dev') {
-                    agent { label 'builtin' }
-                    steps {
-                        sh 'chmod 700 -R scripts/'
-                        sh './scripts/dev-build.sh'
+        parallel {
+            stage('Build') {
+                parallel {
+                    stage('Build Dev') {
+                        agent { label 'builtin' }
+                        steps {
+                            sh 'chmod 700 -R scripts/'
+                            sh './scripts/dev-build.sh'
+                        }
                     }
-                }
-                stage('Build Stg') {
-                    agent { label 'host' }
-                    steps {
-                        sh 'chmod 700 -R scripts/'
-                        sh './scripts/stg-build.sh'
+                    stage('Build Stg') {
+                        agent { label 'host' }
+                        steps {
+                            sh 'chmod 700 -R scripts/'
+                            sh './scripts/stg-build.sh'
+                        }
                     }
                 }
             }
-        }
-        stage('OWASP DependencyCheck') {
-            agent { label 'host' }
-            steps {
-                dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
+            stage('OWASP DependencyCheck') {
+                agent { label 'host' }
+                steps {
+                    dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
+                }
             }
         }
         stage('Test') {
