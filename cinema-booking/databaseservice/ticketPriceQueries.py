@@ -6,8 +6,8 @@ ticket_price_bp = Blueprint("ticket_price", __name__)
 
 db_config = {
     "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
+    "user": os.getenv("DB_NORMALUSER"),
+    "password": os.getenv("DB_NORMALPASSWORD"),
     "host": os.getenv("DB_HOST"),
 }
 
