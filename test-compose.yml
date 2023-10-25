@@ -9,7 +9,7 @@ services:
             - cinema-test_booking-to-payment
             - cinema-test_frontend-to-movie
             - cinema-test_databaseservice-to-database
-        command: bash -c 'cat nonexistent'
+        command: bash -c 'echo test'
 
 networks:
   cinema-test_waf-to-frontend:
