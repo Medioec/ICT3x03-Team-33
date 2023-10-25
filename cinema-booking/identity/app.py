@@ -242,6 +242,52 @@ def logout():
         return jsonify({"message": "Database error"}), 500
 ############################## END OF LOGOUT #########################################
 
+############################## AUTH #########################################
+@jwt.unauthorized_loader
+def unauthorized_callback(callback):
+    print("unauthorized callback")
+    return jsonify({"message": "Unauthorized access"}), 401
+
+# check if user is logged in with valid token
+@app.route("/basicAuth", methods=["POST"])
+@jwt_required() # verifies jwt integrity + expiry
+def basicAuth():
+    print("basic auth")
+    return jsonify({"message": "Authenticated"}), 200
+
+# check if user is logged in with valid token and verify their role
+@app.route("/enhancedAuth", methods=["POST"])
+@jwt_required() # verifies jwt integrity + expiry
+def enhancedAuth():
+    # get session id + role from token
+    sessionId = get_jwt_identity()
+    token = get_jwt()
+    role = token["userRole"]
+
+    print("token role", role)
+          
+    # check against db to see if it's a legit token
+    requestData = {"sessionId": sessionId}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    
+    if response.status_code != 200:
+        return jsonify({"message": "Database error"}), 500
+
+    # get userId from db
+    userId = response.json()["userId"]
+    
+    # check that the user role in the db matches the user role in the token
+    requestData = {"userId": userId}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
+    dbRole = response.json()["userRole"]
+
+    print("db role", dbRole)
+
+    if role != dbRole:
+        return jsonify({"message": "Invalid token"}), 401
+    else:
+        return jsonify({"message": "Authenticated"}), 200
+############################## END OF AUTH #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)

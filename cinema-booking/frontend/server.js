@@ -9,8 +9,10 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
-
 app.use(express.static(__dirname)); // Serve static files from the root directory
+
+app.set('view engine', 'ejs'); // for conditional rendering
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html'); // Serve the index.html from the root directory
 });
@@ -23,6 +25,70 @@ function checkHeaders(req, res, next) {
     next();
 }
 
+// ############################## TESTING AUTH PAGE REDIRECTION #########################################
+
+// testing basicAuth (check if jwt token is valid)
+app.get('/test', async (req, res) => {
+    userRole = "admin";
+    res.render('test', { userRole });
+    
+    // res.sendFile(__dirname + '/pages/movielistings.html');
+
+    // try {
+    //     // get cookie
+    //     const token = req.cookies.token;
+    
+    //     // if token exists, query identity service to check if token is valid
+    //     if (token) {
+    //         const response = await fetch("http://identity:8081/basicAuth", { 
+    //             method: "POST",
+    //             headers: {
+    //                 "Accept": "application/json",
+    //                 "Content-Type": "application/json",
+    //                 "Authorization": `Bearer ${token}`
+    //             }
+    //         });
+
+    //         console.log('Response:', response);
+
+    //         // get result of token validation
+    //         if (response.status === 200) {
+    //             // If the token is valid
+    //             console.log('Token is valid');
+
+    //             // TODO: REPLACE WITH LOGGED IN CODE (e.g. logged in navbar)
+    //         } 
+          
+    //         //  if token is invalid
+    //         else {
+    //             // TODO: REPLACE WITH LOGIC FOR HANDLING THIS CASE 
+
+    //             // FOR TESTING: if token invalid, redirect to login page
+    //             console.log('Token is invalid');
+    //             res.redirect('/login');
+    //         }
+    //     } 
+        
+    //     // if token is not present
+    //     else {
+    //         // TODO: REPLACE WITH LOGIC FOR HANDLING THIS CASE 
+    //         console.log("Token not present");
+    //     }
+
+    //     res.sendFile(__dirname + '/pages/movielistings.html');
+
+    // } catch (error) {
+    //     // Handle any errors that might occur during the process
+    //     console.error('Error:', error);
+    //     res.status(500).send('Internal Server Error');
+    // }
+});
+
+app.get('/moviedetails', (req, res) => {
+    res.sendFile(__dirname + '/pages/moviedetails.html');
+});
+
+// ############################## END OF TESTING AUTH PAGE REDIRECTION #########################################
 
 // ############################## IDENTITY SERVICE #########################################
 // handle GET request from login.html
