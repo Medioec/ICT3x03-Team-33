@@ -52,14 +52,14 @@ def validateUsername(username):
 with open('/app/wordlist/blacklistedPW.txt', 'r', encoding='latin-1') as f:
     BLACKLISTED_PASSWORDS = set(line.strip() for line in f)
 
-# ensure that password is 8 - 32 characters with at least 1 uppercase, 1 lowercase, 1 special character and 1 number
+# ensure that password is 12 - 32 characters with at least 1 uppercase, 1 lowercase, 1 special character and 1 number
 def validatePassword(password):
     # Check if password is in the blacklist
     if password in BLACKLISTED_PASSWORDS:
         return False
 
     # Regular expression pattern check
-    pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,32}$"
+    pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d]).{12,32}$"
     if re.match(pattern, password):
         return True
     # if password does not meet the requirements
