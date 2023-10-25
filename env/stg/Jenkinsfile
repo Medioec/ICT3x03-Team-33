@@ -1,12 +1,22 @@
 pipeline {
     agent none
     stages {
-        stage('Test') {
-            agent { label 'builtin' }
-            steps {
-                sh './scripts/dev-deploy.sh'
-                echo 'Add test step here'
-                sh './scripts/dev-kill.sh'
+        stage('Build') {
+            parallel {
+                stage('Build Dev') {
+                    agent { label 'builtin' }
+                    steps {
+                        sh 'chmod 700 -R scripts/'
+                        sh './scripts/dev-build.sh'
+                    }
+                }
+                stage('Build Stg') {
+                    agent { label 'host' }
+                    steps {
+                        sh 'chmod 700 -R scripts/'
+                        sh './scripts/stg-build.sh'
+                    }
+                }
             }
         }
         stage('OWASP DependencyCheck') {
@@ -15,11 +25,19 @@ pipeline {
                 dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
-        stage('Build and Deploy') {
+        stage('Test') {
+            agent { label 'builtin' }
+            steps {
+                sh 'chmod 700 -R scripts/'
+                sh './scripts/dev-deploy.sh'
+                echo 'Add test step here'
+                sh './scripts/dev-kill.sh'
+            }
+        }
+        stage('Deploy') {
             agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/stg-build.sh'
                 sh './scripts/stg-deploy.sh'
             }
         }
