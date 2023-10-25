@@ -29,8 +29,6 @@ services:
             - frontend-to-booking
             - frontend-to-movie
 
-    # ports for services exposed to test the containers
-    # will remove ports once we implement the APIs
     identity:
         build: 
             context: ./cinema-booking

@@ -5,8 +5,8 @@ services:
         networks:
             - waf-to-frontend
         ports:
-            - '${HTTP_PORT}:80'
-            - '${HTTPS_PORT}:443'
+            - '${HTTP_PORT}'
+            - '${HTTPS_PORT}'
         volumes:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
@@ -28,7 +28,7 @@ services:
             - frontend-to-booking
             - frontend-to-movie
         ports:
-            - "8080:8080"
+            - "${FRONTEND_PORT}"
 
     # ports for services exposed to test the containers
     # will remove ports once we implement the APIs
@@ -43,7 +43,7 @@ services:
         environment:
             - PYTHONUNBUFFERED=1  
         ports:
-            - "8081:8081"
+            - "${IDENTITY_PORT}"
 
     movie:
         build: 
@@ -55,7 +55,7 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
         ports:
-            - "8082:8082"
+            - "${MOVIE_PORT}"
     
     booking:
         build: 
@@ -68,7 +68,7 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
         ports:
-            - "8083:8083"
+            - "${BOOKING_PORT}"
 
     payment:
         build: 
@@ -81,7 +81,7 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
         ports:
-            - "8084:8084"
+            - "${PAYMENT_PORT}"
 
     databaseservice:
         build: 
@@ -100,13 +100,13 @@ services:
             - DB_USER=${DB_USER}
             - DB_PASSWORD=${DB_PASSWORD}
         ports:
-            - "8085:8085"
+            - "${DBSERVICE_PORT}"
 
     database:
         build:
             context: ./cinema-booking/database
         networks:
-        - databaseservice-to-database
+            - databaseservice-to-database
         environment:
             - POSTGRES_DB=${DB_NAME}
             - POSTGRES_USER=${DB_USER}
@@ -115,7 +115,7 @@ services:
             - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
         ports:
-            - "5432:5432"
+            - "${DB_PORT}"
 
 networks:
   waf-to-frontend:
