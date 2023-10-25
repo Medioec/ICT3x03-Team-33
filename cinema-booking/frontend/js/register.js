@@ -92,26 +92,31 @@ document.addEventListener("DOMContentLoaded", function () {
         required: true,
         minlength: 3,
         maxlength: 16,
+        pattern: /^[a-zA-Z0-9]{3,16}$/
       },
       userPassword: {
         required: true,
         minlength: 12,
         maxlength: 32,
+        pattern: /^.{12,32}$/
       },
     },
     messages: {
       email: {
         required: "Please enter your email address.",
+        email: "Please provide a valid email address."
       },
       username: {
         required: "Please enter your username.",
         minlength: "Username must be at least 3 characters long.",
         maxlength: "Username cannot be more than 16 characters long.",
+        pattern: "Please provide a valid username."
       },
       userPassword: {
         required: "Please enter your password.",
         minlength: "Password must be at least 12 characters long.",
         maxlength: "Password cannot be more than 32 characters long.",
+        pattern: "Please provide a valid password."
       }
     }
   });
@@ -129,7 +134,7 @@ function isUsernameValid(username) {
 }
 
 function isPasswordValid(password) {
-  var passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z\d]).{12,32}$/;
+  var passwordPattern = /^.{12,32}$/;
   return passwordPattern.test(password);
 }
 
