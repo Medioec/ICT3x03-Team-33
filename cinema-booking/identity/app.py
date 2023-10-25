@@ -228,7 +228,6 @@ def logout():
         return jsonify({"message": "Error: No token sent"}), 500
     
     # delete session in db
-    print(sessionId)
     requestData = {"sessionId": sessionId}
     response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
 

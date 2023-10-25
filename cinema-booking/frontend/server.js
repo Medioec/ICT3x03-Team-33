@@ -94,32 +94,34 @@ app.post('/registerRequest', checkHeaders, async (req, res) => {
 
 // logout and delete cookie
 app.delete('/logout', async (req, res) => {
-    // get cookie
-    const token = req.cookies.token;
+    try {
+        // get cookie
+        const token = req.cookies.token;
 
-    // send DELETE request containing jwt token to identity service to delete in db
-    const response = await fetch("http://identity:8081/logout", { 
-        method: "DELETE",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` // send jwt token in Authorization header
-        }
-    });
+        // send DELETE request containing jwt token to identity service to delete in db
+        const response = await fetch("http://identity:8081/logout", { 
+            method: "DELETE",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // send jwt token in Authorization header
+            }
+        });
 
-    // parse the response received from the identity service
-    const data = await response.json();
-    console.log(data);
+        // parse the response received from the identity service
+        const data = await response.json();
 
-    // if delete successful, unset cookie
-    res.clearCookie('token');
+        // if delete successful, unset cookie
+        res.clearCookie('token');
 
-    // Send response to the client
-    res.json({ message: 'Logout successful' });
-    // or if you prefer to send a plain text response
-    // res.send('Logout successful');
-
-    // TODO: add any other logout logic here (page redirection, render diff navbar, etc.)
+        // Send response to the client
+        res.json({ message: data });
+        
+    } catch (error) {
+        // Handle other errors that might occur
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 // ############################## END OF IDENTITY SERVICE #########################################
 

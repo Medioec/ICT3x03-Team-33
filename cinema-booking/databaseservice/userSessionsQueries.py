@@ -197,7 +197,6 @@ def delete_session_by_id():
         # get sessionId from json
         data = request.get_json()
         sessionId = data['sessionId']
-        print(sessionId)
 
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -211,11 +210,9 @@ def delete_session_by_id():
         cursor.close()
         conn.close()
         
-        print("select query pass")
 
         # Delete session if it exists
         if session:
-            print("session exists")
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()
 
@@ -225,10 +222,9 @@ def delete_session_by_id():
 
             cursor.close()
             conn.close()
-            print("delete success")
             return jsonify({"message": "Session deleted successfully"}), 200
         else:
-            # Movie does not exist
+            # Session does not exist
             print("session not found")
             return jsonify({"message": "Session not found"}), 404
     except Exception as e:

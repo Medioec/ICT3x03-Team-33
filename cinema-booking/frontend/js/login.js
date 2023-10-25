@@ -89,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
           
           if (response.ok) {
               // TODO LOGOUT SUCCESS CODE (e.g. redirect)
+              console.log('Logout successful');
           } else {
               // Handle error or show a message to the user
               console.error('Logout failed');
