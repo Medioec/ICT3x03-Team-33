@@ -169,7 +169,7 @@ span.validate-tooltip {
 }
 
 .wrapper .inner-warpper {
-  padding: 50px 30px 60px;
+  padding: 50px 30px 40px;
   box-shadow: 1px 1.732px 10px 0px rgba(0, 0, 0, 0.063);
 }
 
@@ -235,6 +235,7 @@ span.validate-tooltip {
 
 #error-message {
   color: red;
+  margin-top: 20px
 }
 
 #togglePassword {
@@ -253,4 +254,34 @@ span.validate-tooltip {
   font-size: 0.6rem;
   margin: 5px;
   color: #8E8E8E;
+}
+
+#login-button{
+  margin-top: 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+#login-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+#register-button{
+  margin-top: 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+#register-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }

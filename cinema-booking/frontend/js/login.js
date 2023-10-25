@@ -1,16 +1,48 @@
+// Define a function to check if username and password are filled correctly
+function checkUsernamePassword() {
+  const $userNameInput = $("#userName");
+  const $userPasswordInput = $("#userPassword");
+  return $userNameInput.val() && $userPasswordInput.val();
+}
+
+// Define the onSuccess function to handle the captcha callback
+function onSuccess() {
+  const $loginButton = $("#login-button");
+  if (checkUsernamePassword() && grecaptcha.getResponse()) {
+    $loginButton.prop("disabled", false);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-    $("#login-button").click(async function (event) {
-      event.preventDefault();
-  
-      if ($("#login-form").valid()) {
-        const username = $("#userName").val();
-        const password = $("#userPassword").val();
-  
-        const data = {
-          username: username,
-          password: password
-        };
-  
+  const $loginButton = $("#login-button");
+  const $userNameInput = $("#userName");
+  const $userPasswordInput = $("#userPassword");
+
+  $userNameInput.on("input", function () {
+    if (checkUsernamePassword()) {
+      onSuccess(); // Check and enable the login button
+    }
+  });
+
+  $userPasswordInput.on("input", function () {
+    if (checkUsernamePassword()) {
+      onSuccess(); // Check and enable the login button
+    }
+  });
+
+  $loginButton.click(async function (event) {
+    event.preventDefault();
+
+    if ($("#login-form").valid()) {
+      const username = $userNameInput.val();
+      const password = $userPasswordInput.val();
+
+      const data = {
+        username: username,
+        password: password
+      };
+
+      if (grecaptcha.getResponse()) { // Check if reCAPTCHA is completed
         await fetch("/loginRequest", {
           method: "POST",
           headers: {
@@ -24,80 +56,83 @@ document.addEventListener("DOMContentLoaded", function () {
           // TODO: REPLACE WITH LOGIN SUCCESS CODE
           document.getElementById("error-message").textContent = data.message;
         });
+      } else {
+        alert("Please complete the reCAPTCHA.");
       }
-    });
+    }
   });
-  
-  (function($) {
-    $('.palceholder').click(function() {
-      $(this).siblings('input').focus();
-    });
-  
-    $('.form-control').focus(function() {
-      $(this).parent().addClass("focused");
-    });
-  
-    $('.form-control').blur(function() {
-      var $this = $(this);
-      if ($this.val().length == 0)
-        $(this).parent().removeClass("focused");
-    });
-    $('.form-control').blur();
-  
-    $.validator.setDefaults({
-      errorElement: 'span',
-      errorClass: 'validate-tooltip'
-    });
-  
-    $("#login-form").validate({
-      rules: {
-        userName: {
-          required: true,
-          minlength: 3,
-          customUsernameValidation: true
-        },
-        userPassword: {
-          required: true
-        }
-      },
-      messages: {
-        userName: {
-          required: "Please enter your username.",
-          minlength: "Username must be at least 3 characters.",
-          customUsernameValidation: "Please provide a valid username."
-        },
-        userPassword: {
-          required: "Please enter your password."
-        }
-      }
-    });
-  
-    $.validator.addMethod("customUsernameValidation", function(value, element) {
-      var pattern = /^[a-zA-Z0-9]{3,16}$/;
-      return pattern.test(value);
-    }, "Please provide a valid username.");
+});
 
-    $("#logout-button").click(async function () {
-      try {
-          const response = await fetch("/logout", {
-              method: "DELETE", 
-              headers: {
-                  "Content-Type": "application/json",
-                  "Accept": "application/json"
-              },
-          });
-          
-          if (response.ok) {
-              // TODO LOGOUT SUCCESS CODE (e.g. redirect)
-              console.log('Logout successful');
-          } else {
-              // Handle error or show a message to the user
-              console.error('Logout failed');
-          }
-      } catch (error) {
-          console.error('An error occurred during logout', error);
-      }
+(function($) {
+  $('.palceholder').click(function() {
+    $(this).siblings('input').focus();
   });
+
+  $('.form-control').focus(function() {
+    $(this).parent().addClass("focused");
+  });
+
+  $('.form-control').blur(function() {
+    var $this = $(this);
+    if ($this.val().length == 0)
+      $(this).parent().removeClass("focused");
+  });
+  $('.form-control').blur();  
+
+  $.validator.setDefaults({
+    errorElement: 'span',
+    errorClass: 'validate-tooltip'
+  });
+
+  $("#login-form").validate({
+    rules: {
+      userName: {
+        required: true,
+        minlength: 3,
+        customUsernameValidation: true
+      },
+      userPassword: {
+        required: true
+      }
+    },
+    messages: {
+      userName: {
+        required: "Please enter your username.",
+        minlength: "Username must be at least 3 characters.",
+        customUsernameValidation: "Please provide a valid username."
+      },
+      userPassword: {
+        required: "Please enter your password."
+      }
+    }
+  });
+
+  $.validator.addMethod("customUsernameValidation", function(value, element) {
+    var pattern = /^[a-zA-Z0-9]{3,16}$/;
+    return pattern.test(value);
+  }, "Please provide a valid username.");
+
+  $("#logout-button").click(async function () {
+    try {
+        const response = await fetch("/logout", {
+            method: "DELETE", 
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        });
+        
+        if (response.ok) {
+            // TODO LOGOUT SUCCESS CODE (e.g. redirect)
+            console.log('Logout successful');
+        } else {
+            // Handle error or show a message to the user
+            console.error('Logout failed');
+        }
+    } catch (error) {
+        console.error('An error occurred during logout', error);
+    }
+});
 
   })(jQuery);
   
