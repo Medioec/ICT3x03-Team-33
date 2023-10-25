@@ -5,8 +5,7 @@ from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
-                                get_jwt_identity, jwt_required)
-import os
+                                jwt_required, get_jwt_identity)
 import json
 import requests
 import user_utils
@@ -42,50 +41,58 @@ def register():
     if not user_utils.validatePassword(password):
         return jsonify({"message": "Password does not meet the requirements"}), 400
     
-    # check if username still exists in db
-    if not user_utils.isUsernameAvailable(username):
-        return jsonify({"message": "Username is already taken"}), 409
-
+    # check if username exists in db
+    try:
+        if not user_utils.isUsernameAvailable(username):
+            return jsonify({"message": "Username is already taken"}), 409
+    
+    except Exception as e:
+        return jsonify({"message": {str(e)}}), 500
+    
+    # check if email address is valid
     try:
         validate_email(email, check_deliverability=True)
 
-        if not user_utils.isEmailAvailable(email):
-            return jsonify({"message": "Email is already in use"}), 409
-
-        ph = PasswordHasher()
-        hash = ph.hash(password)
-
-        role = "member"
-        userId = user_utils.generateUUID()
-        
-        data = {
-            "userId": userId,
-            "email": email,
-            "username": username,
-            "passwordHash": hash,
-            "userRole": role
-        }
-
-        response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
-        
-        if response.status_code == 201:
-            return jsonify({"message": "Registration successful"}), 200
-        
-        # if insert unsuccessful, return error message from databaseservice
-        else:
-            try:
-                response_json = response.json()
-                # get error message from response. if no message, use default "Error occurred"
-                error_message = response_json.get("message", "Error occurred")
-                return jsonify({"message": error_message}), response.status_code
-        
-            except json.JSONDecodeError as e:
-                return jsonify({"message": "JSON response decode error"}), 500
-            
-
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
+
+    # check if email address is still available 
+    try:
+        if not user_utils.isEmailAvailable(email):
+            return jsonify({"message": "Email is already in use"}), 409
+    except Exception as e:
+        return jsonify({"message": {str(e)}}), 500
+
+    ph = PasswordHasher()
+    hash = ph.hash(password)
+
+    role = "member"
+    userId = user_utils.generateUUID()
     
+    data = {
+        "userId": userId,
+        "email": email,
+        "username": username,
+        "passwordHash": hash,
+        "userRole": role
+    }
+
+    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    
+    if response.status_code == 201:
+        return jsonify({"message": "Registration successful"}), 200
+    
+    # if insert unsuccessful, return error message from databaseservice
+    else:
+        try:
+            response_json = response.json()
+            # get error message from response. if no message, use default "Error occurred"
+            error_message = response_json.get("message", "Error occurred")
+            return jsonify({"message": error_message}), response.status_code
+    
+        except json.JSONDecodeError as e:
+            return jsonify({"message": "Error occurred"}), 500
+        
 ############################## END OF REGISTRATION #########################################
 
 
@@ -101,8 +108,12 @@ def login():
         return jsonify({"message": "Please fill in all form data"}), 400
     
     # if username does not exist in db
-    if user_utils.isUsernameAvailable(username):
-        return jsonify({"message": "Username or password was incorrect"}), 404
+    try:
+        if user_utils.isUsernameAvailable(username):
+            return jsonify({"message": "Username or password was incorrect"}), 404
+    except Exception as e:
+        return jsonify({"message": {str(e)}}), 500
+
 
     # get password hash and role from db
     requestData = {"username": username}
@@ -206,6 +217,25 @@ def login():
         return jsonify({"sessionToken": sessionToken}), 200
 ############################## END OF LOGIN #########################################
 
-       
+############################## LOGOUT #########################################
+@app.route("/logout", methods=["DELETE"])
+@jwt_required() # verifies jwt integrity
+def logout():
+    # get sessionId from jwt
+    sessionId = get_jwt_identity()
+
+    if not sessionId:
+        return jsonify({"message": "Error: No token sent"}), 500
+    
+    # delete session in db
+    requestData = {"sessionId": sessionId}
+    response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
+
+    if response.status_code == 200:
+        return jsonify({"message": "Logout successful"}), 200
+    else:
+        return jsonify({"message": "Database error"}), 500
+############################## END OF LOGOUT #########################################
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
