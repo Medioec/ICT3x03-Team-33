@@ -25,7 +25,7 @@ def create_showtime():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO Showtimes (cinemaId, theaterId, movieId, showDate, showTime) VALUES (%s, %s, %s, %s, %s) RETURNING showtimeId"
+        insert_query = "INSERT INTO Showtimes (cinemaId, theaterId, movieId, showDate, showTime) VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(insert_query, (cinema_id, theater_id, movie_id, show_date, show_time))
         new_showtime_id = cursor.fetchone()[0]
         conn.commit()

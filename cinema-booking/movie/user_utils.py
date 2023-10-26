@@ -52,4 +52,14 @@ def validate_showdate_format(input_string):
     if re.match(pattern, input_string):
         return True
     else:
+        return False
+    
+def validate_theaterId_format(input_string):
+    # Define the regular expression pattern for the format "nX" where n is a number and X is a letter
+    pattern = "^\d+[A-Z]$"
+
+    # Use re.match to check if the input matches the pattern
+    if re.match(pattern, input_string):
+        return True
+    else:
         return False    
