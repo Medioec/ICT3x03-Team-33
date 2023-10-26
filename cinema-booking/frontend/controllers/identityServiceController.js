@@ -1,4 +1,13 @@
+// mvc refresher:
+// controller handles data from model (which was sent via backend)
+// takes requests from frontend -> sends data to model
+// receives data from model -> sends data to frontend
+// handles cookies (validating jwt token in cookies, setting cookies, clearing cookies)
+
+// models
 const identityService = require('../models/identityServiceModel');
+
+// custom middleware
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 const checkHeaders = require('../middleware/checkHeaders'); 
 
@@ -18,20 +27,17 @@ exports.postLogin = [checkHeaders, async (req, res) => {
             const decodedToken = JSON.parse(atob(data.sessionToken.split('.')[1]));
             const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
 
-            console.log('Before setting cookie');
             res.cookie('token', data.sessionToken, {
                 path: '/',
                 maxAge: expiryDelta,
                 httpOnly: true
             });
 
-            console.log('After setting cookie');
-
             // Set loggedIn status
             req.loggedIn = true;
 
-            // Send success response
-            res.json({ message: 'Login successful!' });
+            // on login, redirect to home page
+            res.redirect("/");
 
         } else {
             req.loggedIn = false;
@@ -42,7 +48,6 @@ exports.postLogin = [checkHeaders, async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 }];
-
 
 exports.getRegister = (req, res) => {
     // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
