@@ -94,11 +94,11 @@ services:
             - booking-to-databaseservice
             - databaseservice-to-database
         environment:
-            - PYTHONUNBUFFERED=1
-            - DB_HOST=database
-            - DB_NAME=${DB_NAME}
-            - DB_USER=${DB_NORMALUSER}
-            - DB_PASSWORD=${DB_NORMALPASSWORD}
+            PYTHONUNBUFFERED: 1
+            DB_HOST: database
+            DB_NAME: ${DBSVC_NAME}
+            DB_NORMALUSER: ${DBSVC_NORMALUSER}
+            DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
         ports:
             - "8085:8085"
 

@@ -12,6 +12,8 @@ db_config = {
     "host": os.getenv("DB_HOST"),
 }
 
+print(db_config)
+
 ##### Create a new booking entry in the database #####
 @booking_details_bp.route('/generate_booking_details', methods=['POST'])
 def generate_booking_details():
