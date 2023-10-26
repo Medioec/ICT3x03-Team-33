@@ -19,19 +19,10 @@
   <!-- Navbar -->
   <%- include('./partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
-   <!-- log movies to the console for debugging -->
-   <% var data = JSON.stringify(movies) %>
-   <script>
-    try {
-        console.log(<%- JSON.stringify(data) %>);
-    } catch (error) {
-        console.error("Error logging movies:", error);
-    }
-  </script>
-
   <main>
     <div class="container">
 
+      <!-- missing showtimes from movieService -->
       <!-- Movie Booking Section -->
       <section id="booking" class="text-center">
         <div class="row">
@@ -95,12 +86,13 @@
         <% movies.forEach((movie) => { %>
         <div class="col-lg-3 col-md-4 col-sm-6 col-12">
           <div class="showcase-box">
-            <a href="/pages/moviedetails.html">
+            <!-- pass movieId and redirect to moviedetails page  -->
+            <a href="/moviedetails?movieId=<%= movie.movieId %>">
               <!-- generate the image source dynamically -->
               <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"/>
             </a>
           </div>
-          <%= movie.title %>
+          <h3 class="movieTitle"><%= movie.title %></h3>
         </div>
         <% }); %>
       </div>
