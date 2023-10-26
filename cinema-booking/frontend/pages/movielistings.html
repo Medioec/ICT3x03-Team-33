@@ -17,9 +17,7 @@
 
 <body>
   <!-- Navbar -->
-  <div id="navbar"></div>
-
-  <!-- TODO: use js to dynamically populate the page with movies and the movie names to redirect to movie details page -->
+  <%- include('./partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
     <!-- select movie > populate movie page with movie id from main > button to book > booking page -->
@@ -153,9 +151,7 @@
 
 
     <!-- Footer -->
-    <footer>
-      <p>© 2023 Secuu Cinema Booking. All rights reserved.</p>
-    </footer>
+    <%- include('./partial/footer'); %>
 
     <!-- Scripts -->
     <script src="/js/movielistings.js"></script> <!-- TESTING AUTH -->
