@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
           document.getElementById("error-message").textContent = data.message;
         });
       } else {
-        alert("Please complete the reCAPTCHA.");
+        document.getElementById("error-message").textContent ="Please complete the reCAPTCHA.";
       }
     }
   });
