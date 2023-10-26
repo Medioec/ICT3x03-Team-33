@@ -21,12 +21,3 @@ async function fetchData() {
 
 // Call the async function
 fetchData();
-
-function generateImageSource(title) {
-    // Replace special characters and spaces in the title with underscores
-    // e.g. movie title for db: "The Lord of the Rings: The Fellowship of the Ring" 
-    // -> "The Lord of the Rings_ The Fellowship of the Ring"
-    // using this so to avoid issues with : in the image file path
-    const formattedTitle = title.replace(/[:\s]/g, '_');
-    return `/images/movies/${formattedTitle}.jpg`;
-  }
