@@ -231,3 +231,83 @@ def delete_session_by_id():
         return jsonify({"error": str(e)}), 500
 
 #####     End of delete user session by ID     #####
+
+#####     Update a user session status by its ID     #####
+@user_sessions_bp.route('/update_session_status_by_id', methods=['PUT'])
+def update_session_status_by_id():
+    try:
+        # get sessionId from json
+        data = request.get_json()
+        sessionId = data['sessionId']
+        currStatus = data['currStatus']
+
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if session exists
+        select_query = "SELECT * FROM usersessions WHERE sessionId = %s"
+        
+        cursor.execute(select_query, (sessionId,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+
+        # Delete session if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            delete_query = "UPDATE usersessions SET currStatus = %s WHERE sessionId = %s"
+            cursor.execute(delete_query, (currStatus, sessionId,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "Session status updated successfully"}), 200
+        else:
+            # Session does not exist
+            return jsonify({"message": "Session not found"}), 404
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+#####     End of update user session status by ID     #####
+
+##### Retrieves user role based on user ID #####
+@user_sessions_bp.route('/get_role_by_id', methods=['POST'])
+def get_role_by_id():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        userId = data['userId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Construct the SQL query to retrieve the user role using userId
+        select_data_query = "SELECT userRole FROM cinemauser WHERE userId = %s "
+        cursor.execute(select_data_query, (userId,))
+        data_result = cursor.fetchone()
+
+        # Close the cursor and the database connection
+        cursor.close()
+        conn.close()
+
+        # Separate the data into two attributes in a JSON response
+        if data_result:
+            # Assuming there's one result
+            userRole = data_result[0]
+
+            response_data = {
+                "userRole": userRole
+            }
+            return jsonify(response_data), 200
+        else:
+            return jsonify({"message": "No data found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+#####   End of user role by user ID retrieval   #####

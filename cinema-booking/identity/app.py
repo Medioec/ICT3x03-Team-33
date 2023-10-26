@@ -5,7 +5,7 @@ from email_validator import validate_email, EmailNotValidError
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
-                                jwt_required, get_jwt_identity)
+                                jwt_required, get_jwt_identity, get_jwt)
 import json
 import requests
 import user_utils
@@ -112,7 +112,7 @@ def login():
         if user_utils.isUsernameAvailable(username):
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
-        return jsonify({"message": {str(e)}}), 500
+        return jsonify({"message": str(e)}), 500
 
 
     # get password hash and role from db
@@ -219,7 +219,7 @@ def login():
 
 ############################## LOGOUT #########################################
 @app.route("/logout", methods=["DELETE"])
-@jwt_required() # verifies jwt integrity
+@jwt_required() # verifies jwt integrity + expiry
 def logout():
     # get sessionId from jwt
     sessionId = get_jwt_identity()
@@ -227,15 +227,71 @@ def logout():
     if not sessionId:
         return jsonify({"message": "Error: No token sent"}), 500
     
-    # delete session in db
-    requestData = {"sessionId": sessionId}
-    response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
+    # set status to inactive
+    currStatus = "inactive"
+
+    # set session status to inactive in db
+    requestData = {"sessionId": sessionId, "currStatus": currStatus}
+    
+    # response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
+    response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
         return jsonify({"message": "Logout successful"}), 200
     else:
         return jsonify({"message": "Database error"}), 500
 ############################## END OF LOGOUT #########################################
+
+############################## AUTH #########################################
+@jwt.unauthorized_loader
+def unauthorized_callback(callback):
+    print("unauthorized callback")
+    return jsonify({"message": "Unauthorized access"}), 401
+
+# check if user is logged in with valid token
+@app.route("/basicAuth", methods=["POST"])
+@jwt_required() # verifies jwt integrity + expiry
+def basicAuth():
+    return jsonify({"message": "Authenticated"}), 200
+
+# check if user is logged in with valid token and verify their role
+@app.route("/enhancedAuth", methods=["POST"])
+@jwt_required() # verifies jwt integrity + expiry
+def enhancedAuth():
+    try:
+        # get session id + role from token
+        sessionId = get_jwt_identity()
+        token = get_jwt()
+        role = token["userRole"]
+            
+        # check against db to see if it's a legit token
+        requestData = {"sessionId": sessionId}
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        
+        if response.status_code != 200:
+            return jsonify({"message": "Database error"}), 500
+
+        # get userId from db
+        userId = response.json()["userId"]
+        print("userId", userId)
+        
+        # check that the user role in the db matches the user role in the token
+        requestData = {"userId": userId}
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
+        dbRole = response.json()["userRole"]
+
+        print("token role", role)
+        print("db role", dbRole)
+
+        if role != dbRole:
+            return jsonify({"message": "Invalid token"}), 401
+        else:
+            print("authenticated")
+            return jsonify({"message": "Authenticated"}), 200
+    
+    except:
+        return jsonify({"message": "Error occurred"}), 500
+############################## END OF AUTH #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
