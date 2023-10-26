@@ -34,9 +34,9 @@ Then, navigate to the port number on your browser (e.g., `localhost:8080` for fr
 On Docker Desktop\
 Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
-4. Stop containers before building & making changes\
-In windows powershell, to down all containers and volumes: `.\scripts\dev-kill-volumes.bat`
-Linux: `./scripts/dev-kill-volumes.bat`
+4a. Stop containers before building & making changes\
+In windows powershell, to down all containers and volumes: `.\scripts\dev-kill-volumes.bat` \
+Linux: `./scripts/dev-kill-volumes.bat` \
 
-In windows powershell to ONLY down the containers without messing with db: `.\scripts\dev-kill`
-Linux: `./scripts/dev-kill`
+4b. In windows powershell to ONLY down the containers without messing with db: `.\scripts\dev-kill` \
+Linux: `./scripts/dev-kill` 
