@@ -85,3 +85,7 @@ h4{
     width: max-content;
     margin: 5px;
 }
+
+#movieSynopsisRow{
+    margin-left: 0px;
+}
