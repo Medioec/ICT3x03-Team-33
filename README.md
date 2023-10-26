@@ -35,12 +35,8 @@ On Docker Desktop\
 Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
 4. Stop containers before building & making changes\
-On CLI, use the dev-deploy convenience script for redeploying after making changes. This does not remove the db volume. Alternatively, dev-kill will just stop all the deployed containers.\
-or\
-Use these commands:\
-`docker stop [container name]` (e.g., docker stop cinema-booking-database-1)\
-or\
-`docker-compose down --volumes` (This removes all containers and database information. Remove `--volumes` if u want to keep database information. Keep if you want to reset database from init.sql)\
-**OR** \
-On Docker Desktop\
-Press the stop button on the "cinema-booking" main container
+In windows powershell, to down all containers and volumes: `.\scripts\dev-kill-volumes.bat`
+Linux: `./scripts/dev-kill-volumes.bat`
+
+In windows powershell to ONLY down the containers without messing with db: `.\scripts\dev-kill`
+Linux: `./scripts/dev-kill`
