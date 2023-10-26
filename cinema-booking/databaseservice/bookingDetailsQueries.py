@@ -7,10 +7,12 @@ booking_details_bp = Blueprint("bookingdetails", __name__)
 
 db_config = {
     "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
+    "user": os.getenv("DB_NORMALUSER"),
+    "password": os.getenv("DB_NORMALPASSWORD"),
     "host": os.getenv("DB_HOST"),
 }
+
+print(db_config)
 
 ##### Create a new booking entry in the database #####
 @booking_details_bp.route('/generate_booking_details', methods=['POST'])

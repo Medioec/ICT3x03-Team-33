@@ -94,25 +94,28 @@ services:
             - booking-to-databaseservice
             - databaseservice-to-database
         environment:
-            - PYTHONUNBUFFERED=1
-            - DB_HOST=database
-            - DB_NAME=${DB_NAME}
-            - DB_USER=${DB_USER}
-            - DB_PASSWORD=${DB_PASSWORD}
+            PYTHONUNBUFFERED: 1
+            DB_HOST: database
+            DB_NAME: ${DBSVC_NAME}
+            DB_NORMALUSER: ${DBSVC_NORMALUSER}
+            DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
         ports:
             - "${DBSERVICE_PORT}"
 
     database:
-        build:
-            context: ./cinema-booking/database
+        build: ./cinema-booking/database
         networks:
             - databaseservice-to-database
         environment:
-            - POSTGRES_DB=${DB_NAME}
-            - POSTGRES_USER=${DB_USER}
-            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            POSTGRES_DB: ${SUPERUSER_DB_NAME}
+            POSTGRES_USER: ${POSTGRES_SUPERUSER}
+            POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_NORMALUSER: ${DB_NORMALUSER}
+            DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
         volumes:
-            - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+            # - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
         ports:
             - "${DB_PORT}"
