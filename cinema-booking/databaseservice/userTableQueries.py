@@ -6,8 +6,8 @@ user_bp = Blueprint("user", __name__)
 
 db_config = {
     "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
+    "user": os.getenv("DB_NORMALUSER"),
+    "password": os.getenv("DB_NORMALPASSWORD"),
     "host": os.getenv("DB_HOST"),
 }
 
@@ -41,7 +41,50 @@ def add_user():
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         return jsonify({"error": str(e)}), 500
-#####     End of add user     #####    
+#####     End of add user     #####
+
+##### Get user information #####
+@user_bp.route('/get_user_details', methods=['POST'])    
+def get_user_details():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        username = data['username']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Check if the user exists in the "user" table
+        select_query = "SELECT * FROM cinemauser WHERE username = %s"
+        cursor.execute(select_query, (username,))
+        user = cursor.fetchone()
+
+        print (user)
+        
+        cursor.close()
+        conn.close()
+
+        if user:
+            # User found, return HTTP 200 OK
+            user_details = {
+                "userId": user[0],
+                "email": user[1],
+                "username": user[2],
+                "passwordHash": user[3],
+                "userRole": user[4],
+                "isUserBanned": user[5]
+            }
+            return jsonify(user_details), 200
+        else:
+            # User not found, return HTTP 404 Not Found
+            print("User not found")
+            return jsonify({"message": "User not found"}), 404
+
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        return jsonify({"error": str(e)}), 500 
+#####   End of check user     #####    
 
 ##### Checks if username is taken #####
 @user_bp.route('/check_user', methods=['POST'])    

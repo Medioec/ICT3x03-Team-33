@@ -7,6 +7,7 @@ from ticketPriceQueries import ticket_price_bp
 from transactionQueries import transaction_bp
 from creditCardQueries import credit_card_bp
 from bookingDetailsQueries import booking_details_bp
+from showtimesQueries import showtimes_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +20,7 @@ app.register_blueprint(ticket_price_bp,url_prefix='/databaseservice/ticketprice'
 app.register_blueprint(transaction_bp,url_prefix='/databaseservice/transactions')
 app.register_blueprint(credit_card_bp,url_prefix='/databaseservice/creditcard')
 app.register_blueprint(booking_details_bp,url_prefix='/databaseservice/bookingdetails')
+app.register_blueprint(showtimes_bp,url_prefix='/databaseservice/showtimes')
 
 
 if __name__ == "__main__":
