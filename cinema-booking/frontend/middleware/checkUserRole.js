@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 // function to check if the user has the required role to access the page
 async function checkUserRole(requiredRole) {
     return async (req, res, next) => {

@@ -3,6 +3,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+
+// custom middleware
+const checkHeaders = require('./middleware/checkHeaders');
+const checkLoggedIn = require('./middleware/checkLoggedIn');
+const checkUserRole = require('./middleware/checkUserRole');
+
 const app = express();
 const port = process.env.PORT || 8080;
 
@@ -10,6 +16,10 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
+
+// app.use(checkHeaders);
+// app.use(checkLoggedIn);
+// app.use(checkUserRole);
 
 // set up static files (css, js, images) and views
 app.use(express.static(path.join(__dirname, 'public')));

@@ -23,8 +23,10 @@ const checkLoggedIn = async (req, res, next) => {
                 // If token is invalid, set loggedIn to false
                 req.loggedIn = false;
             }
-        } else {
-            // if token is not present, set loggedIn to false
+        } 
+        
+        // if token is not present, set loggedIn to false
+        else {
             req.loggedIn = false;
         }
 
@@ -35,6 +37,7 @@ const checkLoggedIn = async (req, res, next) => {
         // Handle any errors that might occur during the process
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
+        // Skip calling next() when there's an error
     }
 };
 
