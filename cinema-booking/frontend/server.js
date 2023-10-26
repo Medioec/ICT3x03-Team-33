@@ -27,10 +27,12 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // routes
-// const pageRoutes = require('./routes/pageRoutes');
 const identityServiceRoutes = require('./routes/identityServiceRoutes');
+const homeRoutes = require('./routes/homeRoutes');
+
 
 // app.use('/pages', pageRoutes);
+app.use('/', homeRoutes);
 app.use('/', identityServiceRoutes);
 
 // catch-all route for handling undefined routes
