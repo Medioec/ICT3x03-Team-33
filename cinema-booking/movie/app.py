@@ -55,6 +55,8 @@ def getAllMovies():
     try:
         response = requests.get("http://databaseservice:8085/databaseservice/moviedetails/get_all_movies")
         if response.status_code == 200:
+            print(jsonify(response.json()))
+
             return jsonify(response.json()), 200
         else:
             return jsonify({"message": "Get all movies failed"}), 500

@@ -1,3 +1,7 @@
+// nodejs mvc refresher:
+// routes defines mapping of url endpoints and their corresponding controller functions
+// specifies http methods (GET, POST etc.)
+
 const express = require('express');
 const router = express.Router();
 const identityServiceController = require('../controllers/identityServiceController');
