@@ -164,13 +164,13 @@ def createShowtime():
             return jsonify({"message": "Please fill in all form data"}), 400
         # validates cinema_id and movie_id for integers
         if not user_utils.validateInteger(cinema_id) or not user_utils.validateInteger(movie_id):
-            return jsonify({"message": "Title and synopsis should only contain alphabets and spaces"}), 400
+            return jsonify({"message": "cinema_id or movie_id not correct format"}), 400
         # validates theater_id, 
         if not user_utils.validateAlphaWithSpace(theater_id):
-            return jsonify({"message": "Genre, language and subtitles should only contain alphabets and spaces"}), 400
+            return jsonify({"message": "theaterID not correct fomat"}), 400
         # validates show_date and show_time 
-        if not user_utils.validate_showdate_format(show_date) or not user_utils.validate_showtime_format(show_time)
-
+        if not user_utils.validate_showdate_format(show_date) or not user_utils.validate_showtime_format(show_time):
+            return jsonify({"message": "showtime or showdate not in correct format (e.g 12-3-2023 and 12:30 AM/PM)"}), 400
         data = {
             "cinemaId": cinema_id,
             "theaterId": theater_id,
@@ -238,10 +238,13 @@ def updateShowtimeById(showtime_id):
         # validates cinema_id and movie_id for integers
         if not user_utils.validateInteger(cinema_id) or not user_utils.validateInteger(movie_id):
             return jsonify({"message": "Title and synopsis should only contain alphabets and spaces"}), 400
-        # validates genre, theater_id, show_date and show_time for alphabets and spaces
-        if not user_utils.validateAlphaWithSpace(theater_id) or not user_utils.validateAlphaWithSpace(show_date) or not user_utils.validateAlphaWithSpace(show_time):
+        # validates theater_id for alphabets and spaces
+        if not user_utils.validateAlphaWithSpace(theater_id):
             return jsonify({"message": "Genre, language and subtitles should only contain alphabets and spaces"}), 400
-
+        # validates show_date and show_time 
+        if not user_utils.validate_showdate_format(show_date) or not user_utils.validate_showtime_format(show_time):
+            return jsonify({"message": "showtime or showdate not in correct format (e.g 12-3-2023 and 12:30 AM/PM)"}), 400
+        
         url = f"http://databaseservice:8085/databaseservice/showtimes/update_showtime_by_id/{validate_int}"
         response = requests.put(url, json=data)
 
