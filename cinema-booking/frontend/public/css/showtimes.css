@@ -58,9 +58,10 @@ h4{
 
 .movieTitle{
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 1rem;
     width: auto;
     margin-left: -15px;
+    color: blue;
 }
 
 .showtimeHeader{
@@ -84,4 +85,8 @@ h4{
 .btn-primary{
     width: max-content;
     margin: 5px;
+}
+
+#movieSynopsisRow{
+    margin-left: 0px;
 }

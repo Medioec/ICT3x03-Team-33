@@ -285,3 +285,7 @@ span.validate-tooltip {
   color: #666;
   cursor: not-allowed;
 }
+
+#placeholderFix{
+  margin: -4px;
+}
