@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import (JWTManager, create_access_token,
+                                jwt_required, get_jwt_identity, get_jwt)
 import requests
 import user_utils
 from credit_card import *
@@ -7,15 +9,12 @@ from credit_card import *
 app = Flask(__name__)  
 CORS(app)
 
+@jwt_required()
 @app.route('/makePayment', methods=["POST"])
 def makePayment():
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
-    creditCardNumber = data['creditCardNumber']
-    creditCardName = data['creditCardName']
-    creditCardExpiry = data['creditCardExpiry']
-    cvv = data['cvv']
     
     # TODO - Will need to pass in session information in POST request. To take from JWT
     

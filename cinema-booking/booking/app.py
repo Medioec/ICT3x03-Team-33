@@ -15,9 +15,15 @@ def generateBooking():
     seatId = data['seatId']
     ticketPriceId = data['ticketPriceId']
     
-    # TODO - get user's credit card chosen from paymentservice via /getOneCreditCard/<uuid:userId>/<int:creditCardId>
+    data {
+        "userId": userId,
+        "creditCardId": creditCardId,
+    }
     
     # TODO - process payment with paymentservice via /makePayment
+    url = f"http://paymentservice:8084/paymentservice/makePayment"
+    response = requests.post(url, json=data)
+    
 
     # TODO - create booking with databaseservice via /create_booking
     
