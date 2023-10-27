@@ -18,12 +18,11 @@ db_config = {
 def generate_booking_details():
     try:
         data = request.get_json()
+        userId = data['userId']
         showtimeId = data['showtimeId']
         seatId = data['seatId']
         ticketPriceId = data['ticketPriceId']
-        userId = data['userId']
         transaction_id = data['transactionId']
-        ticketPriceId = data['ticketPriceId']
 
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()

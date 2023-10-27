@@ -56,7 +56,7 @@ def makePayment():
         return jsonify({"message": "Invalid credit card name"}), 400
     if not user_utils.validateCreditCardExpiry(card.expiry):
         return jsonify({"message": "Invalid credit card expiry date"}), 400
-    if not user_utils.validateCvv(cvv):
+    if not user_utils.validateCvv(card.cvv):
         return jsonify({"message": "Invalid CVV"}), 400
     
     max_retries = 3
@@ -134,7 +134,7 @@ def addCreditCard():
     userId = rjson['userId']
         
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
-    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry, cvv)
     b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
     
     # Form JSON data to be sent to the databaseservice
@@ -196,7 +196,8 @@ def getCreditCard(userId, creditCardId):
                 "creditCardId": creditCardId,
                 "creditCardNumber": dec_card.card_num,
                 "creditCardName": dec_card.name,
-                "creditCardExpiry": dec_card.expiry
+                "creditCardExpiry": dec_card.expiry,
+                "cvv": dec_card.cvv
             }
         
         return jsonify(ccobj), 200
@@ -250,7 +251,8 @@ def getAllCreditCards():
                 "creditCardId": creditCardId,
                 "creditCardNumber": dec_card.card_num,
                 "creditCardName": dec_card.name,
-                "creditCardExpiry": dec_card.expiry
+                "creditCardExpiry": dec_card.expiry,
+                "cvv": dec_card.cvv
             }
             response_list.append(dictobj)
         
@@ -303,7 +305,7 @@ def updateOneCreditCard():
     userId = rjson['userId']
     
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
-    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry, cvv)
     b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
     
     # Form JSON data to be sent to the databaseservice        

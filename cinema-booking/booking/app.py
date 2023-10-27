@@ -15,7 +15,7 @@ def generateBooking():
     seatId = data['seatId']
     ticketPriceId = data['ticketPriceId']
     
-    data {
+    data = {
         "userId": userId,
         "creditCardId": creditCardId,
     }
@@ -23,9 +23,38 @@ def generateBooking():
     # TODO - process payment with paymentservice via /makePayment
     url = f"http://paymentservice:8084/paymentservice/makePayment"
     response = requests.post(url, json=data)
+    if response.status_code != 200:
+        if response.status_code == 400:
+            return jsonify(response.json()["message"]), 400 # Bad request: Invalid credit card
+        elif response.status_code == 403:
+            return jsonify(response.json()["message"]), 403 # Access denied: No permissions
+        elif response.status_code == 404:
+            return jsonify(response.json()["message"]), 404 # Credit card not found
+        elif response.status_code == 409:
+            return jsonify(response.json()["message"]), 409 # Duplicate entry: This transaction already exists.
+    elif response.status_code == 200:
+        data = {
+            "userId": userId,
+            "showtimeId": showtimeId,            
+            "seatId": seatId,
+            "ticketPriceId": ticketPriceId,
+            "transactionId": response.json()["transactionId"]
+        }
+        
+        # Create booking with databaseservice 
+        url = f"http://databaseservice:8085/databaseservice/bookingdetails//generate_booking_details"
+        response = requests.post(url, json=data)
+        if response.status_code == 201:
+            return jsonify({"message": "Booking created successfully"}), 201
+        elif response.status_code == 409:
+            return jsonify({"message": "Duplicate entry: This booking already exists."}), 409
+        else:
+            return jsonify({"message": "Error generating booking"}), 500
+    else:
+        return jsonify({"message": "Error generating booking"}), 500
+        
+        
     
-
-    # TODO - create booking with databaseservice via /create_booking
     
 @app.route('/retrieveOneBooking/<uuid:userId>/<int:ticketId>', methods=["get"])
 def retrieveOneBooking(userId, ticketId):
