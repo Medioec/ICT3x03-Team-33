@@ -26,15 +26,16 @@
       <h2 class="title">Login to your account</h2>
       <form action="" id="login-form">
         <div class="input-group">
-          <label class="palceholder" for="userName" style="margin: -4px;">Username</label>
+          <label class="palceholder" for="userName" id="placeholderFix">Username</label>
           <input class="form-control" name="userName" id="userName" type="text" placeholder="" />
           <span class="lighting"></span>
         </div>
 
         <div class="input-group" id="passwordInputGroup">
-          <label class="palceholder" for="userPassword" style="margin: -4px;">Password</label>
-          <span id="togglePassword" class="toggle-password" onclick="togglePasswordVisibility()"><i
-              class="bi bi-eye"></i></span>
+          <label class="palceholder" for="userPassword" id="placeholderFix">Password</label>
+          <span id="togglePassword" class="toggle-password">
+            <i class="bi bi-eye"></i>
+          </span>
           <input class="form-control" name="userPassword" id="userPassword" type="password" placeholder="" />
           <span class="lighting"></span>
         </div>

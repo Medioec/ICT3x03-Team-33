@@ -40,7 +40,6 @@ app.use((req, res) => {
     res.status(404).send('Not Found');
 });
 
-
 // ############################## IDENTITY SERVICE #########################################
 // handle GET request from login.html
 app.get('/login', (req, res) => {
