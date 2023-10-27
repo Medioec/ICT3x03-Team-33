@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 jwt_required, get_jwt_identity, get_jwt)
 import json
+import os 
 import requests
 import user_utils
 import base64
@@ -15,7 +16,8 @@ import base64
 app = Flask(__name__)
 CORS(app)
 
-app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
+# app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
 
@@ -178,7 +180,6 @@ def login():
 
         # generate session id
         sessionId = user_utils.generateUUID()
-        
         
         # get user role
         userRole = response.json()["userRole"]

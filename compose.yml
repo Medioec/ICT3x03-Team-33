@@ -42,6 +42,7 @@ services:
             - identity-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1  
+            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${IDENTITY_PORT}"
 
@@ -54,6 +55,7 @@ services:
             - movie-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${MOVIE_PORT}"
     
@@ -67,6 +69,7 @@ services:
             - booking-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${BOOKING_PORT}"
 
@@ -80,6 +83,7 @@ services:
             - payment-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${PAYMENT_PORT}"
 
