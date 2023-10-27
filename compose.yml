@@ -44,7 +44,7 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ./logs/identityService:/logs
+            - ./logs:/logs
             
         ports:
             - "${IDENTITY_PORT}"
@@ -122,7 +122,6 @@ services:
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-            - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
             - ./logs/databaselogs:/logs
         ports:
