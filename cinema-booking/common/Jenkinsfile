@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Set up Python') {
+            steps {
+                sh 'python3 -m venv venv'
+                sh '. venv/bin/activate'
+				script {
+                    // Install Python
+                    sh 'sudo apt-get update && sudo apt-get install -y python3.8 python3-pip'
+                    // Install dependencies
+                    sh 'pip3 install requests'
+                    sh 'pip3 install pycryptodome'
+                }
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+        stage('Run unit tests') {
+            steps {
+                sh 'python -m unittest test_api_crypto.py'
+            }
+        }
+    }
+    post {
+        always {
+            deleteDir() // Clean up workspace
+        }
+    }
+}
