@@ -11,9 +11,13 @@ import json
 import requests
 import user_utils
 import base64
+import logging
 
 app = Flask(__name__)
 CORS(app)
+
+# Configure logging path
+logging.basicConfig(filename='./logs/identityServiceLogs.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 
@@ -48,6 +52,7 @@ def register():
             return jsonify({"message": "Username is already taken"}), 409
     
     except Exception as e:
+        logging.error(f"Error during username availability check: {str(e)}")
         return jsonify({"message": {str(e)}}), 500
     
     # check if email address is valid
@@ -81,11 +86,13 @@ def register():
     response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
     
     if response.status_code == 201:
+        logging.info(f"User {username} registered successfully")
         return jsonify({"message": "Registration successful"}), 200
     
     # if insert unsuccessful, return error message from databaseservice
     else:
         try:
+            logging.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
             response_json = response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
@@ -111,6 +118,8 @@ def login():
     # if username does not exist in db
     try:
         if user_utils.isUsernameAvailable(username):
+            # log login failure
+            logging.error(f"Login failed with username {username}. Error: Username does not exist")
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -123,6 +132,8 @@ def login():
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
         try:
+            # log login failure
+            logging.error(f"Login failed with username {username}. Error: {response.json()['message']}")
             response_json = response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
@@ -165,6 +176,8 @@ def login():
     
     # if password hashes do not match, throw error
     except Exception as e:
+        # log login failure
+        logging.error(f"Login failed with username {username}. Exception during password verification: {e}")
         print(f"Exception during password verification: {e}")
         return jsonify({"message": "Username or password was incorrect"}), 404
 
@@ -209,6 +222,8 @@ def login():
 
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
+        # log login failure
+        logging.error(f"Login failed with username {username}. Error: {response.json()['message']}")
         error_message = response.json().get("message", "Error occurred")
         return jsonify({"message": error_message}), response.status_code
     
@@ -219,13 +234,15 @@ def login():
 ############################## END OF LOGIN #########################################
 
 ############################## LOGOUT #########################################
-@app.route("/logout", methods=["DELETE"])
+@app.route("/logout", methods=["PUT"])
 @jwt_required() # verifies jwt integrity + expiry
 def logout():
     # get sessionId from jwt
     sessionId = get_jwt_identity()
 
     if not sessionId:
+        # log logout failure
+        logging.error(f"Logout failed. Attempted logout without token")
         return jsonify({"message": "Error: No token sent"}), 500
     
     # set status to inactive
@@ -234,18 +251,23 @@ def logout():
     # set session status to inactive in db
     requestData = {"sessionId": sessionId, "currStatus": currStatus}
     
-    # response = requests.delete("http://databaseservice:8085/databaseservice/usersessions/delete_session_by_id", json=requestData)
     response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
+        # log logout success
+        logging.info(f"Logout successful")
         return jsonify({"message": "Logout successful"}), 200
     else:
+        # log database error
+        logging.error(f"Logout failed due to database error. Error: {response.json()['message']}")
         return jsonify({"message": "Database error"}), 500
 ############################## END OF LOGOUT #########################################
 
 ############################## AUTH #########################################
 @jwt.unauthorized_loader
 def unauthorized_callback(callback):
+    # log unauthorized access
+    logging.error(f"Unauthorized access detected")
     print("unauthorized callback")
     return jsonify({"message": "Unauthorized access"}), 401
 
@@ -253,6 +275,8 @@ def unauthorized_callback(callback):
 @app.route("/basicAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
 def basicAuth():
+    # logs login success
+    logging.info(f"Login successful")
     return jsonify({"message": "Authenticated"}), 200
 
 # check if user is logged in with valid token and verify their role
@@ -270,6 +294,8 @@ def enhancedAuth():
         response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
         
         if response.status_code != 200:
+            # log authentication failure
+            logging.error(f"Authentication failed due to database error Error: {response.json()['message']}")
             return jsonify({"message": "Database error"}), 500
 
         # get userId from db
@@ -285,8 +311,12 @@ def enhancedAuth():
         print("db role", dbRole)
 
         if role != dbRole:
+            # log unauthorized access
+            logging.error(f"Unauthorized access detected")
             return jsonify({"message": "Invalid token"}), 401
         else:
+            # log authentication success
+            logging.info(f"Authentication successful")
             print("authenticated")
             return jsonify({"message": "Authenticated"}), 200
     
