@@ -19,16 +19,6 @@
   <!-- Navbar -->
   <%- include('./partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
-   <!-- log movies to the console for debugging -->
-   <% var data = JSON.stringify(movies) %>
-   <script>
-    try {
-        console.log(<%- JSON.stringify(data) %>);
-    } catch (error) {
-        console.error("Error logging movies:", error);
-    }
-  </script>
-
   <main>
     <div class="container">
 
@@ -98,8 +88,9 @@
               <!-- pass movieId and redirect to moviedetails page  -->
               <a href="/moviedetails?movieId=<%= movie.movieId %>">
               <!-- generate the image source dynamically -->
-              <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"/>
-            </a>
+              <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
+                  onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
+                  alt="poster" /></a>
           </div>
           <h3 class="movieTitle"><%= movie.title %></h3></div>
         <% }); %>

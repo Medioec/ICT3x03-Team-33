@@ -33,7 +33,7 @@
                 <h1> Saw X </h2>
             </div>
             <div class="col-md-9">
-                <div class="row" style="margin-left: 2px;">
+                <div class="row" id="showtimeRow">
                     <div class="col-md-3">
                         <div class="row">Cinema:</div>
                     </div>
@@ -44,7 +44,7 @@
                         <div class="row">Time:</div>
                     </div>
                 </div>
-                <div class="row" style="margin-left: -5px;">
+                <div class="row" id="showtimeRow2">
                     <div class="col-md-3">
                         <!-- nts. Cinema cinemaName, location title, rmb to set default value from prev page on load -->
                         <div class="button-container">
@@ -90,7 +90,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3" style="align-self: center;margin-top: 9px;">
+                    <div class="col-md-3" id="seatingPlanCol">
                         <button id="location" class="btn btn-primary">
                             View Seating Plan
                         </button>
@@ -113,7 +113,7 @@
                     </li>
                 </ul>
                 <div class="seatContainer">
-                    <div class="screen" style="margin-left: 40px;">
+                    <div class="screen" id="seatingPlanScreen">
                         <a>
                             Screen
                         </a>
@@ -186,7 +186,7 @@
                         <div class="seat"></div>
                     </div>
                     <div class="row">
-                        <div class="seatNumbers" style="margin-left: 45px;">1</div>
+                        <div class="seatNumbers" id="seatingPlanSeat">1</div>
                         <div class="seatNumbers">2</div>
                         <div class="seatNumbers">3</div>
                         <div class="seatNumbers">4</div>
@@ -230,7 +230,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="row ticketRow" style="justify-content: flex-end;">
+                <div class="row" id="ticketRow">
                     <div class="col-md-2">
                         <a class="ticketHeaders">TOTAL PRICE</a>
                     </div>
@@ -238,7 +238,7 @@
                         <h4 class="totalPrice">$0.00</h4>
                     </div>
                 </div>
-                <div class="row ticketRow" style="justify-content: flex-end;">
+                <div class="row" id="ticketRow">
                     <div class="col-md-2">
                         <button id="location" class="btn btn-secondary">
                             RESET

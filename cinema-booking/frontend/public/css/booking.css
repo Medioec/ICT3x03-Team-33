@@ -15,8 +15,9 @@ h4 .totalPrice {
   border-color: grey;
 }
 
-.ticketRow {
+#ticketRow {
   padding: 15px;
+  justify-content: flex-end;
 }
 
 .seatContainer {
@@ -110,3 +111,25 @@ p.text {
     width: 32px;
     margin: 5px;
   }
+
+#showtimeRow{
+  margin-left: 2px;
+}
+
+#showtimeRow2{
+  margin-left: -5px;
+}
+
+#seatingPlanCol{
+  align-self: center;
+  margin-top: 9px;
+}
+
+#seatingPlanSeat{
+  margin-left: 45px;
+}
+
+#seatingPlanScreen{
+  margin-left: 40px;
+}
+
