@@ -41,8 +41,8 @@ services:
             - identity-to-payment
             - identity-to-databaseservice
         environment:
-            - PYTHONUNBUFFERED=1
-            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
             - ./logs/identityService:/logs
             
@@ -57,8 +57,8 @@ services:
             - frontend-to-movie
             - movie-to-databaseservice
         environment:
-            - PYTHONUNBUFFERED=1
-            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${MOVIE_PORT}"
     
@@ -71,8 +71,8 @@ services:
             - booking-to-payment
             - booking-to-databaseservice
         environment:
-            - PYTHONUNBUFFERED=1
-            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${BOOKING_PORT}"
 
@@ -85,8 +85,8 @@ services:
             - booking-to-payment
             - payment-to-databaseservice
         environment:
-            - PYTHONUNBUFFERED=1
-            - JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${PAYMENT_PORT}"
 
@@ -122,7 +122,7 @@ services:
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-            # - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
             - ./logs/databaselogs:/logs
         ports:
