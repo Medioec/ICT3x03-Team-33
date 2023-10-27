@@ -15,13 +15,23 @@ def makePayment():
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
+    userId = data['userId']
     
     # TODO - Will need to pass in session information in POST request. To take from JWT
     
+    url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
+    response = requests.get(url)
+    
+    if response.status_code == 404:
+        return jsonify({"message": "Credit card not found"}), 404
+    elif response.status_code == 403:
+        return jsonify({"message": "Access denied: No permissions"}), 403
+    else:
+        blob = response.json()['blob']
+
     sessionId = data['sessionId']
     hash = data['hash']
     
-    # TODO - clarify if need to get the blob from db first? How does make payment work? FOLLOW UP
     # Get session encryption key from db here
     payload = {
         "sessionId": sessionId
