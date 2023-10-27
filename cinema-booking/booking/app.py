@@ -1,15 +1,41 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
+import os
 import requests
 import booking_utils
+
 app = Flask(__name__)  
 CORS(app)
 
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+
+jwt = JWTManager(app)
+
+#####   throw error when JWT token is not valid     #####
+@jwt.unauthorized_loader
+def unauthorized_callback(callback):
+    print("unauthorized callback")
+    return jsonify({"message": "Unauthorized access"}), 401
+#####   End of throw error when JWT token is not valid     #####
+
 @app.route('/generateBooking', methods=["POST"])
+@jwt_required()
 def generateBooking():
+    # get sessionId from jwt
+    sessionId = get_jwt_identity()
+    if not sessionId:
+        return jsonify({"message": "Error: No token sent"}), 500
+    
+    # use sessionId to get userId from db
+    requestData = {"sessionId": sessionId}    
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    if response.status_code != 200:
+        return jsonify({"message": "Database error"}), 500
+    userId = response.json()["userId"]
+
     # Retrieve booking details from request
     data = request.get_json()
-    userId = data['userId']
     creditCardId = data['creditCardId']
     showtimeId = data['showtimeId']
     seatId = data['seatId']
@@ -57,6 +83,7 @@ def generateBooking():
     
     
 @app.route('/retrieveOneBooking/<uuid:userId>/<int:ticketId>', methods=["get"])
+@jwt_required()
 def retrieveOneBooking(userId, ticketId):
     try:
         url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
