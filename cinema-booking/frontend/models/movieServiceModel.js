@@ -21,14 +21,15 @@ async function getAllMovies() {
     }
 }
 
-// Function to create a new movie entry in the database
-async function createMovie(movieData) {
+// Function for staff to create a new movie entry in the database
+async function createMovie(token, movieData) {
     try {
         const response = await fetch('http://movie:8082/createMovie', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(movieData)
         });

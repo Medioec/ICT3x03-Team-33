@@ -20,8 +20,10 @@ app.set('views', path.join(__dirname, 'views'));
 // routes
 const identityServiceRoutes = require('./routes/identityServiceRoutes');
 const homeRoutes = require('./routes/homeRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 app.use(homeRoutes);
 app.use(identityServiceRoutes);
+app.use(staffRoutes);
 
 // catch-all route for handling undefined routes
 app.use((req, res) => {
