@@ -49,9 +49,8 @@ services:
         logging:
             driver: "fluentd"
             options:
+                fluentd-address: fluentd:24224
                 tag: "identity"
-                max-size: "10m"
-                max-file: "50"
 
     movie:
         build: 
@@ -116,9 +115,8 @@ services:
         logging:
             driver: "fluentd"
             options:
+                fluentd-address: fluentd:24224
                 tag: "databaseservice"
-                max-size: "10m"
-                max-file: "50"
 
     database:
         build: ./cinema-booking/database
@@ -138,12 +136,12 @@ services:
             - "${DB_PORT}"
 
     fluentd:
-    build: ./fluentd-logging/
-    volumes:
-      - ./fluentd-logging/conf:/fluentd-logging/etc
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
+        build: ./fluentd-logging/
+        volumes:
+        - ./fluentd-logging/conf:/fluentd-logging/etc
+        ports:
+        - "24224:24224"
+        - "24224:24224/udp"
 
 networks:
   waf-to-frontend:
