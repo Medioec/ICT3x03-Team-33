@@ -28,13 +28,6 @@ app.use((req, res) => {
     res.status(404).send('Not Found');
 });
 
-// TODO: Uncomment the following line when HTTPS is enabled
-// Implement the HTTP Strict Transport Security (HSTS) header
-// app.use((req, res, next) => {
-    // res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-    // next();
-// });
-
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
