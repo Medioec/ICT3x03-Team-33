@@ -61,13 +61,13 @@ app.register_blueprint(booking_details_bp,url_prefix='/databaseservice/bookingde
 app.register_blueprint(showtimes_bp,url_prefix='/databaseservice/showtimes')
 
 # Cinema table queries
-app.register_blueprint(cinema_bp,url_prefix='/databaseservice/cinema')
+app.register_blueprint(cinema_bp,url_prefix='/databaseservice/cinemas')
 
 # Seat table queries
-app.register_blueprint(seat_bp,url_prefix='/databaseservice/seat')
+app.register_blueprint(seat_bp,url_prefix='/databaseservice/seats')
 
 # Theater table queries
-app.register_blueprint(theater_bp,url_prefix='/databaseservice/theater')
+app.register_blueprint(theater_bp,url_prefix='/databaseservice/theaters')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8085)
