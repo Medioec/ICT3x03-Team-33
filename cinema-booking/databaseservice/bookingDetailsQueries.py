@@ -3,7 +3,6 @@ import os
 import psycopg2
 from psycopg2 import IntegrityError 
 import logging
-from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
 
 # Create or get the logger
 logger = logging.getLogger(__name__)
