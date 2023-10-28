@@ -28,18 +28,19 @@ function checkUserRole(requiredRole) {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
-            });
+            })
+            .then(response => {
+                console.log(response);
 
-            const responseData = response.json();
-            console.log(responseData);
+                // if validation fails, user doesn't have permissions
+                if (response.status !== 200) {
+                    return res.status(403).send('Access Forbidden');
+                }
 
-            // if validation fails, user doesn't have permissions
-            if (response.status !== 200) {
-                return res.status(403).send('Access Forbidden');
-            }
-
-            // if validation passes, call next middleware
-            next();
+                // if validation passes, call next middleware
+                next();
+            })
+            
         } catch (error) {
             console.error('Error in checkUserRole middleware:', error);
             res.status(500).send('Internal Server Error');

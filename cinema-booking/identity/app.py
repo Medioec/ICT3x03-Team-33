@@ -67,6 +67,7 @@ def register():
         return jsonify({"message": "Username does not meet the requirements"}), 400
     
     if not user_utils.validatePassword(password):
+        print("password not meet reqs")
         return jsonify({"message": "Password does not meet the requirements"}), 400
     
     # check if username exists in db
@@ -288,6 +289,7 @@ def logout():
     response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
+        print("logout successful")
         # log logout success
         logger.info(f"Logout successful")
         return jsonify({"message": "Logout successful"}), 200
