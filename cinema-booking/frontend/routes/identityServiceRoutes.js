@@ -9,7 +9,7 @@ const checkHeaders = require('../middleware/checkHeaders');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 
 // login
-router.get('/login', identityServiceController.getLogin);
+router.get('/login', checkLoggedIn, identityServiceController.getLogin);
 router.post('/loginRequest', checkHeaders, identityServiceController.postLogin);
 
 // register

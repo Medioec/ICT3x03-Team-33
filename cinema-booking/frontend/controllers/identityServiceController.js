@@ -11,17 +11,23 @@ const identityService = require('../models/identityServiceModel');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 const checkHeaders = require('../middleware/checkHeaders'); 
 
-exports.getLogin = [checkLoggedIn, async (req, res) => {
+exports.getLogin = (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
 
+    // if logged in, don't try to login again
+    if (loggedIn) {
+        return res.redirect('/');
+    }
+
     // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
     res.render('login.ejs', { loggedIn });
-}];
+};
 
 exports.postLogin = async (req, res) => {
     try {
         const data = await identityService.loginRequest(req.body);
+        console.log(data);
 
         if (data.sessionToken) {
             const decodedToken = JSON.parse(atob(data.sessionToken.split('.')[1]));
@@ -31,7 +37,7 @@ exports.postLogin = async (req, res) => {
                 path: '/',
                 maxAge: expiryDelta,
                 httpOnly: true
-                // TODO: add more cookie options as needed
+                // TODO: add more cookie options (samesite, secure, etc.)
             });
 
             // Set loggedIn status
@@ -39,7 +45,10 @@ exports.postLogin = async (req, res) => {
 
             // on login, redirect to home page
             console.log("Redirecting to /");
-            res.redirect(301, "/");
+            console.log(res.getHeaders()); // Log headers
+            // res.setHeader('Location', '/');
+            // res.status(302).send();
+            res.redirect(302, "/");
 
         } else {
             req.loggedIn = false;
@@ -51,7 +60,14 @@ exports.postLogin = async (req, res) => {
 };
 
 exports.getRegister = (req, res) => {
-    // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
+    // Get the loggedIn status from the request object
+    const loggedIn = req.loggedIn;
+
+    // if logged in, don't allow register again
+    if (loggedIn) {
+        return res.redirect('/');
+    }
+
     res.render('register.ejs');
 };
 
@@ -79,8 +95,7 @@ exports.logout = async (req, res) => {
 
         // if not logged in, don't try to logout
         if (!loggedIn) {
-            res.status(401).json({ message: 'Not logged in.' });
-            return;
+            return res.status(401).json({ message: 'Not logged in.' });
         }
 
         // if logged in, allow logout
@@ -89,10 +104,11 @@ exports.logout = async (req, res) => {
         const data = await identityService.logoutRequest(token);
 
         res.clearCookie('token');
-        res.json({ message: data });
+        
+        // TODO add logout page/some other redirection
 
     } catch (error) {
-        console.error('Error in logout:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
