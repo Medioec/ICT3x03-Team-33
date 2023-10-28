@@ -26,7 +26,6 @@ exports.postLogin = async (req, res) => {
         if (data.sessionToken) {
             const decodedToken = JSON.parse(atob(data.sessionToken.split('.')[1]));
             const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
-
             res.cookie('token', data.sessionToken, {
                 path: '/',
                 maxAge: expiryDelta,
@@ -36,7 +35,7 @@ exports.postLogin = async (req, res) => {
 
             // set loggedIn status
             req.loggedIn = true;
-            return res.status(data.status).json({'message': 'Login successful'});
+            return res.status(200).json({'message': 'Login successful'});
 
         } else {
             req.loggedIn = false;

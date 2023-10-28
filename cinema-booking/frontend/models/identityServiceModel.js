@@ -12,7 +12,8 @@ async function loginRequest(body) {
         body: JSON.stringify(body),
     });
 
-    return response;
+    responseData = await response.json();
+    return responseData;
 }
 
 async function registerRequest(body) {
