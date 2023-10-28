@@ -141,7 +141,7 @@ networks:
     internal: true
   databaseservice-to-database:
     driver: bridge
-    internal: true
+    internal: true    
 
 volumes:
   postgres_container:
