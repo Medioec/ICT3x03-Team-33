@@ -5,25 +5,24 @@ const movieService = require('../models/movieServiceModel');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 const checkHeaders = require('../middleware/checkHeaders'); 
 
-exports.getHomePage = [checkLoggedIn, async (req, res) => {
+exports.getHomePage = async (req, res) => {
     try {
+        // Get the loggedIn status from the request object
+        const loggedIn = req.loggedIn;
+        // console.log("getHomePage: " + loggedIn);
+        
         // get all movies from movie service
         const movies = await movieService.getAllMovies();
         console.log(movies);
         
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
-        
-        res.render('index.ejs', { movies, loggedIn });
+        // console.log("Rendering index.ejs");
+        return res.render('index.ejs', { movies, loggedIn });
 
     } catch (error) {
         // Handle errors
-        console.error("Error in getHomePage:", error);
-        res.status(500).send('Internal Server Error: ' + error.message);
-
-        // res.status(500).send('Internal Server Error');
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
-}];
+};
 
 exports.getMovieDetailsPage = [async (req, res) => {
     try {
@@ -38,6 +37,7 @@ exports.getMovieDetailsPage = [async (req, res) => {
     } catch (error) {
         // Handle errors
         console.error("Error in getMovieDetailsPage:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
         // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];
