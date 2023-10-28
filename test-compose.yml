@@ -1,36 +1,47 @@
 version: '3.3'
 services:
-    ubuntu:
-        image: ubuntu
-        networks:
-            - cinema-test_waf-to-frontend
-            - cinema-test_frontend-to-identity
-            - cinema-test_frontend-to-booking
-            - cinema-test_booking-to-payment
-            - cinema-test_frontend-to-movie
-            - cinema-test_databaseservice-to-database
-        command: bash -c 'echo test'
+  ubuntu:
+      image: ubuntu
+      networks:
+          - waf-to-frontend
+          - frontend-to-identity
+          - frontend-to-booking
+          - booking-to-payment
+          - frontend-to-movie
+          - databaseservice-to-database
+      command: bash -c 'echo test'
 
 networks:
-  cinema-test_waf-to-frontend:
+  waf-to-frontend:
+    name: cinema-${ENV}_waf-to-frontend
     external: true
-  cinema-test_frontend-to-identity:
+  frontend-to-identity:
+    name: cinema-${ENV}_frontend-to-identity
     external: true
-  cinema-test_frontend-to-booking:
+  frontend-to-booking:
+    name: cinema-${ENV}_frontend-to-booking
     external: true 
-  cinema-test_frontend-to-movie:
+  frontend-to-movie:
+    name: cinema-${ENV}_frontend-to-movie
     external: true
-  cinema-test_booking-to-payment:
+  booking-to-payment:
+    name: cinema-${ENV}_booking-to-payment
     external: true
-  cinema-test_identity-to-payment:
+  identity-to-payment:
+    name: cinema-${ENV}_identity-to-payment
     external: true
-  cinema-test_identity-to-databaseservice:
+  identity-to-databaseservice:
+    name: cinema-${ENV}_identity-to-databaseservice
     external: true
-  cinema-test_movie-to-databaseservice:
+  movie-to-databaseservice:
+    name: cinema-${ENV}_movie-to-databaseservice
     external: true
-  cinema-test_payment-to-databaseservice:
+  payment-to-databaseservice:
+    name: cinema-${ENV}_payment-to-databaseservice
     external: true
-  cinema-test_booking-to-databaseservice:
+  booking-to-databaseservice:
+    name: cinema-${ENV}_booking-to-databaseservice
     external: true
-  cinema-test_databaseservice-to-database:
+  databaseservice-to-database:
+    name: cinema-${ENV}_databaseservice-to-database
     external: true

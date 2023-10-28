@@ -4,7 +4,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/test-build.sh'
+                sh './scripts/docker-build.sh test'
             }
         }
         stage('OWASP DependencyCheck') {
@@ -15,11 +15,11 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/test-deploy.sh'
+                sh './scripts/docker-deploy.sh test'
                 sh 'docker ps'
                 echo 'Add test step here'
-                sh './scripts/unit-test.sh'
-                sh './scripts/test-kill-volumes.sh'
+                sh './scripts/test.sh test'
+                sh './scripts/docker-kill-volumes.sh test'
             }
         }
     }
