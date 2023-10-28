@@ -72,10 +72,12 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           body: JSON.stringify(data),
         })
-        .then(response => response.json())
-        .then(data => {
-          // TODO: REPLACE WITH LOGIN SUCCESS CODE
-          document.getElementById("error-message").textContent = data.message;
+        .then(response => 
+        {
+          // redirect to login if registration successful
+          if (response.ok) {
+            window.location.href = "/login";
+          }
         });
       } else {
         document.getElementById("error-message").textContent = "Please complete the reCAPTCHA.";

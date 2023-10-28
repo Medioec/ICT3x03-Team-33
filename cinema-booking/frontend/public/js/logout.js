@@ -8,7 +8,7 @@ $("#logout-button").click(function () {
     })
 
     .then(response => {
-        if (response.status === 200) {
+        if (response.ok) {
             window.location.href = "/";
         }
     })

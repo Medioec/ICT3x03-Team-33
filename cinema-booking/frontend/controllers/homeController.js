@@ -1,19 +1,13 @@
 // models
 const movieService = require('../models/movieServiceModel');
 
-// custom middleware
-const checkLoggedIn = require('../middleware/checkLoggedIn');
-const checkHeaders = require('../middleware/checkHeaders'); 
-
-exports.getHomePage = async (req, res) => {
+exports.getHomePage = [async (req, res) => {
     try {
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
-        // console.log("getHomePage: " + loggedIn);
         
         // get all movies from movie service
         const movies = await movieService.getAllMovies();
-        console.log(movies);
         
         // console.log("Rendering index.ejs");
         return res.render('index.ejs', { movies, loggedIn });
@@ -22,7 +16,7 @@ exports.getHomePage = async (req, res) => {
         // Handle errors
         return res.status(500).json({ 'message': 'Internal Server Error' });
     }
-};
+}];
 
 exports.getMovieDetailsPage = [async (req, res) => {
     try {

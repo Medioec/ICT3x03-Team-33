@@ -18,11 +18,9 @@ const checkLoggedIn = (req, res, next) => {
                 } else {
                     req.loggedIn = false;
                 }
-                console.log("checkLoggedIn: " + req.loggedIn);
                 next();
             })
             .catch(error => {
-                console.error(error);
                 res.status(500).send('Internal Server Error');
             });
         } else {
@@ -30,7 +28,6 @@ const checkLoggedIn = (req, res, next) => {
             next();
         }
     } catch (error) {
-        console.error(error);
         res.status(500).send('Internal Server Error');
     }
 };

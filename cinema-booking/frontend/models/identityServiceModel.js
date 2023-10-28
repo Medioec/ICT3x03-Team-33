@@ -12,7 +12,7 @@ async function loginRequest(body) {
         body: JSON.stringify(body),
     });
 
-    return response.json();
+    return response;
 }
 
 async function registerRequest(body) {
@@ -25,7 +25,7 @@ async function registerRequest(body) {
         body: JSON.stringify(body),
     });
     
-    return response.json();
+    return response;
 }
 
 async function logoutRequest(token) {
@@ -38,12 +38,7 @@ async function logoutRequest(token) {
         }
     });
 
-    // return response.json();
-    const status = response.status; // Get the HTTP status code
-
-    const responseBody =  response.json(); // Parse the response body as JSON
-
-    return { status, responseBody };
+    return response;
 }
 
 module.exports = {
