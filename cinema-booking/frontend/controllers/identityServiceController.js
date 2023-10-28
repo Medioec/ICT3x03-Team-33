@@ -65,7 +65,7 @@ exports.postRegister = async (req, res) => {
 
         // if logged in, don't try to register
         if (loggedIn) {
-            return res.status(401).json({ message: 'Unauthorized request.'});
+            return res.status(401).json({ message: 'Unauthorized request'});
         }
 
         const data = await identityService.registerRequest(req.body);
@@ -90,8 +90,9 @@ exports.logout = async (req, res) => {
         const token = req.cookies.token;
         const data = await identityService.logoutRequest(token);
         
-        if (data.status === 401) {
-            res.clearCookie('token');
+        res.clearCookie('token');
+
+        if (data.status === 200) {
             return res.status(200).json({'message': 'Logout successful'});
         }
         
