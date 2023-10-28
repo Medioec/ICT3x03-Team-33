@@ -33,13 +33,23 @@
         </script>
 
         <div class="container">
+            <% showtimes.forEach((showtime) => { %>
+                    <a href="/showtimedetails?showtimeId=<%= showtime.showtimeId %>">
+                    <h4><%= showtime.showtimeId %></h4></a>
+            <% }); %>
+        </div>
+
+        <div class="container">
             <!-- Get unique showDates -->
             <% let uniqueShowDates = [...new Set(showtimes.map(showtime => showtime.showDate))]; %>
             
             <!-- Loop through unique showDates -->
             <% uniqueShowDates.forEach(uniqueDate => { %>
-                <h4><%= uniqueDate %></h4>
-                
+                <div class="col-auto dateTab">
+                    <button id="showtimes" class="btn dateButton">
+                        <h4><%= uniqueDate %></h4>
+                    </button>
+                </div>
                 <!-- Get showtimes for the current showDate -->
                 <% let showtimesForDate = showtimes.filter(showtime => showtime.showDate === uniqueDate); %>
                 
@@ -48,8 +58,14 @@
                 
                 <!-- Loop through unique cinemaIds -->
                 <% uniqueCinemaIds.forEach(uniqueCinemaId => { %>
-                    <h5>Cinema <%= uniqueCinemaId %></h5>
-                    
+                    <div class="row movieRow">
+                        <div class="col-md-4">
+                            <h5>Cinema <%= uniqueCinemaId %></h5>
+                            <a class="subtitles">Subtitles: </a>
+                            <div class="row"><a class="ratings">Rating: </a>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Get showtimes for the current cinemaId and showDate -->
                     <% let showtimesForCinema = showtimesForDate.filter(showtime => showtime.cinemaId === uniqueCinemaId); %>
                     
@@ -76,7 +92,6 @@
 
 <%- include('../partial/footer'); %>
 
-<script src="/js/nav.js"></script>
 <script src="/js/moviedetails.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

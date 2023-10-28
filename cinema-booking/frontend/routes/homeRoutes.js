@@ -15,6 +15,12 @@ router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);
 // all showtimes from navbar
 router.get('/allshowtimes',checkLoggedIn, homeController.getAllShowtimesPage);
 
+
+
+
+router.get('/showtimedetails',checkLoggedIn, homeController.getShowtimesDetailsPage);
+
+
 // Add other routes as needed
 
 module.exports = router;

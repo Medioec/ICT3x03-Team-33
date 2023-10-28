@@ -106,3 +106,24 @@ exports.getAllShowtimesPage = [async (req, res) => {
         // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];
+
+exports.getShowtimesDetailsPage = [async (req, res) => {
+    try {
+        // Get the movieId from the query parameters
+        const showtimeId = req.query.showtimeId;
+
+        // Fetch the movie details using the movieServiceModel function
+        const showtimes = await movieService.getShowtimeById(showtimeId);
+
+        // Get the loggedIn status from the request object
+        const loggedIn = req.loggedIn;
+
+        // Render the 'moviedetails.ejs' page with the movie data
+        res.render('pages/showtimedetails.ejs', { showtimes, loggedIn });
+    } catch (error) {
+        // Handle errors
+        console.error("Error in getShowtimesDetailsPage:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+        // res.status(500).send('Internal Server Error: ' + error.message);
+    }
+}];
