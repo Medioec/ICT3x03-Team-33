@@ -17,8 +17,24 @@ import logging
 app = Flask(__name__)
 CORS(app)
 
-# Configure logging path
-logging.basicConfig(filename='./logs/identityServiceLogs.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Create or get the root logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+# File handler
+file_handler_path = './logs/identityServiceLogs.log'
+file_handler = logging.FileHandler(file_handler_path)
+file_handler.setFormatter(log_format)
+logger.addHandler(file_handler)
+
+# Stream (console) handler for stdout
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(log_format)
+logger.addHandler(stream_handler)
+
+logger.info("Identity Service started")
 
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 

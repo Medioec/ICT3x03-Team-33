@@ -11,6 +11,7 @@ from showtimesQueries import showtimes_bp
 from cinemaTableQueries import cinema_bp
 from seatTableQueries import seat_bp
 from theaterTableQueries import theater_bp
+import logging
 
 app = Flask(__name__)
 CORS(app)

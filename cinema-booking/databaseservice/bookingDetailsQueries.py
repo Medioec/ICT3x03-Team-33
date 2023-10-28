@@ -2,6 +2,7 @@ from flask import request, jsonify, Blueprint
 import os
 import psycopg2
 from psycopg2 import IntegrityError 
+import logging
 
 booking_details_bp = Blueprint("bookingdetails", __name__)
 
