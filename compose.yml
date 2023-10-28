@@ -40,19 +40,16 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
-            - fluentd-to-identity
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${IDENTITY_PORT}"
         logging:
-            driver: "fluentd"
+            driver: "json-file"
             options:
-                fluentd-address: fluentd:24224
-                tag: "identity"
-        depends_on:
-        - fluentd
+                max-size: "10m"
+                max-file: "20"
 
     movie:
         build: 
@@ -105,7 +102,6 @@ services:
             - payment-to-databaseservice
             - booking-to-databaseservice
             - databaseservice-to-database
-            - fluentd-to-databaseservice
         environment:
             PYTHONUNBUFFERED: 1
             DB_HOST: database
@@ -115,12 +111,12 @@ services:
         ports:
             - "${DBSERVICE_PORT}"
         logging:
-            driver: "fluentd"
+            driver: "json-file"
             options:
-                fluentd-address: fluentd:24224
-                tag: "databaseservice"
+                max-size: "10m"
+                max-file: "20"
         depends_on:
-        - fluentd
+            - database
 
     database:
         build: ./cinema-booking/database
@@ -138,16 +134,6 @@ services:
             - postgres_container:/var/lib/postgresql/data
         ports:
             - "${DB_PORT}"
-
-    fluentd:
-        build: ./fluentd-logging/
-        volumes:
-        - ./fluentd-logging/conf:/fluentd-logging/etc
-        networks:
-            - fluentd-to-databaseservice
-            - fluentd-to-identity
-        ports:
-        - "24224:24224"
 
 networks:
   waf-to-frontend:
@@ -171,11 +157,7 @@ networks:
   booking-to-databaseservice:
     driver: bridge
   databaseservice-to-database:
-    driver: bridge
-  fluentd-to-databaseservice:
-    driver: bridge
-  fluentd-to-identity:
-    driver: bridge        
+    driver: bridge   
 
 volumes:
   postgres_container:
