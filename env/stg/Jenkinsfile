@@ -1,42 +1,24 @@
 pipeline {
-    agent none
+    agent { label 'host' }
     stages {
         stage('Build') {
-            agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/stg-build.sh'
+                sh './scripts/docker-build.sh stg'
             }
         }
-        stage('OWASP DependencyCheck') {
-            agent { label 'host' }
-            steps {
-                dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
-            }
-        }
-        stage('Test') {
-            agent { label 'host' }
+        stage('Deploy and Test') {
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/test-deploy.sh'
+                sh './scripts/docker-deploy.sh stg'
                 echo 'Add test step here'
-                sh './scripts/unit-test.sh'
-                sh './scripts/test-kill-volumes.sh'
-            }
-        }
-        stage('Deploy') {
-            agent { label 'host' }
-            steps {
-                sh 'chmod 700 -R scripts/'
-                sh './scripts/stg-deploy.sh'
+                sh './scripts/test.sh stg'
             }
         }
     }
     post {
         success {
-            node('host') {
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-            }
+            dependencyCheckPublisher pattern: 'dependency-check-report.xml'
         }
     }
 }

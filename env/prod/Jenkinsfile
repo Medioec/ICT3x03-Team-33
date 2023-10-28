@@ -1,53 +1,28 @@
 pipeline {
-    agent none
+    agent { label 'host' }
     stages {
         stage('Build') {
-            parallel {
-                stage('Build Test') {
-                    agent { label 'builtin' }
-                    steps {
-                        sh 'chmod 700 -R scripts/'
-                        sh './scripts/test-build.sh'
-                    }
-                }
-                stage('Build Prod') {
-                    agent { label 'host' }
-                    steps {
-                        sh 'chmod 700 -R scripts/'
-                        sh './scripts/prod-build.sh'
-                    }
-                }
+            steps {
+                sh 'chmod 700 -R scripts/'
+                sh './scripts/docker-build.sh prod'
             }
         }
         stage('OWASP DependencyCheck') {
-            agent { label 'host' }
             steps {
                 dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
-        stage('Test') {
-            agent { label 'builtin' }
+        stage('Deploy and Test') {
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/test-deploy.sh'
-                echo 'Add test step here'
-                sh './scripts/unit-test.sh'
-                sh './scripts/test-kill-volumes.sh'
-            }
-        }
-        stage('Deploy') {
-            agent { label 'host' }
-            steps {
-                sh 'chmod 700 -R scripts/'
-                sh './scripts/prod-deploy.sh'
+                sh './scripts/docker-deploy.sh prod'
+                sh './scripts/test.sh prod'
             }
         }
     }
     post {
         success {
-            node('host') {
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-            }
+            dependencyCheckPublisher pattern: 'dependency-check-report.xml'
         }
     }
 }

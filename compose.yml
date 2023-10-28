@@ -159,13 +159,13 @@ networks:
   frontend-to-identity:
     driver: bridge
   frontend-to-booking:
-    driver: bridge  
+    driver: bridge
   frontend-to-movie:
     driver: bridge
   booking-to-payment:
     driver: bridge
   identity-to-payment:
-    driver: bridge  
+    driver: bridge
   identity-to-databaseservice:
     driver: bridge
   movie-to-databaseservice:
@@ -175,7 +175,7 @@ networks:
   booking-to-databaseservice:
     driver: bridge
   databaseservice-to-database:
-    driver: bridge   
+    driver: bridge
 
 volumes:
   postgres_container:
