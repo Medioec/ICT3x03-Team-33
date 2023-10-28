@@ -41,14 +41,14 @@ exports.postLogin = async (req, res) => {
 
             // set loggedIn status
             req.loggedIn = true;
-            return res.status(200).json({'message': 'Login successful', 'userRole': userRole});
+            return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
 
         } else {
             req.loggedIn = false;
-            return res.status(401).json({ 'message': 'Login failed. Invalid credentials.' });
+            return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        return res.status(500).json({ 'message': 'Internal Server Error' });
+        return res.status(500).json({'status': 'fail', 'message': 'Internal Server Error' });
     }
 };
 

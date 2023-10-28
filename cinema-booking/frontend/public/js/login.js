@@ -55,15 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => {
           console.log("test");
           console.log("client response status code: ", response.status);
-      
-          if (response.ok) {
-            return response.json(); // Parse response as JSON
-          } else {
-            // Handle non-OK responses here
-            throw new Error(`Server responded with status ${response.status}`);
-          }
+          return response.json(); // Parse response as JSON
         })
         .then(data => {
+          if (data.status === 'fail') {
+            document.getElementById("error-message").textContent = data.message;
+            throw new Error('Invalid Credentials');
+          }
           console.log("client response: ", data.userRole);
       
           switch (data.userRole) {
