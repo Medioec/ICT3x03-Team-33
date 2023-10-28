@@ -1,13 +1,27 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
+import os
 import requests
 import user_utils
 
 app = Flask(__name__)
 CORS(app)
 
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+
+jwt = JWTManager(app)
+
+#####   throw error when JWT token is not valid     #####
+@jwt.unauthorized_loader
+def unauthorized_callback(callback):
+    print("unauthorized callback")
+    return jsonify({"message": "Unauthorized access"}), 401
+#####   End of throw error when JWT token is not valid     #####
+
 #####     Create a new movie entry in the database     #####
 @app.route('/createMovie', methods=["POST"])
+@jwt_required()
 def createMovie():
     try:
         data = request.get_json()
@@ -84,6 +98,7 @@ def getMovieById(movie_id):
 
 #####     Update a movie entry by its ID     #####
 @app.route('/updateMovieById/<int:movie_id>', methods=['PUT'])
+@jwt_required()
 def updateMovieById(movie_id):
     try:
         #ensure movie_id is an integer, throws exception otherwise
@@ -133,6 +148,7 @@ def updateMovieById(movie_id):
 
 #####     Delete a movie entry in the database     #####
 @app.route('/deleteMovieById/<int:movie_id>', methods=["DELETE"])
+@jwt_required()
 def deleteMovieById(movie_id):
     try:
         #ensure movie_id is an integer, throws exception otherwise
@@ -152,6 +168,7 @@ def deleteMovieById(movie_id):
 
 #####     Create a new showtime entry in the database     #####
 @app.route('/createShowtime', methods=["POST"])
+@jwt_required()
 def createShowtime():
     try:
         data = request.get_json()
@@ -288,6 +305,7 @@ def getShowtimeById(showtime_id):
 
 #####     Update a showtime entry by its ID     #####
 @app.route('/updateShowtimeById/<int:showtime_id>', methods=['PUT'])
+@jwt_required()
 def updateShowtimeById(showtime_id):
     try:
         validate_int = int(showtime_id)
@@ -329,6 +347,7 @@ def updateShowtimeById(showtime_id):
 
 #####     Delete a showtime entry in the database     #####
 @app.route('/deleteShowtimeById/<int:showtime_id>', methods=["DELETE"])
+@jwt_required()
 def deleteShowtimeById(showtime_id):
     try:
         validate_int = int(showtime_id)

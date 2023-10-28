@@ -7,75 +7,96 @@
 // models
 const identityService = require('../models/identityServiceModel');
 
-// custom middleware
-const checkLoggedIn = require('../middleware/checkLoggedIn');
-const checkHeaders = require('../middleware/checkHeaders'); 
-
-exports.getLogin = [checkLoggedIn, async (req, res) => {
+exports.getLogin = (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
 
-    // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
-    res.render('login.ejs', { loggedIn });
-}];
+    // if logged in, don't try to login again
+    if (loggedIn) {
+        return res.redirect('/');
+    }
 
-exports.postLogin = [checkHeaders, async (req, res) => {
+    res.render('login.ejs', { loggedIn });
+};
+
+exports.postLogin = async (req, res) => {
     try {
         const data = await identityService.loginRequest(req.body);
 
         if (data.sessionToken) {
             const decodedToken = JSON.parse(atob(data.sessionToken.split('.')[1]));
             const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
-
             res.cookie('token', data.sessionToken, {
                 path: '/',
                 maxAge: expiryDelta,
                 httpOnly: true
+                // TODO: add more cookie options (samesite, secure, etc.)
             });
 
-            // Set loggedIn status
+            // set loggedIn status
             req.loggedIn = true;
-
-            // on login, redirect to home page
-            res.redirect("/");
+            return res.status(200).json({'message': 'Login successful'});
 
         } else {
             req.loggedIn = false;
-            res.status(401).json({ message: 'Login failed. Invalid credentials.' });
+            return res.status(401).json({ 'message': 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        console.error('Error in postLogin:', error);
-        res.status(500).send('Internal Server Error');
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
-}];
+};
 
 exports.getRegister = (req, res) => {
+    // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
 
-    // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
-    res.render('register.ejs', { loggedIn });
+    // if logged in, don't allow register again
+    if (loggedIn) {
+        return res.redirect('/');
+    }
 
+    res.render('register.ejs');
 };
 
 exports.postRegister = async (req, res) => {
     try {
+        const loggedIn = req.loggedIn;
+
+        // if logged in, don't try to register
+        if (loggedIn) {
+            return res.status(401).json({ message: 'Unauthorized request'});
+        }
+
         const data = await identityService.registerRequest(req.body);
-        res.send(data);
+        return res.status(data.status).json({'message': 'Registration successful'});
+        
     } catch (error) {
-        console.error('Error in postRegister:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 
 exports.logout = async (req, res) => {
     try {
+        const loggedIn = req.loggedIn;
+
+        // if not logged in, don't try to logout
+        if (!loggedIn) {
+            res.clearCookie('token');
+            return res.status(401).json({ message: 'Not logged in.' });
+        }
+
+        // if logged in, allow logout
         const token = req.cookies.token;
         const data = await identityService.logoutRequest(token);
-
+        
         res.clearCookie('token');
-        res.json({ message: data });
+
+        if (data.status === 200) {
+            return res.status(200).json({'message': 'Logout successful'});
+        }
+        
     } catch (error) {
-        console.error('Error in logout:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
+

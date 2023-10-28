@@ -4,11 +4,10 @@ const homeController = require('../controllers/homeController');
 const checkHeaders = require('../middleware/checkHeaders');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 
-// index page
-router.get('/', homeController.getHomePage);
+router.get('/', checkLoggedIn, homeController.getHomePage);
 
 // route to moviedetails for a specific movie
-router.get('/moviedetails',checkLoggedIn, homeController.getMovieDetailsPage);
+router.get('/moviedetails', checkLoggedIn, homeController.getMovieDetailsPage);
 
 // all movies from navbar
 router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);

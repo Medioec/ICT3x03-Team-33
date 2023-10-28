@@ -12,7 +12,8 @@ async function loginRequest(body) {
         body: JSON.stringify(body),
     });
 
-    return response.json();
+    responseData = await response.json();
+    return responseData;
 }
 
 async function registerRequest(body) {
@@ -24,26 +25,21 @@ async function registerRequest(body) {
         },
         body: JSON.stringify(body),
     });
-
-    return response.json();
+    
+    return response;
 }
 
 async function logoutRequest(token) {
-    try {
-        const response = await fetch("http://identity:8081/logout", {
-            method: "DELETE",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
+    const response = await fetch("http://identity:8081/logout", {
+        method: "PUT",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
 
-        return response.json();
-    } catch (error) {
-        console.error(error);
-        throw new Error('Internal Server Error');
-    }
+    return response;
 }
 
 module.exports = {

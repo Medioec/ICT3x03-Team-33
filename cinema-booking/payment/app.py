@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
+import os
 import requests
 import user_utils
 from credit_card import *
@@ -7,22 +9,40 @@ from credit_card import *
 app = Flask(__name__)  
 CORS(app)
 
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+
+jwt = JWTManager(app)
+
+#####   throw error when JWT token is not valid     #####
+@jwt.unauthorized_loader
+def unauthorized_callback(callback):
+    print("unauthorized callback")
+    return jsonify({"message": "Unauthorized access"}), 401
+#####   End of throw error when JWT token is not valid     #####
+
 @app.route('/makePayment', methods=["POST"])
+@jwt_required()
 def makePayment():
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
-    creditCardNumber = data['creditCardNumber']
-    creditCardName = data['creditCardName']
-    creditCardExpiry = data['creditCardExpiry']
-    cvv = data['cvv']
+    userId = data['userId']
     
     # TODO - Will need to pass in session information in POST request. To take from JWT
     
+    url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
+    response = requests.get(url)
+    
+    if response.status_code == 404:
+        return jsonify({"message": "Credit card not found"}), 404
+    elif response.status_code == 403:
+        return jsonify({"message": "Access denied: No permissions"}), 403
+    else:
+        blob = response.json()['blob']
+
     sessionId = data['sessionId']
     hash = data['hash']
     
-    # TODO - clarify if need to get the blob from db first? How does make payment work? FOLLOW UP
     # Get session encryption key from db here
     payload = {
         "sessionId": sessionId
@@ -47,7 +67,7 @@ def makePayment():
         return jsonify({"message": "Invalid credit card name"}), 400
     if not user_utils.validateCreditCardExpiry(card.expiry):
         return jsonify({"message": "Invalid credit card expiry date"}), 400
-    if not user_utils.validateCvv(cvv):
+    if not user_utils.validateCvv(card.cvv):
         return jsonify({"message": "Invalid CVV"}), 400
     
     max_retries = 3
@@ -85,6 +105,7 @@ def makePayment():
     return jsonify({"message": "Exceeded maximum retry attempts"}), 500
 
 @app.route('/addCreditCard', methods=["POST"])
+@jwt_required()
 def addCreditCard():
     # Retrieve credit card details from request
     data = request.get_json()
@@ -125,7 +146,7 @@ def addCreditCard():
     userId = rjson['userId']
         
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
-    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry, cvv)
     b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
     
     # Form JSON data to be sent to the databaseservice
@@ -149,6 +170,7 @@ def addCreditCard():
         return jsonify({"message": "Error adding the credit card"}), 500
 
 @app.route('/getOneCreditCard', methods=["POST"])
+@jwt_required()
 def getCreditCard(userId, creditCardId):
     data = request.get_json()
     creditCardId = data['creditCardId']
@@ -187,7 +209,8 @@ def getCreditCard(userId, creditCardId):
                 "creditCardId": creditCardId,
                 "creditCardNumber": dec_card.card_num,
                 "creditCardName": dec_card.name,
-                "creditCardExpiry": dec_card.expiry
+                "creditCardExpiry": dec_card.expiry,
+                "cvv": dec_card.cvv
             }
         
         return jsonify(ccobj), 200
@@ -203,6 +226,7 @@ def getCreditCard(userId, creditCardId):
         return jsonify({"message": "Error retrieving the credit card"}), 500
     
 @app.route('/getAllCreditCards', methods=["POST"])
+@jwt_required()
 def getAllCreditCards():
     data = request.get_json()
     userId = data['userId']
@@ -241,7 +265,8 @@ def getAllCreditCards():
                 "creditCardId": creditCardId,
                 "creditCardNumber": dec_card.card_num,
                 "creditCardName": dec_card.name,
-                "creditCardExpiry": dec_card.expiry
+                "creditCardExpiry": dec_card.expiry,
+                "cvv": dec_card.cvv
             }
             response_list.append(dictobj)
         
@@ -254,6 +279,7 @@ def getAllCreditCards():
         return jsonify({"message": "Error retrieving the credit cards"}), 500
 
 @app.route('/updateOneCreditCard', methods=["PUT"])
+@jwt_required()
 def updateOneCreditCard():
     # Retrieve credit card details from request
     data = request.get_json()
@@ -294,7 +320,7 @@ def updateOneCreditCard():
     userId = rjson['userId']
     
     # use encryption key and hash to encrypt credit card info into blob (b64 cos cannot send binary)
-    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry)
+    card_obj = CreditCard(creditCardNumber, creditCardName, creditCardExpiry, cvv)
     b64 = card_obj.encrypt_to_b64_blob(hash, encryption_key)
     
     # Form JSON data to be sent to the databaseservice        
@@ -323,6 +349,7 @@ def updateOneCreditCard():
         return jsonify({"message": "Error updating the credit card"}), 500
 
 @app.route('/deleteCreditCard/<uuid:userId>/<int:creditCardId>', methods=["DELETE"])
+@jwt_required()
 def deleteCreditCard(userId, creditCardId):
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
     url = f"http://databaseservice:8085/databaseservice/creditcard/delete_credit_card/{userId}/{creditCardId}"
