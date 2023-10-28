@@ -2,9 +2,15 @@ from flask import request, jsonify, Blueprint
 import os
 import psycopg2
 from psycopg2 import IntegrityError 
+import logging
 
+# Create or get the logger
+logger = logging.getLogger(__name__)
+
+# Create a blueprint
 seat_bp = Blueprint("seat", __name__)
 
+# Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_NORMALUSER"),
@@ -15,6 +21,8 @@ db_config = {
 #####     Add new seat entry in the database     #####
 @seat_bp.route('/add_seat', methods=['POST'])
 def add_seat():
+    # Log the addition of a new seat entry
+    logger.info("Adding new seat started.")
     try:
         data = request.get_json()
         seatId = data['seatId']
@@ -31,6 +39,8 @@ def add_seat():
             cursor.close()
             conn.close()
             
+            # Log the successful creation of a new seat entry
+            logger.info("Seat added successfully with new seatId: {new_seat_id}.")
             return jsonify({"message": "Seat added successfully", "seatId": new_seat_id}), 201
             
         except IntegrityError as e:
@@ -38,10 +48,11 @@ def add_seat():
             conn.rollback()  # Rollback the transaction
             cursor.close()
             conn.close()
+            # Log the error
+            logger.error(f"Duplicate entry in add_seat. seatId: {seatId}")
             return jsonify({"error": "Duplicate entry: This seat already exists."}), 409
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 #####     End of add new seat entry    #####
 
 
