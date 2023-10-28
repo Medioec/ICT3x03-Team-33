@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
           if (data.status === 'fail') {
             document.getElementById("error-message").textContent = data.message;
-            throw new Error('Invalid Credentials');
+            throw new Error(data.message);
           }
           console.log("client response: ", data.userRole);
       
