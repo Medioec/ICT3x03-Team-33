@@ -16,6 +16,25 @@ import logging
 app = Flask(__name__)
 CORS(app)
 
+# Create or get the root logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+# File handler
+file_handler_path = './logs/databaseServiceLogs.log'
+file_handler = logging.FileHandler(file_handler_path)
+file_handler.setFormatter(log_format)
+logger.addHandler(file_handler)
+
+# Stream (console) handler for stdout
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(log_format)
+logger.addHandler(stream_handler)
+
+logger.info("Database Service started")
+
 # To use the endpoints in userQueries.py, access it via the url prefix '/databaseservice/user'. e.g. http://localhost:8085/databaseservice/user/add_user
 # User table queries
 app.register_blueprint(user_bp,url_prefix='/databaseservice/user')
