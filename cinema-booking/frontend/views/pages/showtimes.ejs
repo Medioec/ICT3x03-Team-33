@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Showtimes</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/css/nav.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/showtimes.css" />
+</head>
+<main>
+
+    <body>
+        <!-- Navbar -->
+        <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+        
+           <!-- ///////////////MAKE SURE TO REMOVE////////////// -->
+           <!-- log showtimes to the console for debugging -->
+        <% var data = JSON.stringify(showtimes) %>
+        <script>
+            try {
+                console.log(<%- JSON.stringify(data) %>);
+            } catch (error) {
+                console.error("Error logging showtimes:", error);
+            }
+        </script>
+
+        <div class="container">
+            <!-- Get unique showDates -->
+            <% let uniqueShowDates = [...new Set(showtimes.map(showtime => showtime.showDate))]; %>
+            
+            <!-- Loop through unique showDates -->
+            <% uniqueShowDates.forEach(uniqueDate => { %>
+                <h4><%= uniqueDate %></h4>
+                
+                <!-- Get showtimes for the current showDate -->
+                <% let showtimesForDate = showtimes.filter(showtime => showtime.showDate === uniqueDate); %>
+                
+                <!-- Get unique cinemaIds for the current showDate -->
+                <% let uniqueCinemaIds = [...new Set(showtimesForDate.map(showtime => showtime.cinemaId))]; %>
+                
+                <!-- Loop through unique cinemaIds -->
+                <% uniqueCinemaIds.forEach(uniqueCinemaId => { %>
+                    <h5>Cinema <%= uniqueCinemaId %></h5>
+                    
+                    <!-- Get showtimes for the current cinemaId and showDate -->
+                    <% let showtimesForCinema = showtimesForDate.filter(showtime => showtime.cinemaId === uniqueCinemaId); %>
+                    
+                    <!-- Get unique movieIds for the current cinemaId and showDate -->
+                    <% let uniqueMovieIds = [...new Set(showtimesForCinema.map(showtime => showtime.movieId))]; %>
+                    
+                    <!-- Loop through unique movieIds -->
+                    <% uniqueMovieIds.forEach(uniqueMovieId => { %>
+                        <h6>Movie <%= uniqueMovieId %></h6>
+                        <!-- Get showtimes for the current cinemaId, showDate, and movieId -->
+                        <% let showtimesForMovie = showtimesForCinema.filter(showtime => showtime.movieId === uniqueMovieId); %>
+                        <!-- Loop through showtimes for the current movieId -->
+                        <% showtimesForMovie.forEach(showtime => { %>
+                            <button id="showtimes" class="btn btn-primary"><%= showtime.showTime %></button>
+                        <% }); %>
+                    <% }); %>
+                <% }); %>
+            <% }); %>
+        </div>
+
+    </body>
+
+</main>
+
+<%- include('../partial/footer'); %>
+
+<script src="/js/nav.js"></script>
+<script src="/js/moviedetails.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

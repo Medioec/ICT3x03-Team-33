@@ -231,14 +231,74 @@ def getAllShowtimes():
 def getShowtimeById(showtime_id):
     try:
         validate_int = int(showtime_id)
-        url = f"http://databaseservice:8085/databaseservice/showtimes/get_showtime_by_id/{validate_int}"
-        response = requests.get(url)
+        showtime_url = f"http://databaseservice:8085/databaseservice/showtimes/get_showtime_by_id/{validate_int}"
+        response = requests.get(showtime_url)
         if response.status_code == 200:
-            return jsonify(response.json()), 200
+            showtime_id = response.json()['showtimeId']
+            movie_id = response.json()['movieId']
+            cinema_id = response.json()['cinemaId']
+            theater_id = response.json()['theaterId']
+            show_date = response.json()['showDate']
+            show_time = response.json()['showTime']
+            
+            movie_url = f"http://databaseservice:8085/databaseservice/moviedetails/get_movie_by_id/{movie_id}"
+            movie_response = requests.get(movie_url)
+            
+            if movie_response.status_code == 200:
+                movie_title = movie_response.json()['title']
+                movie_synopsis = movie_response.json()['synopsis']
+                movie_genre = movie_response.json()['genre']
+                movie_content_rating = movie_response.json()['contentRating']
+                movie_lang = movie_response.json()['lang']
+                movie_subtitles = movie_response.json()['subtitles']
+                
+                url = f"http://databaseservice:8085/databaseservice/cinemas/get_cinema_by_id/{cinema_id}"
+                cinema_response = requests.get(url)
+                
+                if cinema_response.status_code == 200:
+                    cinemaName = cinema_response.json()['cinemaName']
+                    locationName = cinema_response.json()['locationName']
+                    
+                    theater_url = f"http://databaseservice:8085/databaseservice/theaters/get_theater_by_number/{theater_id}"
+                    theater_response = requests.get(theater_url)
+                    
+                    if theater_response.status_code == 200:
+                        theaterNumber = theater_response.json()['theaterNumber']
+                        
+                        showtime_details = {
+                            "showtimeId": showtime_id,
+                            "cinemaId": cinema_id,
+                            "cinemaName": cinemaName,
+                            "locationName": locationName,
+                            "theaterId": theater_id,
+                            "theaterNumber": theaterNumber,
+                            "movieId": movie_id,
+                            "movieTitle": movie_title,
+                            "movieSynopsis": movie_synopsis,
+                            "movieGenre": movie_genre,
+                            "movieContentRating": movie_content_rating,
+                            "movieLang": movie_lang,
+                            "movieSubtitles": movie_subtitles,
+                            "showDate": show_date,
+                            "showTime": show_time
+                        }
+                        return jsonify(showtime_details), 200
+                    elif theater_response.status_code == 404:
+                        return jsonify({"message": "Showtime retrieving theater details error"}), 404
+                    else:
+                        return jsonify({"message": f"Get showtime with id: {showtime_id} failed with uncaught exception at theater"}), 500
+                elif cinema_response.status_code == 404:
+                    return jsonify({"message": "Showtime retrieving cinema details error"}), 404
+                else:
+                    return jsonify({"message": f"Get showtime with id: {showtime_id} failed with uncaught exception at cinema"}), 500     
+            elif movie_response.status_code == 404:
+                return jsonify({"message": "Showtime retrieving movie details error"}), 404
+            else:
+                return jsonify({"message": f"Get showtime with id: {showtime_id} failed with uncaught exception at movie"}), 500
         elif response.status_code == 404:
             return jsonify({"message": "Showtime not found"}), 404
         else:
-            return jsonify({"message": f"Get showtime with id: {showtime_id} failed with uncaught exception"}), 500
+            return jsonify({"message": f"Get showtime with id: {showtime_id} failed with uncaught exception at showtime"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 #####     End of retrieve showtime by ID     #####
