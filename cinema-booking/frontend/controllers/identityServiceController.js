@@ -48,14 +48,14 @@ exports.postLogin = async (req, res) => {
             console.log(res.getHeaders()); // Log headers
             // res.setHeader('Location', '/');
             // res.status(302).send();
-            res.redirect(302, "/");
+            return res.redirect(302, "/");
 
         } else {
             req.loggedIn = false;
-            res.status(401).json({ message: 'Login failed. Invalid credentials.' });
+            return res.status(401).json({ message: 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 
@@ -85,7 +85,7 @@ exports.postRegister = async (req, res) => {
         res.send(data);
     } catch (error) {
         console.error('Error in postRegister:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 
@@ -100,15 +100,14 @@ exports.logout = async (req, res) => {
 
         // if logged in, allow logout
         const token = req.cookies.token;
-        console.log('logout token:', token);
         const data = await identityService.logoutRequest(token);
-
-        res.clearCookie('token');
         
-        // TODO add logout page/some other redirection
+        res.clearCookie('token');
+
+        return res.status(data.status).json(data.responseBody);
 
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 
