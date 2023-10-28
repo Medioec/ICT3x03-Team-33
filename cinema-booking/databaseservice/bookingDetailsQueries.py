@@ -3,6 +3,7 @@ import os
 import psycopg2
 from psycopg2 import IntegrityError 
 import logging
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
 
 booking_details_bp = Blueprint("bookingdetails", __name__)
 
@@ -12,7 +13,6 @@ db_config = {
     "password": os.getenv("DB_NORMALPASSWORD"),
     "host": os.getenv("DB_HOST"),
 }
-
 
 ##### Create a new booking entry in the database #####
 @booking_details_bp.route('/generate_booking_details', methods=['POST'])
