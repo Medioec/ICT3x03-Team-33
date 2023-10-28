@@ -19,7 +19,7 @@ exports.getLogin = [checkLoggedIn, async (req, res) => {
     res.render('login.ejs', { loggedIn });
 }];
 
-exports.postLogin = [checkHeaders, async (req, res) => {
+exports.postLogin = async (req, res) => {
     try {
         const data = await identityService.loginRequest(req.body);
 
@@ -31,23 +31,24 @@ exports.postLogin = [checkHeaders, async (req, res) => {
                 path: '/',
                 maxAge: expiryDelta,
                 httpOnly: true
+                // TODO: add more cookie options as needed
             });
 
             // Set loggedIn status
             req.loggedIn = true;
 
             // on login, redirect to home page
-            res.redirect("/");
+            console.log("Redirecting to /");
+            res.redirect(301, "/");
 
         } else {
             req.loggedIn = false;
             res.status(401).json({ message: 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        console.error('Error in postLogin:', error);
         res.status(500).send('Internal Server Error');
     }
-}];
+};
 
 exports.getRegister = (req, res) => {
     // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
@@ -56,6 +57,14 @@ exports.getRegister = (req, res) => {
 
 exports.postRegister = async (req, res) => {
     try {
+        const loggedIn = req.loggedIn;
+
+        // if logged in, don't try to register
+        if (loggedIn) {
+            res.status(401).json({ message: 'Already logged in.'});
+            return;
+        }
+
         const data = await identityService.registerRequest(req.body);
         res.send(data);
     } catch (error) {
@@ -66,11 +75,22 @@ exports.postRegister = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
+        const loggedIn = req.loggedIn;
+
+        // if not logged in, don't try to logout
+        if (!loggedIn) {
+            res.status(401).json({ message: 'Not logged in.' });
+            return;
+        }
+
+        // if logged in, allow logout
         const token = req.cookies.token;
+        console.log('logout token:', token);
         const data = await identityService.logoutRequest(token);
 
         res.clearCookie('token');
         res.json({ message: data });
+
     } catch (error) {
         console.error('Error in logout:', error);
         res.status(500).json({ error: 'Internal Server Error' });

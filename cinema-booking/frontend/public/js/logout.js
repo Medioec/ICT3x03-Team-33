@@ -1,7 +1,7 @@
 $("#logout-button").click(async function () {
     try {
         const response = await fetch("/logout", {
-            method: "DELETE", 
+            method: "PUT", 
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
@@ -16,6 +16,6 @@ $("#logout-button").click(async function () {
             console.error('Logout failed');
         }
     } catch (error) {
-        console.error('An error occurred during logout', error);
+        console.error('Error occured', error);
     }
 });

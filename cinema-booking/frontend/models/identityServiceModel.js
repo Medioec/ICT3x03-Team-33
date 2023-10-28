@@ -31,7 +31,7 @@ async function registerRequest(body) {
 async function logoutRequest(token) {
     try {
         const response = await fetch("http://identity:8081/logout", {
-            method: "DELETE",
+            method: "PUT",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",

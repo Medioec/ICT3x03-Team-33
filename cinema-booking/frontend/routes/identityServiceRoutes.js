@@ -6,11 +6,17 @@ const express = require('express');
 const router = express.Router();
 const identityServiceController = require('../controllers/identityServiceController');
 const checkHeaders = require('../middleware/checkHeaders');
+const checkLoggedIn = require('../middleware/checkLoggedIn');
 
+// login
 router.get('/login', identityServiceController.getLogin);
 router.post('/loginRequest', checkHeaders, identityServiceController.postLogin);
-router.get('/register', identityServiceController.getRegister);
-router.post('/registerRequest', checkHeaders, identityServiceController.postRegister);
-router.delete('/logout', identityServiceController.logout);
+
+// register
+router.get('/register', checkLoggedIn, identityServiceController.getRegister);
+router.post('/registerRequest', checkLoggedIn, checkHeaders, identityServiceController.postRegister);
+
+// logout
+router.put('/logout', checkLoggedIn, checkHeaders, identityServiceController.logout);
 
 module.exports = router;
