@@ -45,7 +45,7 @@ pipeline {
             agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
-                sh './scripts/docker-build.sh stg'
+                sh './scripts/docker-build.sh prod'
             }
         }
         stage('Deploy Prod') {
