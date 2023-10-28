@@ -69,8 +69,5 @@ app.register_blueprint(seat_bp,url_prefix='/databaseservice/seat')
 # Theater table queries
 app.register_blueprint(theater_bp,url_prefix='/databaseservice/theater')
 
-
-
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8085)
