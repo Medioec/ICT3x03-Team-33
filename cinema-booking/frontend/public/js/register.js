@@ -5,8 +5,13 @@ function checkRegistrationFields() {
   const $userPasswordInput = $("#userPassword");
   const isFormValid = $("#register-form").valid(); // Check overall form validity
 
+  // Sanitize input values using DOMPurify
+  const email = DOMPurify.sanitize($emailInput.val());
+  const username = DOMPurify.sanitize($userNameInput.val());
+  const password = DOMPurify.sanitize($userPasswordInput.val());
+
   // Return true if all fields are filled correctly and the form is valid
-  return $emailInput.val() && $userNameInput.val() && $userPasswordInput.val() && isFormValid;
+  return email && username && password && isFormValid;
 }
 
 // Define the onSuccess function to handle the captcha callback
@@ -53,9 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     if ($("#register-form").valid()) {
-      const email = $emailInput.val();
-      const username = $userNameInput.val();
-      const password = $userPasswordInput.val();
+      const email = DOMPurify.sanitize($emailInput.val());
+      const username = DOMPurify.sanitize($userNameInput.val());
+      const password = DOMPurify.sanitize($userPasswordInput.val());
 
       const data = {
         email: email,

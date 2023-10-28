@@ -34,8 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     if ($("#login-form").valid()) {
-      const username = $userNameInput.val();
-      const password = $userPasswordInput.val();
+      // Sanitize the username and password inputs using DOMPurify
+      const username = DOMPurify.sanitize($userNameInput.val());
+      const password = DOMPurify.sanitize($userPasswordInput.val());
 
       const data = {
         username: username,

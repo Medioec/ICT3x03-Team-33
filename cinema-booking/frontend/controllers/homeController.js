@@ -113,7 +113,7 @@ exports.getAllShowtimesPage = [async (req, res) => {
 exports.getShowtimesDetailsPage = [async (req, res) => {
     try {
         // Get the movieId from the query parameters
-        const showtimeId = req.query.showtimeId;
+        const showtimeId = req.query.showtime_id;
 
         // Fetch the movie details using the movieServiceModel function
         const showtimes = await movieService.getShowtimeById(showtimeId);
