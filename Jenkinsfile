@@ -60,7 +60,9 @@ pipeline {
     }
     post {
         success {
-            dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            node('host') {
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
         }
     }
 }
