@@ -29,6 +29,8 @@ services:
             - frontend-to-movie
         ports:
             - "${FRONTEND_PORT}"
+        depends_on:
+            - identity
 
     # ports for services exposed to test the containers
     # will remove ports once we implement the APIs
@@ -50,6 +52,9 @@ services:
             options:
                 max-size: "10m"
                 max-file: "20"
+        depends_on:
+            - database
+            - databaseservice
 
     movie:
         build: 
@@ -63,6 +68,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${MOVIE_PORT}"
+        depends_on:
+            - database
+            - databaseservice
     
     booking:
         build: 
@@ -77,6 +85,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${BOOKING_PORT}"
+        depends_on:
+            - database
+            - databaseservice
 
     payment:
         build: 
@@ -91,6 +102,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${PAYMENT_PORT}"
+        depends_on:
+            - database
+            - databaseservice
 
     databaseservice:
         build: 
