@@ -60,7 +60,7 @@ pipeline {
     }
     post {
         success {
-            node('host') {
+            node('builtin') {
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
         }
