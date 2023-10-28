@@ -17,8 +17,24 @@ import logging
 app = Flask(__name__)
 CORS(app)
 
-# Configure logging path
-logging.basicConfig(filename='./logs/identityServiceLogs.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Create or get the root logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+
+# File handler
+file_handler_path = './logs/identityServiceLogs.log'
+file_handler = logging.FileHandler(file_handler_path)
+file_handler.setFormatter(log_format)
+logger.addHandler(file_handler)
+
+# Stream (console) handler for stdout
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(log_format)
+logger.addHandler(stream_handler)
+
+logger.info("Identity Service started")
 
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 
@@ -27,6 +43,9 @@ jwt = JWTManager(app)
 ############################## REGISTRATION #########################################
 @app.route("/register", methods=["POST"])
 def register():
+    # logs registration attempt
+    logger.info("Attempting registration...")
+    
     # get data from registration form
     data = request.get_json()
     email = data['email']
@@ -36,6 +55,9 @@ def register():
     # Sanitize email and username
     email = html.escape(email)
     username = html.escape(username)
+    
+    # logs sanitized user input
+    logger.info(f"Sanitized user input: Email: {email}, Username: {username}")
 
     if not email or not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -50,10 +72,12 @@ def register():
     # check if username exists in db
     try:
         if not user_utils.isUsernameAvailable(username):
+            # log registration failure due to username already taken
+            logger.warning(f"Username '{username}' is already taken.")
             return jsonify({"message": "Username is already taken"}), 409
     
     except Exception as e:
-        logging.error(f"Error during username availability check: {str(e)}")
+        logger.error(f"Error during username availability check: {str(e)}")
         return jsonify({"message": {str(e)}}), 500
     
     # check if email address is valid
@@ -72,6 +96,9 @@ def register():
 
     ph = PasswordHasher()
     hash = ph.hash(password)
+    
+    # logs that password has been hashed
+    logger.info("Password has been hashed.")
 
     role = "member"
     userId = user_utils.generateUUID()
@@ -87,13 +114,13 @@ def register():
     response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
     
     if response.status_code == 201:
-        logging.info(f"User {username} registered successfully")
+        logger.info(f"User '{username}' registered successfully!")
         return jsonify({"message": "Registration successful"}), 200
     
     # if insert unsuccessful, return error message from databaseservice
     else:
         try:
-            logging.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
+            logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
             response_json = response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
@@ -108,6 +135,9 @@ def register():
 ############################## LOGIN #########################################
 @app.route("/login", methods=["POST"])
 def login():
+    # logs login attempt
+    logger.info("Attempting login...")
+    
     # get data from login form
     data = request.get_json()
     username = data['username']
@@ -120,7 +150,7 @@ def login():
     try:
         if user_utils.isUsernameAvailable(username):
             # log login failure
-            logging.error(f"Login failed with username {username}. Error: Username does not exist")
+            logger.warning(f"Login attempt with non-existent username '{username}'.")
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -134,7 +164,7 @@ def login():
         # get error message from response. if no message, use default "Error occurred"
         try:
             # log login failure
-            logging.error(f"Login failed with username {username}. Error: {response.json()['message']}")
+            logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
             response_json = response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
@@ -178,7 +208,8 @@ def login():
     # if password hashes do not match, throw error
     except Exception as e:
         # log login failure
-        logging.error(f"Login failed with username {username}. Exception during password verification: {e}")
+        logger.error(f"Password verification failed for username '{username}'. Reason: {e}")
+
         print(f"Exception during password verification: {e}")
         return jsonify({"message": "Username or password was incorrect"}), 404
 
@@ -223,7 +254,7 @@ def login():
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
         # log login failure
-        logging.error(f"Login failed with username {username}. Error: {response.json()['message']}")
+        logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
         error_message = response.json().get("message", "Error occurred")
         return jsonify({"message": error_message}), response.status_code
     
@@ -237,12 +268,15 @@ def login():
 @app.route("/logout", methods=["PUT"])
 @jwt_required() # verifies jwt integrity + expiry
 def logout():
+    # logs logout attempt
+    logger.info("Attempting logout...")
+    
     # get sessionId from jwt
     sessionId = get_jwt_identity()
 
     if not sessionId:
         # log logout failure
-        logging.error(f"Logout failed. Attempted logout without token")
+        logger.error(f"Logout failed. Attempted logout without token")
         return jsonify({"message": "Error: No token sent"}), 500
     
     # set status to inactive
@@ -255,11 +289,11 @@ def logout():
 
     if response.status_code == 200:
         # log logout success
-        logging.info(f"Logout successful")
+        logger.info(f"Logout successful")
         return jsonify({"message": "Logout successful"}), 200
     else:
         # log database error
-        logging.error(f"Logout failed due to database error. Error: {response.json()['message']}")
+        logger.error(f"Logout failed due to database error. Error: {response.json()['message']}")
         return jsonify({"message": "Database error"}), 500
 ############################## END OF LOGOUT #########################################
 
@@ -267,7 +301,7 @@ def logout():
 @jwt.unauthorized_loader
 def unauthorized_callback(callback):
     # log unauthorized access
-    logging.error(f"Unauthorized access detected")
+    logger.error(f"Unauthorized access detected")
     print("unauthorized callback")
     return jsonify({"message": "Unauthorized access"}), 401
 
@@ -275,14 +309,19 @@ def unauthorized_callback(callback):
 @app.route("/basicAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
 def basicAuth():
+    #logs authentication attempt
+    logger.info("Basic authentication attempted. (user only)")
+    
     # logs login success
-    logging.info(f"Login successful")
+    logger.info(f"Login successful")
+    
     return jsonify({"message": "Authenticated"}), 200
 
 # check if user is logged in with valid token and verify their role
 @app.route("/enhancedAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
 def enhancedAuth():
+    logger.info("Enhanced authentication attempted (user and role).")
     try:
         # get session id + role from token
         sessionId = get_jwt_identity()
@@ -295,7 +334,7 @@ def enhancedAuth():
         
         if response.status_code != 200:
             # log authentication failure
-            logging.error(f"Authentication failed due to database error Error: {response.json()['message']}")
+            logger.error(f"Authentication failed due to database error Error: {response.json()['message']}")
             return jsonify({"message": "Database error"}), 500
 
         # get userId from db
@@ -312,11 +351,11 @@ def enhancedAuth():
 
         if role != dbRole:
             # log unauthorized access
-            logging.error(f"Unauthorized access detected")
+            logger.error(f"Unauthorized access detected")
             return jsonify({"message": "Invalid token"}), 401
         else:
             # log authentication success
-            logging.info(f"Authentication successful")
+            logger.info(f"Authentication successful")
             print("authenticated")
             return jsonify({"message": "Authenticated"}), 200
     

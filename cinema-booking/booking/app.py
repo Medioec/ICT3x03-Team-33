@@ -78,8 +78,6 @@ def generateBooking():
             return jsonify({"message": "Error generating booking"}), 500
     else:
         return jsonify({"message": "Error generating booking"}), 500
-        
-        
     
     
 @app.route('/retrieveOneBooking/<uuid:userId>/<int:ticketId>', methods=["get"])

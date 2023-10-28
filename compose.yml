@@ -29,6 +29,8 @@ services:
             - frontend-to-movie
         ports:
             - "${FRONTEND_PORT}"
+        depends_on:
+            - identity
 
     # ports for services exposed to test the containers
     # will remove ports once we implement the APIs
@@ -43,11 +45,18 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-        volumes:
-            - ./logs:/logs
-            
         ports:
             - "${IDENTITY_PORT}"
+        volumes:
+            - ./cinema-booking/identity/logs:/logs
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
+            - databaseservice
 
     movie:
         build: 
@@ -61,6 +70,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${MOVIE_PORT}"
+        depends_on:
+            - database
+            - databaseservice
     
     booking:
         build: 
@@ -75,6 +87,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${BOOKING_PORT}"
+        depends_on:
+            - database
+            - databaseservice
 
     payment:
         build: 
@@ -89,6 +104,9 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${PAYMENT_PORT}"
+        depends_on:
+            - database
+            - databaseservice
 
     databaseservice:
         build: 
@@ -108,6 +126,15 @@ services:
             DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
         ports:
             - "${DBSERVICE_PORT}"
+        volumes:
+            - ./cinema-booking/databaseservice/logs:/logs
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
 
     database:
         build: ./cinema-booking/database
@@ -123,7 +150,6 @@ services:
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
             - postgres_container:/var/lib/postgresql/data
-            - ./logs/databaselogs:/logs
         ports:
             - "${DB_PORT}"
 
@@ -149,7 +175,7 @@ networks:
   booking-to-databaseservice:
     driver: bridge
   databaseservice-to-database:
-    driver: bridge        
+    driver: bridge   
 
 volumes:
   postgres_container:

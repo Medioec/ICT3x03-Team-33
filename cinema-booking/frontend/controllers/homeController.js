@@ -1,6 +1,9 @@
 // models
 const movieService = require('../models/movieServiceModel');
 
+// custom middleware
+const checkHeaders = require('../middleware/checkHeaders'); 
+
 exports.getHomePage = [async (req, res) => {
     try {
         // Get the loggedIn status from the request object
