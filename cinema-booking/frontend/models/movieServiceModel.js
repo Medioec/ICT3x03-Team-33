@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// MOVIES FUNCTIONS ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 // Function to retrieve all movies from the database
 async function getAllMovies() {
     try {
@@ -115,10 +119,136 @@ async function deleteMovieById(movieId) {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// SHOWTIMES FUNCTIONS //////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// Function to create a new showtime entry in the database
+async function createShowtime(showtimeData) {
+    try {
+        const response = await fetch('http://movie:8082/createShowtime', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(showtimeData)
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error('Failed to create a showtime');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in createShowtime:', error);
+        throw error;
+    }
+}
+
+// Function to retrieve all showtimes from the database
+async function getAllShowtimes() {
+    try {
+        const response = await fetch('http://movie:8082/getAllShowtimes', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error('Failed to get showtimes');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in getAllShowtimes:', error);
+        throw error;
+    }
+}
+
+// Function to retrieve a showtime by its ID
+async function getShowtimeById(showtimeId) {
+    try {
+        const response = await fetch(`http://movie:8082/getShowtimeById/${showtimeId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error(`Failed to get showtime with ID: ${showtimeId}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in getShowtimeById:', error);
+        throw error;
+    }
+}
+
+// Function to update a showtime entry by its ID
+async function updateShowtimeById(showtimeId, showtimeData) {
+    try {
+        const response = await fetch(`http://movie:8082/updateShowtimeById/${showtimeId}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(showtimeData)
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error(`Failed to update showtime with ID: ${showtimeId}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in updateShowtimeById:', error);
+        throw error;
+    }
+}
+
+// Function to delete a showtime entry in the database
+async function deleteShowtimeById(showtimeId) {
+    try {
+        const response = await fetch(`http://movie:8082/deleteShowtimeById/${showtimeId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application.json',
+                'Content-Type': 'application.json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error(`Failed to delete showtime with ID: ${showtimeId}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in deleteShowtimeById:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createMovie,
     getAllMovies,
     getMovieById,
     updateMovieById,
-    deleteMovieById
+    deleteMovieById,
+    createShowtime,
+    getAllShowtimes,
+    getShowtimeById,
+    updateShowtimeById,
+    deleteShowtimeById
 };

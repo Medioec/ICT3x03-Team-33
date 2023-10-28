@@ -8,6 +8,9 @@ router.get('/', homeController.getHomePage);
 // route to moviedetails for a specific movie
 router.get('/moviedetails', homeController.getMovieDetailsPage);
 
+// all movies from navbar
+router.get('/allmovies', homeController.getAllMoviesPage);
+
 // Add other routes as needed
 
 module.exports = router;

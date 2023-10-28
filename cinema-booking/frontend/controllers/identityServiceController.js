@@ -50,8 +50,11 @@ exports.postLogin = [checkHeaders, async (req, res) => {
 }];
 
 exports.getRegister = (req, res) => {
+    const loggedIn = req.loggedIn;
+
     // TODO: ADD IN LOGGED IN STATUS FOR NAVBAR
-    res.render('register.ejs');
+    res.render('register.ejs', { loggedIn });
+
 };
 
 exports.postRegister = async (req, res) => {
