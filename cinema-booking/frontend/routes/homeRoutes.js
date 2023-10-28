@@ -8,7 +8,7 @@ const checkLoggedIn = require('../middleware/checkLoggedIn');
 router.get('/', checkLoggedIn, homeController.getHomePage);
 
 // route to moviedetails for a specific movie
-router.get('/moviedetails',checkLoggedIn, homeController.getMovieDetailsPage);
+router.get('/moviedetails', checkLoggedIn, homeController.getMovieDetailsPage);
 
 // all movies from navbar
 router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);
@@ -16,8 +16,8 @@ router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);
 // all showtimes from navbar
 router.get('/allshowtimes',checkLoggedIn, homeController.getAllShowtimesPage);
 
-// route to moviedetails for a specific movie
-router.get('/moviedetails', checkLoggedIn, homeController.getMovieDetailsPage);
+// showtimedetails page
+router.get('/showtimedetails',checkLoggedIn, homeController.getShowtimesDetailsPage);
 
 // Add other routes as needed
 module.exports = router;

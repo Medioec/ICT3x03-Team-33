@@ -25,14 +25,15 @@ async function getAllMovies() {
     }
 }
 
-// Function to create a new movie entry in the database
-async function createMovie(movieData) {
+// Function for staff to create a new movie entry in the database
+async function createMovie(token, movieData) {
     try {
         const response = await fetch('http://movie:8082/createMovie', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(movieData)
         });
@@ -171,9 +172,9 @@ async function getAllShowtimes() {
 }
 
 // Function to retrieve a showtime by its ID
-async function getShowtimeById(showtimeId) {
+async function getShowtimeById(showtime_id) {
     try {
-        const response = await fetch(`http://movie:8082/getShowtimeById/${showtimeId}`, {
+        const response = await fetch(`http://movie:8082/getShowtimeById/${showtime_id}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -183,7 +184,7 @@ async function getShowtimeById(showtimeId) {
 
         if (!response.ok) {
             console.error('Response not OK. Status:', response.status);
-            throw new Error(`Failed to get showtime with ID: ${showtimeId}`);
+            throw new Error(`Failed to get showtime with ID: ${showtime_id}`);
         }
 
         return response.json();
@@ -194,9 +195,9 @@ async function getShowtimeById(showtimeId) {
 }
 
 // Function to update a showtime entry by its ID
-async function updateShowtimeById(showtimeId, showtimeData) {
+async function updateShowtimeById(showtime_id, showtimeData) {
     try {
-        const response = await fetch(`http://movie:8082/updateShowtimeById/${showtimeId}`, {
+        const response = await fetch(`http://movie:8082/updateShowtimeById/${showtime_id}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -207,7 +208,7 @@ async function updateShowtimeById(showtimeId, showtimeData) {
 
         if (!response.ok) {
             console.error('Response not OK. Status:', response.status);
-            throw new Error(`Failed to update showtime with ID: ${showtimeId}`);
+            throw new Error(`Failed to update showtime with ID: ${showtime_id}`);
         }
 
         return response.json();
@@ -218,9 +219,9 @@ async function updateShowtimeById(showtimeId, showtimeData) {
 }
 
 // Function to delete a showtime entry in the database
-async function deleteShowtimeById(showtimeId) {
+async function deleteShowtimeById(showtime_id) {
     try {
-        const response = await fetch(`http://movie:8082/deleteShowtimeById/${showtimeId}`, {
+        const response = await fetch(`http://movie:8082/deleteShowtimeById/${showtime_id}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application.json',
@@ -230,7 +231,7 @@ async function deleteShowtimeById(showtimeId) {
 
         if (!response.ok) {
             console.error('Response not OK. Status:', response.status);
-            throw new Error(`Failed to delete showtime with ID: ${showtimeId}`);
+            throw new Error(`Failed to delete showtime with ID: ${showtime_id}`);
         }
 
         return response.json();

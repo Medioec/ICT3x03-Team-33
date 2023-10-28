@@ -46,7 +46,6 @@ def generateBooking():
         "creditCardId": creditCardId,
     }
     
-    # TODO - process payment with paymentservice via /makePayment
     url = f"http://paymentservice:8084/paymentservice/makePayment"
     response = requests.post(url, json=data)
     if response.status_code != 200:
@@ -80,10 +79,22 @@ def generateBooking():
         return jsonify({"message": "Error generating booking"}), 500
     
     
-@app.route('/retrieveOneBooking/<uuid:userId>/<int:ticketId>', methods=["get"])
+@app.route('/retrieveOneBooking/<int:ticketId>', methods=["GET"])
 @jwt_required()
-def retrieveOneBooking(userId, ticketId):
+def retrieveOneBooking(ticketId):
     try:
+        # get sessionId from jwt
+        sessionId = get_jwt_identity()
+        if not sessionId:
+            return jsonify({"message": "Error: No token sent"}), 500
+        
+        # use sessionId to get userId from db
+        requestData = {"sessionId": sessionId}    
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        if response.status_code != 200:
+            return jsonify({"message": "Database error"}), 500
+        userId = response.json()["userId"]
+        
         url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
         response = requests.get(url)
 
@@ -114,9 +125,21 @@ def retrieveOneBooking(userId, ticketId):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/retrieveAllBookings/<uuid:userId>', methods=["get"])
-def retrieveAllBookings(userId):
+@app.route('/retrieveAllBookings/', methods=["GET"])
+def retrieveAllBookings():
     try:
+        # get sessionId from jwt
+        sessionId = get_jwt_identity()
+        if not sessionId:
+            return jsonify({"message": "Error: No token sent"}), 500
+        
+        # use sessionId to get userId from db
+        requestData = {"sessionId": sessionId}    
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        if response.status_code != 200:
+            return jsonify({"message": "Database error"}), 500
+        userId = response.json()["userId"]
+        
         url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
         response = requests.get(url)
 

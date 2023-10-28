@@ -34,8 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     if ($("#login-form").valid()) {
-      const username = $userNameInput.val();
-      const password = $userPasswordInput.val();
+      // Sanitize the username and password inputs using DOMPurify
+      const username = DOMPurify.sanitize($userNameInput.val());
+      const password = DOMPurify.sanitize($userPasswordInput.val());
 
       const data = {
         username: username,
@@ -51,12 +52,35 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           body: JSON.stringify(data),
         })
-        .then(response => 
-        {
+        .then(response => {
+          console.log("test");
+          console.log("client response status code: ", response.status);
+      
           if (response.ok) {
-            window.location.href = "/";
+            return response.json(); // Parse response as JSON
+          } else {
+            // Handle non-OK responses here
+            throw new Error(`Server responded with status ${response.status}`);
           }
+        })
+        .then(data => {
+          console.log("client response: ", data.userRole);
+      
+          switch (data.userRole) {
+            case "member":
+              window.location.href = "/";
+              break;
+      
+            case "staff":
+              window.location.href = "/staff";
+              break;
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error.message);
+          // Handle the error as needed
         });
+      
       } else {
         document.getElementById("error-message").textContent ="Please complete the reCAPTCHA.";
       }
