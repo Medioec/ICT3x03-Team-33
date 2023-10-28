@@ -40,14 +40,16 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
+            - fluentd-to-identity
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${IDENTITY_PORT}"
         logging:
-            driver: "json-file"
+            driver: "fluentd"
             options:
+                tag: "identity"
                 max-size: "10m"
                 max-file: "50"
 
@@ -102,6 +104,7 @@ services:
             - payment-to-databaseservice
             - booking-to-databaseservice
             - databaseservice-to-database
+            - fluentd-to-databaseservice
         environment:
             PYTHONUNBUFFERED: 1
             DB_HOST: database
@@ -111,8 +114,9 @@ services:
         ports:
             - "${DBSERVICE_PORT}"
         logging:
-            driver: "json-file"
+            driver: "fluentd"
             options:
+                tag: "databaseservice"
                 max-size: "10m"
                 max-file: "50"
 
@@ -132,6 +136,14 @@ services:
             - postgres_container:/var/lib/postgresql/data
         ports:
             - "${DB_PORT}"
+
+    fluentd:
+    build: ./fluentd-logging/
+    volumes:
+      - ./fluentd-logging/conf:/fluentd-logging/etc
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
 
 networks:
   waf-to-frontend:
@@ -155,6 +167,10 @@ networks:
   booking-to-databaseservice:
     driver: bridge
   databaseservice-to-database:
+    driver: bridge
+  fluentd-to-databaseservice:
+    driver: bridge
+  fluentd-to-identity:
     driver: bridge        
 
 volumes:
