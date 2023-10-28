@@ -1,10 +1,6 @@
 // models
 const movieService = require('../models/movieServiceModel');
 
-// custom middleware
-const checkUserRole = require('../middleware/checkUserRole');
-const checkHeaders = require('../middleware/checkHeaders'); 
-
 exports.getStaffDashboard = async (req, res) => {
     try {
         const movies = await movieService.getAllMovies();
