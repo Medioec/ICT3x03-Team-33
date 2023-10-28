@@ -46,7 +46,7 @@ def add_theater():
 
 
 #####     Retrieve a theater by its ID     #####
-@theater_bp.route('/get_theater_by_number/<str:theater_number>', methods=['GET'])
+@theater_bp.route('/get_theater_by_number/<string:theater_number>', methods=['GET'])
 def get_theater_by_number(theater_number):
     try:
         conn = psycopg2.connect(**db_config)
@@ -104,7 +104,7 @@ def get_all_theaters():
 #####     End of retrieve all theaters     #####
 
 #####     Update a theater entry by its ID     #####
-@theater_bp.route('/update_theater_by_id/<int:theater_number>', methods=['PUT'])
+@theater_bp.route('/update_theater_by_id/<string:theater_number>', methods=['PUT'])
 def update_theater_by_id(theater_number):
     try:
         data = request.get_json()
@@ -146,7 +146,7 @@ def update_theater_by_id(theater_number):
 
 
 #####     Delete a theater entry by its ID     #####
-@theater_bp.route('/delete_theater_by_id/<int:theater_number>', methods=['DELETE'])
+@theater_bp.route('/delete_theater_by_id/<string:theater_number>', methods=['DELETE'])
 def delete_theater_by_id(theater_number):
     try:
         conn = psycopg2.connect(**db_config)

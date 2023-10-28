@@ -2,14 +2,19 @@ const express = require('express');
 const router = express.Router();
 const homeController = require('../controllers/homeController');
 const checkHeaders = require('../middleware/checkHeaders');
+const checkLoggedIn = require('../middleware/checkLoggedIn');
 
+// index page
 router.get('/', homeController.getHomePage);
 
 // route to moviedetails for a specific movie
-router.get('/moviedetails', homeController.getMovieDetailsPage);
+router.get('/moviedetails',checkLoggedIn, homeController.getMovieDetailsPage);
 
 // all movies from navbar
-router.get('/allmovies', homeController.getAllMoviesPage);
+router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);
+
+// all showtimes from navbar
+router.get('/allshowtimes',checkLoggedIn, homeController.getAllShowtimesPage);
 
 // Add other routes as needed
 
