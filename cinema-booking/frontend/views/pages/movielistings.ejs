@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cinema Booking</title>
+  <title>All Movies</title>
 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -17,70 +17,41 @@
 
 <body>
   <!-- Navbar -->
-  <%- include('./partial/navbar.ejs', { loggedIn: loggedIn }) %>
+  <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
-    <!-- select movie > populate movie page with movie id from main > button to book > booking page > payment -->
-    <section id="trending">
-      <div class="container">
-        <div class="row">
-          <h2 class="showcase-heading">All Movies</h2>
-          
-          <!-- <% movies.forEach((movie)=> { %> -->
-          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-            <div class="showcase-box">
-              <!-- <a href="/moviedetails"> -->
-              <!-- then, passover the movie.title in js to movielistings page to render MovieDetails fields -->
-              <a href="/pages/moviedetails.html">
-                <!-- take movie title & append to file name for respective img -->
-                <!-- <img src="<%= article.imgSrc %>"/> -->
-                <img src="/images/movies/sawx.jpg"/>
-              </a>
-            </div>
-            <!-- <%= movie.title %> -->
-            Saw X
-          </div>
+    <div class="container">
 
-          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-            <div class="showcase-box">
-              <a href="/pages/moviedetails.html">
-                <img src="/images/movies/trolls.jpg"/>
-              </a>
-            </div>
-            Trolls
+    <section id="movies">
+    <div class="container">
+      <div class="row">
+        <h2 class="showcase-heading">All Movies</h2>
+        
+        <% movies.forEach((movie) => { %>
+        <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+          <div class="showcase-box">
+              <!-- pass movieId and redirect to moviedetails page  -->
+              <a href="/moviedetails?movieId=<%= movie.movieId %>">
+              <!-- generate the image source dynamically -->
+              <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
+                  onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
+                  alt="poster" /></a>
           </div>
-
-          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-            <div class="showcase-box">
-              <a href="/pages/moviedetails.html">
-                <img src="/images/movies/fnaf.jpg"/>
-              </a>
-            </div>
-            Five Nights at Freddy's
-          </div>
-
-          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-            <div class="showcase-box">
-              <a href="/pages/moviedetails.html">
-                <img src="/images/movies/creator.jpg"/>
-              </a>
-            </div>
-            The Creator
-          </div>
-
-        </div>
+          <h3 class="movieTitle"><%= movie.title %></h3></div>
+        <% }); %>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <%- include('./partial/footer'); %>
+  </main>
+    <!-- footer -->
+    <%- include('../partial/footer'); %>
 
     <!-- Scripts -->
-    <script src="/js/movielistings.js"></script> <!-- TESTING AUTH -->
-
-    <script src="/js/nav.js"></script>
     <script src="/js/app.js"></script>
+    <script src="/js/movielistings.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 
 </html>
