@@ -1,5 +1,5 @@
-// function to check if the user has the required role to access the page
-async function checkUserRole(requiredRole) {
+// function to check if the user is logged in and has the required role to access the page
+function checkUserRole(requiredRole) {
     return async (req, res, next) => {
         try {
             // get cookie
@@ -21,31 +21,25 @@ async function checkUserRole(requiredRole) {
             }
 
             // verify their role using identity service
-            try {
-                const response = await fetch("http://identity:8081/enhancedAuth", {
-                    method: "POST",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
-
-                const responseData = await response.json();
-
-                console.log(responseData);
-
-                // if validation fails, user doesn't have permissions
-                if (response.status !== 200) {
-                    return res.status(403).send('Access Forbidden');
+            const response = fetch("http://identity:8081/enhancedAuth", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 }
+            });
 
-                // if validation passes, call next middleware
-                next();
-            } catch (error) {
-                console.error('Error in checkUserRole middleware:', error);
-                res.status(500).send('Internal Server Error');
+            const responseData = response.json();
+            console.log(responseData);
+
+            // if validation fails, user doesn't have permissions
+            if (response.status !== 200) {
+                return res.status(403).send('Access Forbidden');
             }
+
+            // if validation passes, call next middleware
+            next();
         } catch (error) {
             console.error('Error in checkUserRole middleware:', error);
             res.status(500).send('Internal Server Error');
