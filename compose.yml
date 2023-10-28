@@ -47,6 +47,8 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         ports:
             - "${IDENTITY_PORT}"
+        volumes:
+            - ./cinema-booking/identity/logs:/logs
         logging:
             driver: "json-file"
             options:
@@ -124,6 +126,8 @@ services:
             DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
         ports:
             - "${DBSERVICE_PORT}"
+        volumes:
+            - ./cinema-booking/databaseservice/logs:/logs
         logging:
             driver: "json-file"
             options:
