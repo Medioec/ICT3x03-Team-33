@@ -10,9 +10,12 @@ RUN apt-get update && \
     sudo gem sources --clear-all && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
-    
+
+# Create log directory and set permissions
+RUN mkdir -p /fluentd/log/ && chown fluent:fluent /fluentd/log/
+
 # Copy custom Fluentd configuration
-COPY ./fluentd.conf /fluentd/etc/
+COPY ./fluentd.conf /fluentd-logging/etc/
 
 # Switch to Fluentd user
 USER fluent

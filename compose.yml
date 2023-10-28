@@ -51,6 +51,8 @@ services:
             options:
                 fluentd-address: fluentd:24224
                 tag: "identity"
+        depends_on:
+        - fluentd
 
     movie:
         build: 
@@ -117,6 +119,8 @@ services:
             options:
                 fluentd-address: fluentd:24224
                 tag: "databaseservice"
+        depends_on:
+        - fluentd
 
     database:
         build: ./cinema-booking/database
@@ -139,9 +143,11 @@ services:
         build: ./fluentd-logging/
         volumes:
         - ./fluentd-logging/conf:/fluentd-logging/etc
+        networks:
+            - fluentd-to-databaseservice
+            - fluentd-to-identity
         ports:
         - "24224:24224"
-        - "24224:24224/udp"
 
 networks:
   waf-to-frontend:
