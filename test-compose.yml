@@ -9,7 +9,7 @@ services:
           - booking-to-payment
           - frontend-to-movie
           - databaseservice-to-database
-      command: bash -c 'echo test'
+      command: bash -c 'echo DummyTest'
 
 networks:
   waf-to-frontend:

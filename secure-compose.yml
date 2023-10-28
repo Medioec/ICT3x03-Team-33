@@ -108,40 +108,52 @@ services:
 
 networks:
   internet-access:
-    driver: bridge
+    driver: overlay
+    attachable: true
   waf-to-frontend:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   frontend-to-identity:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   frontend-to-booking:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   frontend-to-movie:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   booking-to-payment:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   identity-to-payment:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   identity-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   movie-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   payment-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   booking-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
     internal: true
   databaseservice-to-database:
-    driver: bridge
-    internal: true    
+    driver: overlay
+    attachable: true
+    internal: true
 
 volumes:
   postgres_container:

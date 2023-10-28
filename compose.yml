@@ -122,27 +122,38 @@ services:
 
 networks:
   waf-to-frontend:
-    driver: bridge
+    driver: overlay
+    attachable: true
   frontend-to-identity:
-    driver: bridge
+    driver: overlay
+    attachable: true
   frontend-to-booking:
-    driver: bridge  
+    driver: overlay
+    attachable: true
   frontend-to-movie:
-    driver: bridge
+    driver: overlay
+    attachable: true
   booking-to-payment:
-    driver: bridge
+    driver: overlay
+    attachable: true
   identity-to-payment:
-    driver: bridge  
+    driver: overlay
+    attachable: true
   identity-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
   movie-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
   payment-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
   booking-to-databaseservice:
-    driver: bridge
+    driver: overlay
+    attachable: true
   databaseservice-to-database:
-    driver: bridge        
+    driver: overlay
+    attachable: true
 
 volumes:
   postgres_container:
