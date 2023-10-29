@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 cinema_bp = Blueprint("cinema", __name__)
 
+# Log cinema queries started
+logger.info("Cinema queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),

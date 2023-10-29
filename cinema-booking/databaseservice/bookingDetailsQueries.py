@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 booking_details_bp = Blueprint("bookingdetails", __name__)
 
+# log booking details queries started
+logger.info("Booking details queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),
