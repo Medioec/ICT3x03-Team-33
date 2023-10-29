@@ -16,6 +16,8 @@ pipeline {
                     sh 'python3 -m venv venv'
                     sh '. venv/bin/activate'
                     sh 'pip install -r requirements.txt'
+                    sh 'pip install pytest'
+                    sh 'pip install Flask-Testing'
                 }
             }
         }
@@ -25,7 +27,7 @@ pipeline {
                 script {
                     echo 'Running tests...'
                     sh 'python3 -m unittest discover -s tests'
-                    sh 'pytest'
+                    sh 'pytest test_credit_card_queries.py'
                 }
             }
         }
