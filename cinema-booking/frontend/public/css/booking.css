@@ -10,7 +10,7 @@ h4 .totalPrice {
 
 .booking-selection {
   margin: 10px;
-  padding: 3px;
+  padding: 15px 5px 5px 5px;
   border-top: solid;
   border-color: grey;
 }
@@ -112,17 +112,14 @@ p.text {
     margin: 5px;
   }
 
-#showtimeRow{
-  margin-left: 2px;
-}
-
 #showtimeRow2{
   margin-left: -5px;
+  display: flex;
 }
 
 #seatingPlanCol{
   align-self: center;
-  margin-top: 9px;
+  margin-top: 22px;
 }
 
 #seatingPlanSeat{
@@ -133,3 +130,22 @@ p.text {
   margin-left: 40px;
 }
 
+#movieTitle{
+  font-size: 2rem;
+}
+
+#cinemaDropdown, #dateDropdown, #timeDropdown{
+  width: max-content;
+}
+
+.button-container{
+  display: inline;
+}
+
+#dropdownHeader{
+  margin-left: 10px;
+}
+
+#showcaseContainer{
+  padding-top: 25px;
+}

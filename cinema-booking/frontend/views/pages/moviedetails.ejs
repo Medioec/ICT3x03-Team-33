@@ -4,13 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= movie.title %></title>
+  <title>
+    <%= movie.title %>
+  </title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
 
   <link rel="stylesheet" href="/css/nav.css" />
   <link rel="stylesheet" href="/css/style.css" />
@@ -21,142 +23,104 @@
   <!-- Navbar -->
   <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
-  <main>
-    <section id="movieDetails">
-        <div class="container">
-          <h2 class="showcase-heading"><%= movie.title %></h2>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="showcase-box">
-                <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
-                onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
-                alt="poster" />
-              </div>
-            </div>
-            <div class="col-md-8">
-              <h2 class="showcase-heading">Details</h2>
+    <script>
+      // Convert showtimeDetails to a JSON string and log it to the browser console
+      console.log(JSON.stringify(<%= JSON.stringify(showtimeDetails) %>));
+    </script>
+
+    <main>
+          <section id="movieDetails">
+            <div class="container">
+              <h2 class="showcase-heading">
+                <%= movie.title %>
+              </h2>
               <div class="row">
-                <div class="col-md-4">Genre</div>
-                <div class="col-md-8">
-                  <%= movie.genre %>
+                <div class="col-md-3">
+                  <div class="showcase-box" id="inDetails">
+                    <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
+                      onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';" alt="poster" />
+                  </div>
                 </div>
-                <div class="col-md-4">Content Rating</div>
-                <div class="col-md-8">
-                  <%= movie.contentRating %>
+                <div class="col-md-9">
+                  <h2 class="showcase-heading">Details</h2>
+                  <div class="row">
+                    <div class="col-md-4" id="detailsBody">Genre:</div>
+                    <div class="col-md-8" id="detailsContent">
+                      <%= movie.genre %>
+                    </div>
+                    <div class="col-md-4" id="detailsBody">Content Rating:</div>
+                    <div class="col-md-8" id="detailsContent">
+                      <%= movie.contentRating %>
+                    </div>
+                    <div class="col-md-4" id="detailsBody">Language:</div>
+                    <div class="col-md-8" id="detailsContent">
+                      <%= movie.lang %>
+                    </div>
+                    <div class="col-md-4" id="detailsBody">Subtitles:</div>
+                    <div class="col-md-8" id="detailsContent">
+                      <%= movie.subtitles %>
+                    </div>
+                    <div class="row">
+                      <h2 class="showcase-heading">Synopsis</h2>
+                    </div>
+                    <div class="row" id="movieSynopsisRow">
+                      <%= movie.synopsis %>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-md-4">Language</div>
-                <div class="col-md-8">
-                  <%= movie.lang %>
-                </div>
-                <div class="col-md-4">Subtitles</div>
-                <div class="col-md-8">
-                  <%= movie.subtitles %>
-                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="showtimes">
+            <div class="container" id="showtimesContainer">
+              <h2 class="showcase-heading">Showtimes</h2>
+              <div class="row">
                 <div class="row">
-                  <h2 class="showcase-heading">Synopsis</h2>
+                  <div class="col-md-3">
+                    <h3 class="showtimeHeader">Select a cinema</h3>
+                  </div>
+                  <div class="col-md-9" id="timeslotMovie">
+                    <h3 class="showtimeHeader">Select time slot for
+                      <h3 class="movieTitle"><%= movie.title %></h3>
+                    </h3>
+                  </div>
                 </div>
-                <div class="row" id="movieSynopsisRow">
-                  <%= movie.synopsis %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>      
-
-    <section id="showtimes">
-      <div class="container">
-        <div class="row">
-          <h2 class="showcase-heading">Showtimes</h2>
-        </div>
-        <div class="row">
-          <div class="col-md-3 cinemaSection">
-            <div class="row flex-container">
-              <h3 class="showtimeHeader">Select a cinema</h3>
-            </div>
-            <div class="row">
-              <button id="showtimes" class="btn cinemaBtn">
-                <h4>cinemaName</h4>
-              </button>
-            </div>
-            <div class="row">
-              <button id="showtimes" class="btn cinemaBtn">
-                <h4>cinemaName</h4>
-              </button>
-            </div>
-            <div class="row">
-              <button id="showtimes" class="btn cinemaBtn">
-                <h4>cinemaName</h4>
-              </button>
-            </div>
-            <div class="row">
-              <button id="showtimes" class="btn cinemaBtn">
-                <h4>cinemaName</h4>
-              </button>
-            </div>
-            <div class="row">
-              <button id="showtimes" class="btn cinemaBtn">
-                <h4>cinemaName</h4>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-9 showtimeSection">
-            <div class="row flex-container">
-              <h3 class="showtimeHeader">Select time slot for</h3>
-              <h3 class="movieTitle"><%= movie.title %></h3>
-            </div>
-            <div class="row showtimeRow">
-              <div class=" row">
-                <h3 class="dayDate">Saturday 21-10-2023</h3>
-              </div>
-              <div class="row showtimeBtnRow">
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>12:00PM</h4>
-                </button>
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>2:50PM</h4>
-                </button>
-              </div>
-            </div>
-            <div class="row showtimeRow">
-              <div class=" row">
-                <h3 class="dayDate">Sunday 22-10-2023</h3>
-              </div>
-              <div class="row showtimeBtnRow">
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>12:00PM</h4>
-                </button>
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>2:50PM</h4>
-                </button>
-              </div>
-            </div>
-            <div class="row showtimeRow">
-              <div class=" row">
-                <h3 class="dayDate">Monday 23-10-2023</h3>
-              </div>
-              <div class="row showtimeBtnRow">
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>12:00PM</h4>
-                </button>
-                <button id="showtimes" class="btn btn-primary">
-                  <h4>2:50PM</h4>
-                </button>
-              </div>
-            </div>
-          </div>
           
-        </div>
-      </div>
-
-    </section>
-  </main>
+                <div class="container" id="innerShowtimeContainer">
+                  <% for (const cinemaName in showtimeDetails) { %>
+                    <div class="row">
+                      <div class="col-md-3 cinemaSection">
+                        <h3 class="cinemaName"><%= cinemaName %></h3>
+                      </div>
+                      <div class="col-md-9 showtimeSection">
+                        <% const sortedShowtimes = showtimeDetails[cinemaName].sort((a, b) => {
+                          const aDate = new Date(`2000-01-01 ${a.showTime}`);
+                          const bDate = new Date(`2000-01-01 ${b.showTime}`);
+                          return aDate - bDate;
+                        });
+                
+                        for (const showtime of sortedShowtimes) { %>
+                          <a class="btn btn-primary" href="/booking?showtimeId=<%= showtime.showtimeId %>" role="button">
+                            <%= showtime.showTime %>
+                          </a>
+                        <% } %>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+                
+              </div>
+            </div>
+          </section>
+          
+    </main>
 
     <!-- Footer -->
     <%- include('../partial/footer'); %>
 
-    <script src="/js/moviedetails.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+      <script src="/js/moviedetails.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
 
 </body>
 

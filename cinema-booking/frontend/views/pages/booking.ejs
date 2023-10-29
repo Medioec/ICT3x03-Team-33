@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- nts. replace with MovieDetails title -->
+    <title>Seat selection for Saw X</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+
+    <link rel="stylesheet" href="/css/nav.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/booking.css" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3" id="showcaseContainer">
+                <div class="showcase-box">
+                    <img src="/images/movies/<%= showtimeDetails.movieTitle.replace(/[:\s]/g, '_') %>.jpg"
+                    onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
+                    alt="poster" /></a>                </div>
+                <h1 id="movieTitle"> <%= showtimeDetails.movieTitle %></h1>
+            </div>
+            <div class="col-md-9">
+                <div class="flex-row" id="showtimeRow2">
+                    <div class="p-2">
+                        <div class="button-container">
+                            <div class="row" id="dropdownHeader">Cinema:</div>
+                            <div class="row">
+                                <div class="dropdown">
+                                    <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        <%= showtimeDetails.cinemaName %>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">GV Bugis</a></li>
+                                        <li><a class="dropdown-item" href="#">Shaw Paya Lebar</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <!-- nts. showtimes date -->
+                        <div class="button-container">
+                            <div class="row" id="dropdownHeader">Date:</div>
+                            <div class="row">
+                                <div class="dropdown">
+                                    <button id="dateDropdown" class="btn btn-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        <%= showtimeDetails.showDate %>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">MONDAY 23-10-23</a></li>
+                                        <li><a class="dropdown-item" href="#">TUESDAY 24-10-23</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <!-- nts. showtimes time -->
+                        <div class="button-container">
+                            <div class="row" id="dropdownHeader">Time:</div>
+                            <div class="row">
+                                <div class="dropdown">
+                                    <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        <%= showtimeDetails.showTime %>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">12:00PM</a></li>
+                                        <li><a class="dropdown-item" href="#">1:45PM</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-2" id="seatingPlanCol">
+                        <button id="location" class="btn btn-primary">
+                            View Seating Plan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- seat selection here -->
+                <ul class="showcase">
+                    <li>
+                        <div class="seat"></div>
+                        <small>Available</small>
+                    </li>
+                    <li>
+                        <div class="seat selected"></div>
+                        <small>Selected</small>
+                    </li>
+                    <li>
+                        <div class="seat sold"></div>
+                        <small>Sold</small>
+                    </li>
+                </ul>
+                <div class="seatContainer">
+                    <div class="screen" id="seatingPlanScreen">
+                        <a>
+                            Screen
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers">A</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="seatNumbers">B</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers">C</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat sold"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers">D</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers">E</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers">F</div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat sold"></div>
+                        <div class="seat"></div>
+                    </div>
+                    <div class="row">
+                        <div class="seatNumbers" id="seatingPlanSeat">1</div>
+                        <div class="seatNumbers">2</div>
+                        <div class="seatNumbers">3</div>
+                        <div class="seatNumbers">4</div>
+                        <div class="seatNumbers">5</div>
+                        <div class="seatNumbers">6</div>
+                        <div class="seatNumbers">7</div>
+                        <div class="seatNumbers">8</div>
+                    </div>
+                </div>
+            </div>
+            <div class="booking-selection">
+                <div class="row ticketRow">
+                    <div class="col-md-6">
+                        <a class="ticketHeaders">TICKET TYPE</a>
+                    </div>
+                    <div class="col-md-2">
+                        <a class="ticketHeaders">TICKET PRICE</a>
+                    </div>
+                    <div class="col-md-2">
+                        <a class="ticketHeaders">QUANTITY</a>
+                    </div>
+                    <div class="col-md-2">
+                        <a class="ticketHeaders">TOTAL AMOUNT</a>
+                    </div>
+                </div>
+                <div class="row ticketRow">
+                    <div class="col-md-6">
+                        Adult
+                    </div>
+                    <div class="col-md-2">
+                        $16.00
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text">
+                            <span id="count">0</span>
+                        </p>
+                    </div>
+                    <div class="col-md-2">
+                        <p class="text">
+                            $<span id="total">0</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row" id="ticketRow">
+                    <div class="col-md-2">
+                        <a class="ticketHeaders">TOTAL PRICE</a>
+                    </div>
+                    <div class="col-md-2">
+                        <h4 class="totalPrice">$0.00</h4>
+                    </div>
+                </div>
+                <div class="row" id="ticketRow">
+                    <div class="col-md-2">
+                        <button id="location" class="btn btn-secondary">
+                            RESET
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="location" class="btn btn-primary">
+                            CHECKOUT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    </div>
+    </div>
+    
+    <!-- footer -->
+    <%- include('../partial/footer'); %>
+
+    <script src="/js/booking.js"></script>
+    <script src="/js/nav.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

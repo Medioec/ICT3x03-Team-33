@@ -50,7 +50,7 @@
   background-color: white;
   color: #585858;
   border: 1px solid #000;
-  width: 200px !important;
+  width: 200px;
 }
 
 .button-container .dropdown .btn::after {
@@ -67,7 +67,7 @@
   background-color: white;
   border: 1px solid #000;
   color: gray;
-  width: 200px !important;
+  width: 200px;
 }
 
 .button-container .dropdown-menu .dropdown-item {

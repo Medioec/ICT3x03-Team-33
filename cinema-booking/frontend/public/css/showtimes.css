@@ -38,14 +38,24 @@ h4{
     padding-top: 10px;;
 }
 
-.dateTab{
-    display: inline-flex;
-}
-
 /* moviedetails.html styles */
+
+#inDetails{
+    width: 200px;
+    height: 300px;
+}
 
 .cinemaSection{
     background-color: #949494;
+    width: 230px;
+    padding: 20px 15px 40px 15px;
+}
+
+.showtimeSection{
+    background-color: #D3D3D3;
+    width: 810px;
+    padding: 15px 5px 15px 20px;
+    border: 1px solid grey;
 }
 
 .cinemaBtn{
@@ -59,10 +69,6 @@ h4{
     padding-top: 10px;
 }
 
-.showtimeSection{
-    background-color: #D3D3D3;
-}
-
 .movieTitle{
     text-decoration: none;
     font-size: 1rem;
@@ -74,15 +80,17 @@ h4{
 .showtimeHeader{
     font-size: 0.9rem;
     width: auto;
+    margin-right: 20px;
 }
 
-.showtimeRow {
-    border-bottom: solid;
-    border-color: grey;
+#showtimeRow {
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 15px 0px 15px 0px;
+    background-color: lightgrey;
 }
 
 .dayDate{
@@ -94,6 +102,41 @@ h4{
     margin: 5px;
 }
 
-#movieSynopsisRow{
+#movieSynopsisRow, #detailsBody, #detailsContent{
     margin-left: 0px;
+    padding: 10px;
+}
+
+#detailsBody{
+    font-weight: 500;
+}
+
+#cinemaRow{
+    padding-top: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+#showtimesContainer{
+    margin-top: -10px;
+    padding-top: 0px;
+}
+
+.cinemaName{
+    color: white;
+    font-size: medium;
+    text-decoration: overline;
+}
+
+#innerShowtimeContainer{
+    margin-top: -20px;
+}
+
+#timeslotMovie{
+    display: flex;
+}
+
+.showcase-heading{
+    color: #0d6efd;
+    margin: 15px;
 }
