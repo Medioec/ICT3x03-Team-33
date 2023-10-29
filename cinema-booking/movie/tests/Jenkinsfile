@@ -30,8 +30,8 @@ pipeline {
                 script {
                     // Run your tests here
                     // Example:
-                    sh 'python -m unittest test_app.py'
-                    sh 'python -m unittest test_user_utils.py'
+                    sh 'python -m unittest tests/test_app.py'
+                    sh 'python -m unittest tests/test_user_utils.py'
                 }
             }
         }
