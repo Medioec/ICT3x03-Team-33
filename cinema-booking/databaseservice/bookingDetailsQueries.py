@@ -105,7 +105,7 @@ def get_booking_details_by_id(user_id, ticket_id):
 
 #####     Retrieve all bookings by userId     #####
 @booking_details_bp.route('/get_all_bookings_by_userId/<uuid:userId>', methods=['GET'])
-def get_ticket_price_by_id(userId):
+def get_all_bookings_by_userId(userId):
     # Log the retrieval of all bookings by userId
     logger.info(f"Retrieving all bookings for userId: {userId}.")
     try:

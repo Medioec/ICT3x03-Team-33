@@ -1,9 +1,18 @@
 from flask import request, jsonify, Blueprint
 import os
 import psycopg2
+import logging
 
+# Create or get the logger
+logger = logging.getLogger(__name__)
+
+# Create a blueprint
 user_bp = Blueprint("user", __name__)
 
+# Log user queries started
+logger.info("User queries started.")
+
+# Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_NORMALUSER"),
@@ -14,6 +23,8 @@ db_config = {
 #####     Adds a new user to the database     #####
 @user_bp.route('/add_user', methods=['POST'])
 def add_user():
+    # Log the addition of a new user
+    logger.info("Adding new user started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -36,16 +47,21 @@ def add_user():
         conn.close()
 
         # Return HTTP 201 Created to indicate successful resource creation
+        # log the successful creation of a new user
+        logger.info("User added successfully. username: {username}")
         return jsonify({"message": "User added successfully"}), 201
-
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in add_user: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####     End of add user     #####
 
 ##### Get user information #####
 @user_bp.route('/get_user_details', methods=['POST'])    
 def get_user_details():
+    # Log the retrieval of a user
+    logger.info("Retrieving user details started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -75,20 +91,27 @@ def get_user_details():
                 "userRole": user[4],
                 "isUserBanned": user[5]
             }
+            
+            # Log the successful retrieval of a user
+            logger.info("User retrieved successfully. username: {username}")
             return jsonify(user_details), 200
         else:
             # User not found, return HTTP 404 Not Found
-            print("User not found")
+            # Log the user not found error
+            logger.warning("User not found with username: {username}.")
             return jsonify({"message": "User not found"}), 404
-
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in get_user_details: {str(e)}")
         return jsonify({"error": str(e)}), 500 
-#####   End of check user     #####    
+#####   End of get user information     #####    
 
 ##### Checks if username is taken #####
 @user_bp.route('/check_user', methods=['POST'])    
 def check_user():
+    # Log checking if username is taken
+    logger.info("Checking if username is taken started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -108,20 +131,26 @@ def check_user():
 
         if user:
             # User found, return HTTP 200 OK
+            # Log the successful retrieval of a user
+            logger.info("User found with username: {username}.")
             return jsonify({"message": "User found"}), 200
         else:
             # User not found, return HTTP 404 Not Found
-            print("User not found")
+            # Log the user not found error
+            logger.warning("User not found with username: {username}.")
             return jsonify({"message": "User not found"}), 404
-
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in check_user: {str(e)}")
         return jsonify({"error": str(e)}), 500 
 #####   End of check user     #####
 
 #####   Checks if email is taken     #####
 @user_bp.route('/check_email', methods=['POST'])
 def check_email():
+    # Log checking if email is taken
+    logger.info("Checking if email is taken started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -141,12 +170,17 @@ def check_email():
 
         if user:
             # Email found, return HTTP 200 OK
+            # Log the successful retrieval of a user
+            logger.info("Email found with email: {email}.")
             return jsonify({"message": "Email found"}), 200
         else:
             # Email not found, return HTTP 404 Not Found
+            # Log the email not found error
+            logger.warning("Email not found with email: {email}.")
             return jsonify({"message": "Email not found"}), 404
-
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in check_email: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####   End of check email     #####
