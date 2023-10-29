@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 # Create a blueprint
 showtimes_bp = Blueprint("showtimes", __name__)
 
+# log showtimes queries started
+logger.info("Showtimes queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),

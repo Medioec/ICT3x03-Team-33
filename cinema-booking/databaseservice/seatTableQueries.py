@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 # Create a blueprint
 seat_bp = Blueprint("seat", __name__)
 
+# Log seat queries started
+logger.info("Seat queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),

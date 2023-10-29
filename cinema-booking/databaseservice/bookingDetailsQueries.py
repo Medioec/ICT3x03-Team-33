@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 booking_details_bp = Blueprint("bookingdetails", __name__)
 
+# log booking details queries started
+logger.info("Booking details queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),
@@ -102,7 +105,7 @@ def get_booking_details_by_id(user_id, ticket_id):
 
 #####     Retrieve all bookings by userId     #####
 @booking_details_bp.route('/get_all_bookings_by_userId/<uuid:userId>', methods=['GET'])
-def get_ticket_price_by_id(userId):
+def get_all_bookings_by_userId(userId):
     # Log the retrieval of all bookings by userId
     logger.info(f"Retrieving all bookings for userId: {userId}.")
     try:

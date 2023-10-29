@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 # Create a blueprint
 movie_details_bp = Blueprint("movie_details", __name__)
 
+# Log movie details queries started
+logger.info("Movie details queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),

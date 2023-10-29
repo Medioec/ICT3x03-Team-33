@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 credit_card_bp = Blueprint("credit_card", __name__)
 
+# Log credit card queries started
+logger.info("Credit card queries started.")
+
 # Set up db config credentials
 db_config = {
     "dbname": os.getenv("DB_NAME"),
