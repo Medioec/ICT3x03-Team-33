@@ -29,7 +29,7 @@ server {
 	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
-	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
+	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
 
 	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
 	add_header Referrer-Policy "strict-origin";
@@ -45,6 +45,12 @@ server {
 
 	# Ensures that newly opened windows (or tabs) originating from your site are not granted access back to the opening page, improving isolation.
 	add_header Cross-Origin-Opener-Policy same-origin;
+
+    add_header Cross-Origin-Resource-Policy same-origin;
+
+    add_header Cache-Control "no-store, max-age=0";
+
+    add_header Pragma no-cache;
 
 
     location /health {
@@ -120,12 +126,6 @@ server {
     	# Instructs the browser not to override the response's Content-Type header
     	add_header X-Content-Type-Options "nosniff";
 
-	# Page can only be framed by other pages on the same domain
-    	add_header X-Frame-Options "SAMEORIGIN";
-
-	# Enables the built-in XSS (Cross-Site Scripting) protection
-    	add_header X-XSS-Protection "1; mode=block";
-
 	# Informs the browser not to open files that are considered safe by the browser's security settings directly
 	add_header X-Download-Options "noopen";
     	
@@ -133,7 +133,7 @@ server {
 	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
-	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
+	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
 
 	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
 	add_header Referrer-Policy "strict-origin";
@@ -149,6 +149,18 @@ server {
 
 	# Ensures that newly opened windows (or tabs) originating from your site are not granted access back to the opening page, improving isolation.
 	add_header Cross-Origin-Opener-Policy same-origin;
+
+    add_header Cross-Origin-Resource-Policy same-origin;
+
+    add_header Cache-Control "no-store, max-age=0";
+
+    add_header Pragma no-cache;
+
+    proxy_hide_header Access-Control-Allow-Origin;
+    
+    add_header Access-Control-Allow-Origin "https://3x03.redapplepie.com";
+
+    proxy_hide_header X-Powered-By;
 
     location / {
         client_max_body_size 0;
