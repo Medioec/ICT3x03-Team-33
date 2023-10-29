@@ -101,3 +101,8 @@
   font-weight: 500;
   margin-bottom: 25px;
 }
+
+.loginWarning{
+  padding: 10px;
+  color: red;
+}

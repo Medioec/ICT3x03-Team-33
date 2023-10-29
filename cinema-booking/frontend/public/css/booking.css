@@ -136,6 +136,7 @@ p.text {
 
 #cinemaDropdown, #dateDropdown, #timeDropdown{
   width: max-content;
+  color: black;
 }
 
 .button-container{
@@ -148,4 +149,67 @@ p.text {
 
 #showcaseContainer{
   padding-top: 25px;
+}
+
+.seat-reserved{
+  background-color: rgba(0, 128, 0, 0.913);
+  border-style: solid;
+  height: 26px;
+  width: 32px;
+  margin: 3px;
+  font-size: 50px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-style: solid;
+  border-color: black;
+}
+
+#showcaseSeats, #reserved{
+  pointer-events: none;
+}
+
+#priceRow{
+  display: flex;
+}
+
+#loginModal{
+  width: 400px;
+  height: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+}
+
+#modalRow{
+  padding: 15px;
+  justify-content: center;
+  display: flex;
+}
+
+#modalCloseRow{
+  justify-content: end;
+  padding: 20px;
+  display: flex;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  z-index: 1000;
+}
+
+.showcaseHeading{
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  margin: 10px;
 }
