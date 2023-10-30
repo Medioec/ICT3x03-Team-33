@@ -461,10 +461,12 @@ def create_staff():
 
         print("sent to email service")
 
-        if response != 200:
-             # delete user from db
+        if response.status_code != 200:
+            # delete user from db
             data = {"userId": userId}
-            delete_response = requests.post("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
+            delete_response = requests.delete("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
+
+            print("delete_response", delete_response)
 
             return jsonify({"message": "Error sending email"}), 500
         

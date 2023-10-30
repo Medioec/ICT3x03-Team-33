@@ -212,7 +212,7 @@ def delete_user_by_id():
             cursor = conn.cursor()
 
             delete_query = "DELETE FROM cinemauser WHERE userId = %s"
-            cursor.execute(delete_query, (sessionId,))
+            cursor.execute(delete_query, (userId,))
             conn.commit()
 
             cursor.close()

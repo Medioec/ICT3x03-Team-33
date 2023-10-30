@@ -1,10 +1,10 @@
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import requests
 import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)  
 CORS(app)
@@ -43,43 +43,37 @@ def send_staff_activation_email():
 
                 <h2 style="color: #333;">Staff Account Activation</h2>
 
-                <p>Welcome to Secuu Movies Team!</p>
+                <p>Welcome to CineGo Team!</p>
                 
-                <p style="color: #666;">Your username is: <strong>{username}</strong></p>
+                <p style="color: #666;">Your username is: <strong>{}</strong></p>
 
                 <p style="color: #666;">To activate your staff account, please click the button below:</p>
 
-                <a href="{activation_link}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px; margin-top: 10px;">Activate Account</a>
+                <a href="{}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; font-size: 16px; margin-top: 10px;">Activate Account</a>
 
-                <p style="color: #999; font-size: 12px;">This email was sent by Secuu Movies. Please do not reply to this email.</p>
+                <p style="color: #999; font-size: 12px;">This email was sent by CineGo. Please do not reply to this email.</p>
 
             </div>
 
         </body>
         </html>
-    """
+    """.format(username, activation_link)
 
     message = MIMEMultipart()
-    message['From'] = sender_email
-    message['To'] = recipient_email
     message['Subject'] = subject
     message.attach(MIMEText(body, 'html'))
 
     print("message created")
 
-
     try:
         # Establish a connection to Gmail's SMTP server
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()
-            
-            # Login to your Gmail account
-            server.login(sender_email, sender_password)
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+            smtp_server.login(sender_email, sender_password)
+            print("smtp server logged in")
             
             # Send the email
-            server.sendmail(sender_email, recipient_email, message.as_string())
-
-        print("email sent")
+            smtp_server.sendmail(sender_email, recipient_email, message.as_string())
+            print("email sent")
 
         return jsonify({"message": "Email sent!"}), 200
     
