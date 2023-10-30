@@ -29,7 +29,7 @@ server {
 	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS. updated to allow loading of resources from additional domains
-	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://www.google.com https://cdnjs.cloudflare.com; style-src 'self' https://stackpath.bootstrapcdn.com https://cdn.jsdelivr.net; frame-src https://www.google.com;";
+	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' https://stackpath.bootstrapcdn.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdn.jsdelivr.net; frame-src https://www.google.com;";
 
 	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
 	add_header Referrer-Policy "strict-origin";
@@ -133,7 +133,8 @@ server {
 	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS. updated to allow loading of resources from additional domains
-	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://www.google.com https://cdnjs.cloudflare.com; style-src 'self' https://stackpath.bootstrapcdn.com https://cdn.jsdelivr.net; frame-src https://www.google.com;";
+	add_header Content-Security-Policy "default-src 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content; script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' https://stackpath.bootstrapcdn.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdn.jsdelivr.net; frame-src https://www.google.com;";
+	
 
 	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
 	add_header Referrer-Policy "strict-origin";
