@@ -425,7 +425,7 @@ def create_staff():
             # create a unique activation link
             # timestamp is embedded into token, will be checked when token is decoded
             link_type = "activate-staff-account"
-            activation_link = user_utils.generateEmailLinks(serializer, email, link_type) 
+            activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
         except Exception as e:
             print("error generating email link", e)
 
@@ -475,6 +475,47 @@ def create_staff():
     except:
         return jsonify({"message": "Error occurred"}), 500
 ############################## END OF STAFF REGISTRATION #########################################
+
+############################## VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
+# verifies if the link is valid  before loading form to set password
+@app.route("/activate_staff_account", methods=["POST"])
+def activate_staff_account():
+    try:
+        # get activation link
+        data = request.get_json()
+        activation_link = data['activation_link']
+
+        # check if activation link is valid
+        expiration_time_in_seconds = 86400 # 24 hour window
+        username = serializer.loads(activation_link, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+
+        # if activation link is invalid
+        if username is None:
+            return jsonify({"message": "Invalid activation link"}), 400
+
+        # if activation link is valid, double check against user info in db
+        requestData = {"username": username}
+        response = requests.post("http://databaseservice:8085/databaseservice/user/get_user_details", json=requestData)
+        
+        if response.status_code !=200:
+            return jsonify({"message": "Error occurred"}), 500
+        
+        # get info from db
+        userId = response.json()['userId']
+        db_tokenHash = response.json()['passwordHash']
+
+        # check if activation link matches link in db
+        try:
+            ph = PasswordHasher()
+            ph.verify(db_tokenHash, activation_link)
+            return jsonify({"message": "Valid activation link"}), 200
+        
+        except:
+            return jsonify({"message": "Invalid activation link"}), 400
+
+    except:
+        return jsonify({"message": "Error occurred"}), 500    
+############################## END OF VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)

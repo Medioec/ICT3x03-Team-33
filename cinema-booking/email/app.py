@@ -24,7 +24,7 @@ def send_staff_activation_email():
     activation_link = data["activation_link"]
 
     # TODO: replace with actual url in production
-    activation_link = f'https://localhost.com/activate?token={activation_link}'
+    activation_link = f'http://localhost:8080/activate?token={activation_link}'
     print("activation link: {}".format(activation_link))
 
     # create email
