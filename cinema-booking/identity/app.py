@@ -373,11 +373,6 @@ def enhancedAuth():
 @app.route("/create_staff", methods=["POST"])
 # @jwt_required() # can only be accessed by admins
 def create_staff():
-    
-    # requestData = {"userId": userId}
-    response = requests.post("http://email:587//create_activation_link")    
-    print(response)
-    
     # logs registration attempt
     logger.info("Attempting staff creation...")
     
@@ -425,13 +420,41 @@ def create_staff():
     except Exception as e:
         return jsonify({"message": {str(e)}}), 500
 
-    
     # create a unique activation link with expiry
     expiration_in_seconds = 3600 # 1 hour expiry
     link_type = "activate-staff-account"
     activation_link = user_utils.generateEmailLinks(serializer, email, link_type, expiration_in_seconds)
 
-    # TODO SEND EMAIL TO USER WITH ACTIVATION LINK
+    # hash activation link and store in db -> will use this to verify when staff uses their activation link
+    ph = PasswordHasher()
+    hash = ph.hash(activation_link)
+
+    userId = user_utils.generateUUID()
+    role = "staff"
+
+    # insert all info into db
+    data = {
+        "userId": userId,
+        "email": email,
+        "username": username,
+        "passwordHash": hash,
+        "userRole": role
+    }
+    
+    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    
+    if response.status_code != 201:
+        return jsonify({"message": "Database insert error"}), 500
+
+    # send email to user with activation link
+    requestData = {"email": email,
+                   "activation_link": activation_link}
+    response = requests.post("http://email:587//create_activation_link", json=requestData)    
+    
+    if response != 200:
+        return jsonify({"message": "Error sending email"}), 500
+    else:
+        return jsonify({"message": "Email sent"}), 200
 
     
     # ph = PasswordHasher()

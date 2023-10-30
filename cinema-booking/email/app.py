@@ -30,6 +30,7 @@ def create_activation_link():
     # get email from request
     data = request.get_json()
     recipient_email = data["email"]
+    username = data["username"]
     activation_link = data["activation_link"]
 
     # TODO: replace with actual url in production
@@ -52,6 +53,8 @@ def create_activation_link():
                 <h2 style="color: #333;">Staff Account Activation</h2>
 
                 <p>Welcome to Secuu Movies Team!</p>
+                
+                <p style="color: #666;">Your username is:</p><bold>{username}</bold>
 
                 <p style="color: #666;">To activate your staff account, please click the button below:</p>
 
