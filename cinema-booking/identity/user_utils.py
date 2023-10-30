@@ -71,3 +71,7 @@ def generateUUID():
 def generateSecretKey():
     secret_key = secrets.token_bytes(32) 
     return secret_key
+
+# generate a random 16 character string
+def generateRandomString():
+    return secrets.token_urlsafe(16)

@@ -12,7 +12,6 @@ exports.getHomePage = [async (req, res) => {
         // get all movies from movie service
         const movies = await movieService.getAllMovies();
         
-        // console.log("Rendering index.ejs");
         return res.render('index.ejs', { movies, loggedIn });
 
     } catch (error) {
@@ -21,24 +20,39 @@ exports.getHomePage = [async (req, res) => {
     }
 }];
 
+
 exports.getMovieDetailsPage = [async (req, res) => {
     try {
-        // Get the movieId from the query parameters
         const movieId = req.query.movieId;
-
-        // Fetch the movie details using the movieServiceModel function
         const movie = await movieService.getMovieById(movieId);
 
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
+        // Get all showtimes from the service
+        const showtimes = await movieService.getAllShowtimes();
+        const movieIdNumber = parseInt(movieId);
 
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/moviedetails.ejs', { movie, loggedIn });
+        // Filter and map the showtimes array to get an array of objects with movieId and showtimeId
+        const filteredShowtimes = showtimes
+            .filter((showtime) => showtime.movieId === movieIdNumber) 
+            .map((showtime) => ({
+                movieId: showtime.movieId,
+                showtimeId: showtime.showtimeId
+            }));
+
+        const showtimeDetails = {};
+
+        // Retrieve showtime details for each showtime in filteredShowtimes
+        for (const showtime of filteredShowtimes) {
+            const showtimeData = await movieService.getShowtimeById(showtime.showtimeId);
+            showtimeDetails[showtimeData.cinemaName] = showtimeDetails[showtimeData.cinemaName] || [];
+            showtimeDetails[showtimeData.cinemaName].push(showtimeData);
+        }
+
+        const loggedIn = req.loggedIn;
+        res.render('pages/moviedetails.ejs', { movie, showtimeDetails, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getMovieDetailsPage:", error);
         return res.status(500).json({ 'message': 'Internal Server Error' });
-        // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];
 
@@ -110,23 +124,19 @@ exports.getAllShowtimesPage = [async (req, res) => {
     }
 }];
 
-exports.getShowtimesDetailsPage = [async (req, res) => {
+exports.getBookingForMoviePage = [async (req, res) => {
     try {
-        // Get the movieId from the query parameters
-        const showtimeId = req.query.showtime_id;
-
-        // Fetch the movie details using the movieServiceModel function
-        const showtimes = await movieService.getShowtimeById(showtimeId);
+        const showtimeId = req.query.showtimeId;
+        const showtimeDetails = await movieService.getShowtimeById(showtimeId);
 
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
 
         // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/showtimedetails.ejs', { showtimes, loggedIn });
+        res.render('pages/booking.ejs', { showtimeDetails, loggedIn });
     } catch (error) {
         // Handle errors
-        console.error("Error in getShowtimesDetailsPage:", error);
-        return res.status(500).json({ 'message': 'Internal Server Error' });
+        console.error("Error in getBookingForMoviePage:", error);
         // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];
