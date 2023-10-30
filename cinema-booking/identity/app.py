@@ -3,7 +3,8 @@ from argon2 import PasswordHasher
 from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-from flask import Flask, request, jsonify, session, sessions
+from flask import Flask, request, jsonify, session
+from flask_session import Session
 from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
@@ -43,11 +44,17 @@ logger.addHandler(stream_handler)
 
 logger.info("Identity Service started")
 
+app.config['WTF_CSRF_ENABLED'] = True
 app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken']
 #cryptographically sign the flask session cookie used for csrftoken
 app.config['SECRET_KEY'] = user_utils.generateSecretKey()
-#app.config['SESSION_TYPE'] = 'filesystem'
-#sessions(app)
+
+# Session configuration, server side sessions for particular user, stored as cookie on client browser
+app.config['SESSION_TYPE'] = 'filesystem'  # or 'redis', 'memcached', etc.
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_KEY_PREFIX'] = 'dev:app:'
+Session(app)
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 #app.config['SESSION_COOKIE_DOMAIN'] = "frontend"  # Adjust as necessary
 
@@ -393,7 +400,7 @@ def get_csrf_token():
   
     #Double Submit Cookie method
     response = jsonify({"csrf_token": token})
-    #response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token as a cookie
+    response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token as a cookie
     return response
     
 

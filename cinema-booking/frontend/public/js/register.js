@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const csrfToken = document.getElementById('csrfToken').value;
         await fetch("/registerRequest", {
           method: "POST",
+          //This is necessary to ensure that cookies are sent with the request, even if it’s a cross-origin request. getting error 500.
           credentials: 'include', 
           headers: {
             "Content-Type": "application/json",
