@@ -14,7 +14,7 @@ RUN apt-get update
 RUN pip install -r requirements.txt
 
 # Copy app directory contents into the container at /app
-COPY databaseservice/ /app
+COPY sessioncleaning/ /app
 
 # Run your Flask app
-CMD ["python", "./app.py"]
+CMD ["tail", "-f", "/dev/null"]

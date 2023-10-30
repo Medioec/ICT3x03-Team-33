@@ -155,28 +155,21 @@ services:
             - "${DB_PORT}"
     
     ofelia-scheduler:
-        image: mcuadros/ofelia:v0.3.6
+        image: mcuadros/ofelia:v0.3.7
         networks:
             - scheduler-to-sessioncleaning
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-        command: daemon --docker
-        labels:
-            - ofelia.enabled=true
-
-    job-clean-inactive-sessions:
-        image: "mcuadros/ofelia:v0.3.6"
-        networks:
-            - scheduler-to-sessioncleaning
         command: job-run sessioncleaning /app/app.py
         labels:
             - ofelia.enabled=true
-            - ofelia.job-local.schedule=0 0 2 * * *
-            - ofelia.job-local.no-overlap="true"
-            - ofelia.job-local.command=docker start script
+        depends_on:
+            - sessioncleaning
            
     sessioncleaning:
-        build: ./sessioncleaning
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./sessioncleaning/Dockerfile
         networks:
             - scheduler-to-sessioncleaning
             - sessioncleaning-to-database
@@ -191,9 +184,13 @@ services:
             options:
                 max-size: "1m"
                 max-file: "5"
+        labels:
+            - ofelia.enabled=true
+            - ofelia.job-exec.sessioncleaning.schedule=@every 1m
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py
+            - ofelia.job-exec.sessioncleaning.no-overlap=true
         depends_on:
             - database
-            - ofelia-scheduler
 
 networks:
   default:

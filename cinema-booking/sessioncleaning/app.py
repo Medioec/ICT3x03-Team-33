@@ -1,11 +1,6 @@
-import Flask
-from flask_cors import CORS
 import psycopg2
 import os
 import logging
-
-app=Flask(__name__)
-CORS(app)
 
 # Create or get the root logger
 logger = logging.getLogger()
@@ -34,24 +29,44 @@ db_config = {
     "host": os.getenv("DB_HOST"),
 }
 
+# Function to delete inactive sessions
 def delete_inactive_sessions():
+    # log the function call
+    logger.info("delete_inactive_sessions called")
     try:
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
-
-        # Delete sessions marked as 'inactive'
-        delete_query = "DELETE FROM UserSessions WHERE currStatus = 'inactive'"
-        try:
-            cursor.execute(delete_query)
-        conn.commit()
-
-        logger.info("Deleted inactive sessions")
+        
+        currStatus = 'inactive'
+        
+        # Checks to see if inactive session exists
+        select_query = "SELECT * FROM usersessions WHERE currStatus = %s"
+        
+        cursor.execute(select_query, (currStatus,))
+        sessionInactiveExists = cursor.fetchone()
 
         cursor.close()
         conn.close()
+        
+        
+        # If inactive session exists, delete it
+        if sessionInactiveExists:
+            delete_query = "DELETE FROM UserSessions WHERE currStatus = %s"
+            cursor.execute(delete_query, (currStatus,))
+            conn.commit()
+            
+            cursor.close()
+            conn.close()
+            
+            # log deleted inactive sessions
+            logger.info("Deleted inactive sessions")
+        else:
+            # log no sessions to delete
+            logger.info("No inactive sessions to delete")
     except Exception as e:
-        logger.error("Error in delete_inactive_sessions")
+        logger.error("Uncaught error in delete_inactive_sessions")
+        
 
 if __name__ == "__main__":
     delete_inactive_sessions()
