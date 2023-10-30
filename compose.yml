@@ -42,6 +42,7 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
+            - identity-to-email
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
@@ -57,6 +58,22 @@ services:
         depends_on:
             - database
             - databaseservice
+
+    email:
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./email/Dockerfile
+        networks:
+            - identity-to-email
+            - booking-to-email
+        environment:
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        ports:
+            - "${EMAIL_PORT}"
+        depends_on:
+            - identity
+            - booking
 
     movie:
         build: 
@@ -82,6 +99,7 @@ services:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
+            - booking-to-email
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
@@ -175,6 +193,10 @@ networks:
   booking-to-databaseservice:
     driver: bridge
   databaseservice-to-database:
+    driver: bridge
+  identity-to-email:
+    driver: bridge
+  booking-to-email:
     driver: bridge
 
 volumes:
