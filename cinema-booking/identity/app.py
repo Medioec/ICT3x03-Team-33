@@ -51,9 +51,7 @@ app.config['SECRET_KEY'] = user_utils.generateSecretKey()
 
 # Session configuration, server side sessions for particular user, stored as cookie on client browser
 app.config['SESSION_TYPE'] = 'filesystem'  # or 'redis', 'memcached', etc.
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_KEY_PREFIX'] = 'dev:app:'
+
 Session(app)
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 #app.config['SESSION_COOKIE_DOMAIN'] = "frontend"  # Adjust as necessary
@@ -394,13 +392,13 @@ def enhancedAuth():
 @app.route("/get_csrf_token", methods=["GET"])
 def get_csrf_token():
     token = generate_csrf()
-    #sending the session as a cookie to the client is the default behavior of Flask's session management
-    session["csrf_token"] = token
+    #sending the session as a cookie to the client is the default behavior of Flask's session management let flask handle it
+    #session["csrf_token"] = token
     logger.info("Generated CSRF Token: %s", token)
   
     #Double Submit Cookie method
     response = jsonify({"csrf_token": token})
-    response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token as a cookie
+    #response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token manual as a cookie causes error 500, shld let flask session handle it automatically
     return response
     
 
