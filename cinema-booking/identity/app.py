@@ -371,7 +371,7 @@ def enhancedAuth():
 
 ############################## STAFF REGISTRATION #########################################
 @app.route("/create_staff", methods=["POST"])
-# @jwt_required() # can only be accessed by admins
+@jwt_required() # can only be accessed by admins
 def create_staff():
     try:
         # logs registration attempt
