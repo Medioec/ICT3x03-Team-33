@@ -78,6 +78,6 @@ def generateRandomString():
     return secrets.token_urlsafe(16)
 
 # create unique email link using user email, link type and set expiration time
-def generateEmailLinks(serializer, email, link_type, expiration_in_seconds):
-    email_link = serializer.dumps(email, salt=link_type, max_age=expiration_in_seconds)
+def generateEmailLinks(serializer, email, link_type):
+    email_link = serializer.dumps(email, salt=link_type)
     return email_link

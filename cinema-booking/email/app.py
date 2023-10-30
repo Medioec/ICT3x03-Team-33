@@ -10,23 +10,14 @@ import smtplib
 app = Flask(__name__)  
 CORS(app)
 
-app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
-jwt = JWTManager(app)
-
 # gmail credentials
 sender_email = os.getenv("EMAIL_NAME")
 sender_password = os.getenv("EMAIL_PASSWORD")
 
-#####   throw error when JWT token is not valid     #####
-@jwt.unauthorized_loader
-def unauthorized_callback(callback):
-    print("unauthorized callback")
-    return jsonify({"message": "Unauthorized access"}), 401
-#####   End of throw error when JWT token is not valid     #####
-
 ############################## CREATE ACTIVATION LINK #########################################
-@app.route("/create_activation_link", methods=["POST"])
-def create_activation_link():
+@app.route("/send_staff_activation_email", methods=["POST"])
+def send_staff_activation_email():
+    print("inside create_activation_link")
     # get email from request
     data = request.get_json()
     recipient_email = data["email"]
@@ -35,6 +26,7 @@ def create_activation_link():
 
     # TODO: replace with actual url in production
     activation_link = f'https://localhost.com/activate?token={activation_link}'
+    print("activation link: {}".format(activation_link))
 
     # create email
     subject = "Activate Your Account"
@@ -54,7 +46,7 @@ def create_activation_link():
 
                 <p>Welcome to Secuu Movies Team!</p>
                 
-                <p style="color: #666;">Your username is:</p><bold>{username}</bold>
+                <p style="color: #666;">Your username is: <strong>{username}</strong></p>
 
                 <p style="color: #666;">To activate your staff account, please click the button below:</p>
 
@@ -74,6 +66,9 @@ def create_activation_link():
     message['Subject'] = subject
     message.attach(MIMEText(body, 'html'))
 
+    print("message created")
+
+
     try:
         # Establish a connection to Gmail's SMTP server
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
@@ -84,6 +79,8 @@ def create_activation_link():
             
             # Send the email
             server.sendmail(sender_email, recipient_email, message.as_string())
+
+        print("email sent")
 
         return jsonify({"message": "Email sent!"}), 200
     
