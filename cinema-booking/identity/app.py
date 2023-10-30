@@ -365,5 +365,97 @@ def enhancedAuth():
         return jsonify({"message": "Error occurred"}), 500
 ############################## END OF AUTH #########################################
 
+############################## STAFF REGISTRATION #########################################
+@app.route("/create_staff", methods=["POST"])
+@jwt_required() # can only be accessed by admins
+def create_staff():
+    # logs registration attempt
+    logger.info("Attempting staff creation...")
+    
+    # get data from registration form
+    data = request.get_json()
+    email = data['email']
+    username = data['username']
+
+    # Sanitize email and username
+    email = html.escape(email)
+    username = html.escape(username)
+    
+    # logs sanitized user input
+    logger.info(f"Sanitized user input: Email: {email}, Username: {username}")
+
+    if not email or not username:
+        return jsonify({"message": "Please fill in all form data"}), 400
+
+    # ensure username and password contain only allowed characters
+    if not user_utils.validateUsername(username):
+        return jsonify({"message": "Username does not meet the requirements"}), 400
+    
+    # check if username exists in db
+    try:
+        if not user_utils.isUsernameAvailable(username):
+            # log registration failure due to username already taken
+            logger.warning(f"Username '{username}' is already taken.")
+            return jsonify({"message": "Username is already taken"}), 409
+    
+    except Exception as e:
+        logger.error(f"Error during username availability check: {str(e)}")
+        return jsonify({"message": {str(e)}}), 500
+    
+    # check if email address is valid
+    try:
+        validate_email(email, check_deliverability=True)
+
+    except EmailNotValidError:
+        return jsonify({"message": "Email is invalid"}), 400
+
+    # check if email address is still available 
+    try:
+        if not user_utils.isEmailAvailable(email):
+            return jsonify({"message": "Email is already in use"}), 409
+    except Exception as e:
+        return jsonify({"message": {str(e)}}), 500
+
+    # TODO
+    # CREATE UNIQUE ACTIVATION LINK + EXPIRY
+    # SEND EMAIL TO USER WITH ACTIVATION LINK
+
+    ph = PasswordHasher()
+    hash = ph.hash(password)
+    
+    # logs that password has been hashed
+    logger.info("Password has been hashed.")
+
+    role = "staff"
+    userId = user_utils.generateUUID()
+    
+    data = {
+        "userId": userId,
+        "email": email,
+        "username": username,
+        "passwordHash": hash,
+        "userRole": role
+    }
+
+    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    
+    if response.status_code == 201:
+        logger.info(f"User '{username}' registered successfully!")
+        return jsonify({"message": "Registration successful"}), 200
+    
+    # if insert unsuccessful, return error message from databaseservice
+    else:
+        try:
+            logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
+            response_json = response.json()
+            # get error message from response. if no message, use default "Error occurred"
+            error_message = response_json.get("message", "Error occurred")
+            return jsonify({"message": error_message}), response.status_code
+    
+        except json.JSONDecodeError as e:
+            return jsonify({"message": "Error occurred"}), 500
+        
+############################## END OF STAFF REGISTRATION #########################################
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
