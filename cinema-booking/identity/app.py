@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 jwt_required, get_jwt_identity, get_jwt)
+from itsdangerous import URLSafeTimedSerializer
 import json
 import os 
 import requests
@@ -36,9 +37,12 @@ logger.addHandler(stream_handler)
 
 logger.info("Identity Service started")
 
-app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
-
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
+
+# create serializer for generating links
+EMAIL_SECRET_KEY = os.getenv("EMAIL_SECRET_KEY")
+serializer = URLSafeTimedSerializer(EMAIL_SECRET_KEY)
 
 ############################## REGISTRATION #########################################
 @app.route("/register", methods=["POST"])
@@ -367,8 +371,13 @@ def enhancedAuth():
 
 ############################## STAFF REGISTRATION #########################################
 @app.route("/create_staff", methods=["POST"])
-@jwt_required() # can only be accessed by admins
+# @jwt_required() # can only be accessed by admins
 def create_staff():
+    
+    # requestData = {"userId": userId}
+    response = requests.post("http://email:587//create_activation_link")    
+    print(response)
+    
     # logs registration attempt
     logger.info("Attempting staff creation...")
     
@@ -416,44 +425,49 @@ def create_staff():
     except Exception as e:
         return jsonify({"message": {str(e)}}), 500
 
-    # TODO
-    # CREATE UNIQUE ACTIVATION LINK + EXPIRY
-    # SEND EMAIL TO USER WITH ACTIVATION LINK
+    
+    # create a unique activation link with expiry
+    expiration_in_seconds = 3600 # 1 hour expiry
+    link_type = "activate-staff-account"
+    activation_link = user_utils.generateEmailLinks(serializer, email, link_type, expiration_in_seconds)
 
-    ph = PasswordHasher()
-    hash = ph.hash(password)
-    
-    # logs that password has been hashed
-    logger.info("Password has been hashed.")
+    # TODO SEND EMAIL TO USER WITH ACTIVATION LINK
 
-    role = "staff"
-    userId = user_utils.generateUUID()
     
-    data = {
-        "userId": userId,
-        "email": email,
-        "username": username,
-        "passwordHash": hash,
-        "userRole": role
-    }
+    # ph = PasswordHasher()
+    # hash = ph.hash(password)
+    
+    # # logs that password has been hashed
+    # logger.info("Password has been hashed.")
 
-    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    # role = "staff"
+    # userId = user_utils.generateUUID()
     
-    if response.status_code == 201:
-        logger.info(f"User '{username}' registered successfully!")
-        return jsonify({"message": "Registration successful"}), 200
+    # data = {
+    #     "userId": userId,
+    #     "email": email,
+    #     "username": username,
+    #     "passwordHash": hash,
+    #     "userRole": role
+    # }
+
+    # response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
     
-    # if insert unsuccessful, return error message from databaseservice
-    else:
-        try:
-            logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
-            response_json = response.json()
-            # get error message from response. if no message, use default "Error occurred"
-            error_message = response_json.get("message", "Error occurred")
-            return jsonify({"message": error_message}), response.status_code
+    # if response.status_code == 201:
+    #     logger.info(f"User '{username}' registered successfully!")
+    #     return jsonify({"message": "Registration successful"}), 200
     
-        except json.JSONDecodeError as e:
-            return jsonify({"message": "Error occurred"}), 500
+    # # if insert unsuccessful, return error message from databaseservice
+    # else:
+    #     try:
+    #         logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
+    #         response_json = response.json()
+    #         # get error message from response. if no message, use default "Error occurred"
+    #         error_message = response_json.get("message", "Error occurred")
+    #         return jsonify({"message": error_message}), response.status_code
+    
+    #     except json.JSONDecodeError as e:
+    #         return jsonify({"message": "Error occurred"}), 500
         
 ############################## END OF STAFF REGISTRATION #########################################
 
