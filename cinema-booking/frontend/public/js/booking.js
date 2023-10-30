@@ -26,7 +26,7 @@ function updateSelectedCount() {
     total.innerText = selectedSeatsCount * ticketPrice;
 
     // Display selected seat IDs in the selectedSeatsDisplay element
-    selectedSeatsDisplay.innerText = selectedSeatIds.join(', '); // Display as a comma-separated list
+    selectedSeatsDisplay.innerText = selectedSeatIds.join(', ');
 }
 
 function populateUI() {
@@ -56,13 +56,9 @@ container.addEventListener('click', (e) => {
 // Add an event listener to the reset button
 const resetButton = document.getElementById('resetButton');
 resetButton.addEventListener('click', () => {
-    // Deselect all selected seats
     selectedSeats.forEach(seat => seat.classList.remove('selected'));
-
-    // Clear the selected seats in the local storage
     localStorage.removeItem('selectedSeats');
 
-    // Update the selected seat count, price, and display
     updateSelectedCount();
 });
 
@@ -70,13 +66,11 @@ checkoutButton.addEventListener('click', () => {
     if (loggedIn === 'true') {
         // User is logged in, continue with checkout logic
     } else {
-        // User is not logged in, show the modal
         loginModal.style.display = 'block';
         modalOverlay.style.display = 'block';
     }
 });
 
-// Close the modal when the close button or "Cancel" button is clicked
 modalCloseBtn.addEventListener('click', () => {
     loginModal.style.display = 'none';
     modalOverlay.style.display = 'none';
