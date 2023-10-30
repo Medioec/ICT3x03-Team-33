@@ -160,19 +160,21 @@ services:
             - scheduler-to-sessioncleaning
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-        command: job-run sessioncleaning /app/app.py
+        command: daemon --docker
         labels:
             - ofelia.enabled=true
         depends_on:
             - sessioncleaning
            
     sessioncleaning:
+        container_name: sessioncleaning
         build: 
             context: ./cinema-booking
             dockerfile: ./sessioncleaning/Dockerfile
         networks:
             - scheduler-to-sessioncleaning
             - sessioncleaning-to-database
+        entrypoint: tail -f /dev/null
         environment:
             PYTHONUNBUFFERED: 1
             DB_HOST: database
@@ -186,9 +188,9 @@ services:
                 max-file: "5"
         labels:
             - ofelia.enabled=true
-            - ofelia.job-exec.sessioncleaning.schedule=@every 1m
-            - ofelia.job-exec.sessioncleaning.command=python /app/app.py
+            - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function        
         depends_on:
             - database
 

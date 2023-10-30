@@ -1,6 +1,7 @@
 import psycopg2
 import os
 import logging
+import argparse
 
 # Create or get the root logger
 logger = logging.getLogger()
@@ -45,9 +46,6 @@ def delete_inactive_sessions():
         
         cursor.execute(select_query, (currStatus,))
         sessionInactiveExists = cursor.fetchone()
-
-        cursor.close()
-        conn.close()
         
         
         # If inactive session exists, delete it
@@ -62,11 +60,21 @@ def delete_inactive_sessions():
             # log deleted inactive sessions
             logger.info("Deleted inactive sessions")
         else:
+            cursor.close()
+            conn.close()
             # log no sessions to delete
             logger.info("No inactive sessions to delete")
     except Exception as e:
+        cursor.close()
+        conn.close()
         logger.error("Uncaught error in delete_inactive_sessions")
-        
+        logger.error(e)
 
 if __name__ == "__main__":
-    delete_inactive_sessions()
+    parser = argparse.ArgumentParser(description="Run specific functions from this script.")
+    parser.add_argument('--run-function', action='store_true', help='Run the special function')
+
+    args = parser.parse_args()
+
+    if args.run_function:
+        delete_inactive_sessions()

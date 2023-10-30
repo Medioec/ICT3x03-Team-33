@@ -17,4 +17,4 @@ RUN pip install -r requirements.txt
 COPY sessioncleaning/ /app
 
 # Run your Flask app
-CMD ["tail", "-f", "/dev/null"]
+CMD ["python","-u","/app/app.py"]
