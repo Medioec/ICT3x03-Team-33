@@ -3,10 +3,18 @@
 // specifies http methods (GET, POST etc.)
 
 const express = require('express');
+const cors = require('cors');
 const router = express.Router();
 const identityServiceController = require('../controllers/identityServiceController');
 const checkHeaders = require('../middleware/checkHeaders');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
+
+const corsOptions = {
+    origin: 'http://localhost:8080',
+    credentials: true
+};
+
+router.use(cors(corsOptions));
 
 // login
 router.get('/login', checkLoggedIn, identityServiceController.getLogin);

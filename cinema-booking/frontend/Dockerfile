@@ -9,6 +9,7 @@ COPY package.json .
 
 # Install any necessary dependencies
 RUN npm install
+RUN npm install node-fetch
 
 # Copy the contents of the local frontend directory into the container
 COPY . .

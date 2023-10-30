@@ -14,37 +14,37 @@ server {
     server_name 3x03.redapplepie.com;
 
     # Instructs the browser not to override the response's Content-Type header
-    add_header X-Content-Type-Options "nosniff";
+    #add_header X-Content-Type-Options "nosniff";
 
 	# Page can only be framed by other pages on the same domain
-    add_header X-Frame-Options "SAMEORIGIN";
+    #add_header X-Frame-Options "SAMEORIGIN";
 
 	# Enables the built-in XSS (Cross-Site Scripting) protection
-    add_header X-XSS-Protection "1; mode=block";
+    #add_header X-XSS-Protection "1; mode=block";
 
 	# Informs the browser not to open files that are considered safe by the browser's security settings directly
-	add_header X-Download-Options "noopen";
+	#add_header X-Download-Options "noopen";
     	
 	#  Allows a website to specify which browser features and APIs it intends to use and from where
 	add_header Feature-Policy "geolocation 'self'; camera 'none'";
 	
 	# Enforces content loading only from whitelisted sources, enhancing protection against XSS.
-	add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
+	#add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://code.jquery.com; style-src 'self' https://stackpath.bootstrapcdn.com;";
 
 	# Dictates which referrer information should be included with requests made from your site, enhancing user privacy.
-	add_header Referrer-Policy "strict-origin";
+	#add_header Referrer-Policy "strict-origin";
 
 	# Ensures the browser only interacts with the server over HTTPS, reducing the risk of man-in-the-middle attacks.
-	add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+	#add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
 
 	# Allows only geolocation access, restricting camera and microphone for enhanced user privacy.
-	add_header Permissions-Policy "geolocation=*, camera=(), microphone=()";
+	#add_header Permissions-Policy "geolocation=*, camera=(), microphone=()";
 
 	# Protects your site from being loaded in an iframe or object tag on another site, reducing risk of data leaks.
-	add_header Cross-Origin-Embedder-Policy require-corp;
+	#add_header Cross-Origin-Embedder-Policy require-corp;
 
 	# Ensures that newly opened windows (or tabs) originating from your site are not granted access back to the opening page, improving isolation.
-	add_header Cross-Origin-Opener-Policy same-origin;
+	#add_header Cross-Origin-Opener-Policy same-origin;
 
 
     location /health {

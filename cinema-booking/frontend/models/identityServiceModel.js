@@ -10,6 +10,7 @@ async function loginRequest(body) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body),
+        credentials: 'include' 
     });
 
     responseData = await response.json();
@@ -17,16 +18,25 @@ async function loginRequest(body) {
 }
 
 async function registerRequest(body) {
+    const csrfToken = getCookie("csrf_token"); 
     const response = await fetch("http://identity:8081/register", {
         method: "POST",
         headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'X-CSRFToken': csrfToken
         },
         body: JSON.stringify(body),
+        credentials: 'include' 
     });
     
     return response;
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
 async function logoutRequest(token) {
@@ -36,7 +46,8 @@ async function logoutRequest(token) {
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
-        }
+        },
+        credentials: 'include' 
     });
 
     return response;

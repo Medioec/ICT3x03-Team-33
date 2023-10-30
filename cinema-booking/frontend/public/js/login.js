@@ -44,11 +44,15 @@ document.addEventListener("DOMContentLoaded", function () {
       };
 
       if (grecaptcha.getResponse()) { // Check if reCAPTCHA is completed
+        //fetch token value from ejs
+        const csrfToken = document.getElementById('csrfToken').value;
         await fetch("/loginRequest", {
           method: "POST",
+          credentials: 'include', 
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Accept": "application/json",
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify(data),
         })

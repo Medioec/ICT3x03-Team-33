@@ -26,6 +26,7 @@
       <div class="inner-warpper text-center">
         <h2 class="title">Login to your account</h2>
         <form action="" id="login-form">
+          <input type="hidden" name="_csrf" id="csrfToken" value="<%= csrfToken %>">
           <div class="input-group">
             <label class="palceholder" for="userName" id="placeholderFix">Username</label>
             <input class="form-control" name="userName" id="userName" type="text" placeholder="" />

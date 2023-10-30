@@ -3,7 +3,8 @@ from argon2 import PasswordHasher
 from cryptography.fernet import Fernet
 from datetime import datetime, timedelta
 from email_validator import validate_email, EmailNotValidError
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session, sessions
+from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 jwt_required, get_jwt_identity, get_jwt)
@@ -15,7 +16,13 @@ import base64
 import logging
 
 app = Flask(__name__)
-CORS(app)
+
+#Activates csrf protection, any unsafe requests (like POST, PUT, DELETE) 
+#to your Flask app will be expected to include a valid CSRF token
+#CORS(app, origins=["http://frontend:8080"], supports_credentials=True)
+CORS(app, origins=["http://localhost:8080"], supports_credentials=True)
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 # Create or get the root logger
 logger = logging.getLogger()
@@ -36,7 +43,13 @@ logger.addHandler(stream_handler)
 
 logger.info("Identity Service started")
 
+app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken']
+#cryptographically sign the flask session cookie used for csrftoken
+app.config['SECRET_KEY'] = user_utils.generateSecretKey()
+#app.config['SESSION_TYPE'] = 'filesystem'
+#sessions(app)
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
+#app.config['SESSION_COOKIE_DOMAIN'] = "frontend"  # Adjust as necessary
 
 jwt = JWTManager(app)
 
@@ -45,9 +58,13 @@ jwt = JWTManager(app)
 def register():
     # logs registration attempt
     logger.info("Attempting registration...")
-    
+    csrf_token_from_header = request.headers.get('X-CSRFToken')
+    csrf_token_from_session = session.get("csrf_token")
     # get data from registration form
     data = request.get_json()
+    logger.info("Received Data: %s", data)
+    logger.info("CSRF Token from Header: %s", csrf_token_from_header)
+    logger.info("CSRF Token from Session: %s", csrf_token_from_session) 
     email = data['email']
     username = data['username']
     password = data['password']
@@ -83,7 +100,7 @@ def register():
     
     # check if email address is valid
     try:
-        validate_email(email, check_deliverability=True)
+        validate_email(email, check_deliverabiliQty=True)
 
     except EmailNotValidError:
         return jsonify({"message": "Email is invalid"}), 400
@@ -140,6 +157,8 @@ def login():
     logger.info("Attempting login...")
     
     # get data from login form
+    received_token = request.headers.get('X-CSRFToken')
+    print("Received Token:", received_token)
     data = request.get_json()
     username = data['username']
     password = data['password']
@@ -364,6 +383,27 @@ def enhancedAuth():
     except:
         return jsonify({"message": "Error occurred"}), 500
 ############################## END OF AUTH #########################################
+
+@app.route("/get_csrf_token", methods=["GET"])
+def get_csrf_token():
+    token = generate_csrf()
+    #sending the session as a cookie to the client is the default behavior of Flask's session management
+    session["csrf_token"] = token
+    logger.info("Generated CSRF Token: %s", token)
+  
+    #Double Submit Cookie method
+    response = jsonify({"csrf_token": token})
+    #response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token as a cookie
+    return response
+    
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    response = jsonify({"message": "CSRF token is missing or incorrect.", "error": str(e)})
+    print("CSRF token is missing or incorrect." +str(e))
+    response.status_code = 400
+    return response
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)

@@ -6,8 +6,10 @@
 
 // models
 const identityService = require('../models/identityServiceModel');
+//import middleware
+const fetchCsrfToken = require('../middleware/fetchCsrfToken');
 
-exports.getLogin = (req, res) => {
+exports.getLogin = [fetchCsrfToken, (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
 
@@ -16,8 +18,8 @@ exports.getLogin = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('login.ejs', { loggedIn });
-};
+    res.render('login.ejs', { loggedIn, csrfToken: res.locals.csrfToken });
+}];
 
 exports.postLogin = async (req, res) => {
     try {
@@ -52,7 +54,7 @@ exports.postLogin = async (req, res) => {
     }
 };
 
-exports.getRegister = (req, res) => {
+exports.getRegister = [fetchCsrfToken, (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
 
@@ -61,8 +63,8 @@ exports.getRegister = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('register.ejs');
-};
+    res.render('register.ejs', { csrfToken: res.locals.csrfToken });
+}];
 
 exports.postRegister = async (req, res) => {
     try {
