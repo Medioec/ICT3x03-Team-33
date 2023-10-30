@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Get the source code from your version control system
+                checkout scm
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                script {
+                    echo 'Setting up the environment...'
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate'
+                    sh 'pip install -r requirements.txt'
+                    sh 'pip install pytest'
+                    sh 'pip install Flask-Testing'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    sh 'python3 -m unittest discover -s tests'
+                    sh 'pytest test_credit_card_queries.py'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // This block runs after the pipeline, no matter what
+            sh 'deactivate'
+        }
+
+        success {
+            // This block runs if the pipeline was successful
+            echo 'Unit tests passed!'
+        }
+
+        failure {
+            // This block runs if the pipeline failed
+            echo 'Unit tests failed!'
+        }
+    }
+}
