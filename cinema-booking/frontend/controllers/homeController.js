@@ -5,16 +5,30 @@ exports.getHomePage = [async (req, res) => {
     try {
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
-        
-        // get all movies from movie service
+
         const movies = await movieService.getAllMovies();
+        const showtimes = await movieService.getAllShowtimes();
+        // const movieId = movies.movieId;
+        // const movieDetails = await movieService.getMovieById(movieId);
+        //const showtimeDetails = await movieService.getShowtimeById();
+
+        // const movieIdNumber = parseInt(movieId);
+
+        console.log(movies);
+        console.log(showtimes);
+        // console.log(movieId);
+        // console.log(movieDetails);
+
+         return res.render('index.ejs', { movies, showtimes, loggedIn });
         
-        return res.render('index.ejs', { movies, loggedIn });
+        // return res.render('index.ejs', { movies, movieDetails, showtimes, loggedIn });
+
+        // return res.render('index.ejs', { movies, showtimes, showtimeDetails, loggedIn });
 
     } catch (error) {
         // Handle errors
-        return res.status(500).json({ 'message': 'Internal Server Error' });
-    }
+        res.status(500).send('Internal Server Error');
+    }    
 }];
 
 
