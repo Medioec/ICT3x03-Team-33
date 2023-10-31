@@ -1,13 +1,12 @@
-// JavaScript to update the dropdown button text
-document.addEventListener('DOMContentLoaded', function() {
-  document.addEventListener('click', function (event) {
-      const dropdownBtn = event.target.closest('.dropdown').querySelector('.btn');
-      const dropdownItem = event.target.closest('.dropdown-item');
-    
-      if (dropdownBtn && dropdownItem) {
-        dropdownBtn.textContent = dropdownItem.textContent;
+  document.addEventListener("DOMContentLoaded", function () {
+    var movieDropdown = document.getElementById("movieDropdown");
+
+    movieDropdown.addEventListener("click", function () {
+      var dropdownMenu = movieDropdown.nextElementElement;
+      if (dropdownMenu.style.display === "block") {
+        dropdownMenu.style.display = "none";
+      } else {
+        dropdownMenu.style.display = "block";
       }
     });
-});
-  
-  
+  });

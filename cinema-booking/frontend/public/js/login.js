@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
       
           switch (data.userRole) {
             case "member":
-              window.location.href = "/";
+              window.location.href = "/member";
               break;
       
             case "staff":

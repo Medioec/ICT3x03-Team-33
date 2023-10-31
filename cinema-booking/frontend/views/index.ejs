@@ -26,17 +26,30 @@
       <!-- Movie Booking Section -->
       <section id="booking" class="text-center">
         <div class="row">
-          <div class="button-container">
+          <div class="container">
+
             <div class="dropdown">
-              <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Dropdown button
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </div>
+
+            <div class="dropdown">
+              <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 Movie
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Movie 1</a></li>
-                <li><a class="dropdown-item" href="#">Movie 2</a></li>
+                <% movies.forEach((movie) => { %>
+                  <li><a class="dropdown-item" href="#"><%= movie.title %></a></li>
+                <% }); %>
               </ul>
             </div>
+            
             <div class="dropdown">
               <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button"
                 data-bs-toggle="dropdown">

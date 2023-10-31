@@ -5,7 +5,7 @@ const checkUserRole = require('../middleware/checkUserRole');
 
 member_role = 'member';
 
-router.get('/memberhome', checkUserRole(member_role), memberController.getMembersHomePage);
+router.get('/member', checkUserRole(member_role), memberController.getMembersHomePage);
 
 // Add other routes as needed
 
