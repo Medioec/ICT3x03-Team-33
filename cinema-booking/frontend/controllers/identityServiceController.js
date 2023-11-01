@@ -8,6 +8,8 @@
 const identityService = require('../models/identityServiceModel');
 const logger = require('../middleware/logger');
 
+const captchaKey = process.env.CAPTCHA_KEY
+
 exports.getLogin = (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
@@ -17,7 +19,7 @@ exports.getLogin = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('login.ejs', { loggedIn });
+    res.render('login.ejs', { loggedIn, captchaKey });
 };
 
 exports.postLogin = async (req, res) => {

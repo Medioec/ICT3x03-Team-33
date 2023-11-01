@@ -28,6 +28,8 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
+        environment:
+            - CAPTCHA_KEY=${CAPTCHA_KEY}
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
