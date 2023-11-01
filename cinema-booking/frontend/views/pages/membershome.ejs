@@ -19,7 +19,7 @@
 
 <body>
   <!-- Navbar -->
-  <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+  <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
     <div class="container">
@@ -89,9 +89,7 @@
                 <img src="/images/location.png" alt="location icon" />
               </button>
 
-              <button id="find-me">Show my location</button><br />
               <p id="status"></p>
-              <a id="map-link" target="_blank"></a>
 
             </div>
           </div>

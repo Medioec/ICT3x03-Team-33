@@ -1,30 +1,24 @@
-document.querySelector("#find-me").addEventListener("click", geoFindMe);
+document.querySelector("#location").addEventListener("click", geoFindMe);
 
 function geoFindMe() {
   const status = document.querySelector("#status");
-  const mapLink = document.querySelector("#map-link");
-
-  mapLink.href = "";
-  mapLink.textContent = "";
 
   function success(position) {
     const userLat = position.coords.latitude;
     const userLong = position.coords.longitude;
 
     status.textContent = "";
-    mapLink.href = `https://www.openstreetmap.org/#map=18/${userLat}/${userLong}`;
-    mapLink.textContent = `Latitude: ${userLat} °, Longitude: ${userLong} °`;
 
     // After obtaining the user's location, find the nearest cinema
     const userLocation = { lat: userLat, lng: userLong };
     const nearestCinema = findNearestCinema(userLocation, cinemaLocations);
     if (nearestCinema) {
-      status.textContent = `The nearest cinema is ${nearestCinema.name}.`;
-      // Redirect to the nearest cinema page
       // pass over cinemaId in the url
-      // const cinemaName = nearestCinema.name;
+      const cinemaName = nearestCinema.name;
       // check for cinemaName's cinemaId in the cinemaMapping
-      // const cinemaId = cinemaMapping[cinemaName];
+      const cinemaId = cinemaMapping[cinemaName];
+      status.textContent = `The nearest cinema is ${nearestCinema.name}, ${cinemaId}.`;
+      // Redirect to the nearest cinema page
       // window.location.href = "/cinemas?cinemaId=" + cinemaId;
     } else {
       status.textContent = "No cinemas found.";

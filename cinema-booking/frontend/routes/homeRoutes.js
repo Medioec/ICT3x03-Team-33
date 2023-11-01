@@ -19,8 +19,5 @@ router.get('/allshowtimes',checkLoggedIn, homeController.getAllShowtimesPage);
 // seat selection for selected movie
 router.get('/booking',checkLoggedIn, homeController.getBookingForMoviePage);
 
-// recommended cinemas
-router.get('/cinemas',checkLoggedIn, homeController.getCinemasPage);
-
 // Add other routes as needed
 module.exports = router;
