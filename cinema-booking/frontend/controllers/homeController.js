@@ -78,14 +78,24 @@ exports.getAllShowtimesPage = [async (req, res) => {
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
 
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/showtimes.ejs', { showtimes, loggedIn });
+        // Define the cinemaMapping
+        const cinemaMapping = {
+            'Golden Village Tampines': 1,
+            'Shaw JCube': 2,
+            'Cathay AMK Hub': 3,
+            'GV Suntec City': 4,
+            'The Projector': 5,
+        };
+
+        // Render the 'showtimes.ejs' page with the movie data and cinemaMapping
+        res.render('pages/showtimes.ejs', { showtimes, loggedIn, cinemaMapping });
     } catch (error) {
         // Handle errors
         console.error("Error in getAllShowtimesPage:", error);
-        // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];
+
+
 
 exports.getAllMoviesPage = [async (req, res) => {
     try {
