@@ -2,6 +2,7 @@
 
 import unittest
 from uuid import UUID
+from datetime import datetime
 from user_utils import (
     validateCreditCardNumber,
     validateCreditCardName,
@@ -40,7 +41,7 @@ class TestUserUtils(unittest.TestCase):
 
     def test_get_transaction_date_time(self):
         transaction_date_time = getTransactionDateTime()
-        self.assertIsInstance(transaction_date_time, str)
+        self.assertIsInstance(transaction_date_time, datetime)
 
 if __name__ == '__main__':
     unittest.main()
