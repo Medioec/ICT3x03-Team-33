@@ -78,17 +78,8 @@ exports.getAllShowtimesPage = [async (req, res) => {
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
 
-        // Define the cinemaMapping
-        const cinemaMapping = {
-            'Golden Village Tampines': 1,
-            'Shaw JCube': 2,
-            'Cathay AMK Hub': 3,
-            'GV Suntec City': 4,
-            'The Projector': 5,
-        };
-
         // Render the 'showtimes.ejs' page with the movie data and cinemaMapping
-        res.render('pages/showtimes.ejs', { showtimes, loggedIn, cinemaMapping });
+        res.render('pages/showtimes.ejs', { showtimes, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getAllShowtimesPage:", error);
@@ -114,17 +105,19 @@ exports.getBookingForMoviePage = [async (req, res) => {
 
 exports.getCinemasPage  = [async (req, res) => {
     try {
-        const cinemaId = req.query.cinemaId;
-        // match showtimeId with cinemaId
+        // const cinemaId = req.query.cinemaId;
+        
+        // // match showtimeId with cinemaId
+        // const showtimes = await movieService.getAllShowtimes();
+        
+        // // use showtimeId obtained to getShowtimeById
+        // const showtimeDetails = await movieService.getShowtimeById(showtimeId);
 
-        // use showtimeId obtained to getShowtimeById
-        const showtimeDetails = await movieService.getShowtimeById(showtimeId);
+        // // Get the loggedIn status from the request object
+        // const loggedIn = req.loggedIn;
 
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
-
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/cinemas.ejs', { showtimeDetails, loggedIn });
+        // // Render the 'moviedetails.ejs' page with the movie data
+        // res.render('pages/cinemas.ejs', { showtimeDetails, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getBookingForMoviePage:", error);

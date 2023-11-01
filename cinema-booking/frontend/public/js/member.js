@@ -20,6 +20,12 @@ function geoFindMe() {
     const nearestCinema = findNearestCinema(userLocation, cinemaLocations);
     if (nearestCinema) {
       status.textContent = `The nearest cinema is ${nearestCinema.name}.`;
+      // Redirect to the nearest cinema page
+      // pass over cinemaId in the url
+      // const cinemaName = nearestCinema.name;
+      // check for cinemaName's cinemaId in the cinemaMapping
+      // const cinemaId = cinemaMapping[cinemaName];
+      // window.location.href = "/cinemas?cinemaId=" + cinemaId;
     } else {
       status.textContent = "No cinemas found.";
     }
@@ -64,6 +70,15 @@ function findNearestCinema(userLocation, cinemaLocations) {
 
   return nearestCinema;
 }
+
+  // Define the cinemaMapping
+  const cinemaMapping = {
+    'Golden Village Tampines': 1,
+    'Shaw JCube': 2,
+    'Cathay AMK Hub': 3,
+    'GV Suntec City': 4,
+    'The Projector': 5,
+};
 
 const cinemaLocations = [
   {
