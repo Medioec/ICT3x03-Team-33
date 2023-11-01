@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Register</title>
+  <title>Create Staff Account</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -20,11 +20,12 @@
 </head>
 
 <body>
-  <!-- Navbar -->
+  <!-- will replace with admin navbar -->
+  <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
   <div class="wrapper">
     <div class="inner-warpper text-center">
-      <h2 class="title">Register for an account</h2>
+      <h2 class="title">Create Staff Account</h2>
       <form action="" id="register-form">
 
         <div class="input-group">
@@ -41,49 +42,22 @@
           <span class="lighting"></span>
         </div>
 
-        <a class="guidelines">Password must be 12 - 32 characters long.</a>
-
-        <div class="input-group" id="passwordInputGroup">
-          <label class="palceholder" for="userPassword" id="placeholderFix">Password</label>
-          <span id="togglePassword" class="toggle-password">
-            <i class="bi bi-eye"></i>
-          </span>
-          <input class="form-control" name="userPassword" id="userPassword" type="password" placeholder="" />
-          <span class="lighting"></span>
-        </div>
-
         <div class="recaptcha-error">
-          <!-- uncomment below if testing on 3x03.redapplepie.com -->
-          <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LcPUOAoAAAAAOU1Zy_KJVlo5Osn4EtA9eNT1sd1"
-            data-callback="onSuccess" data-action="action"></div> -->
-            
-          <!-- uncomment below if testing on stg-3x03.redapplepie.com -->
-          <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LeVl-coAAAAAE9CkECF9qgWWfLP1aAhjgrbTPbJ"
-            data-callback="onSuccess" data-action="action"></div> -->
-
-          <!-- uncomment below if testing on localhost -->
+          <!-- using localhost sitekey, need to generate a new once deployed on server -->
           <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdDtsooAAAAAHj_xBabr_6QUfmu3cUnSSQSnKTP"
             data-callback="onSuccess" data-action="action"></div>
         </div>
 
-        <button type="submit" id="register-button" disabled>Register</button>
+        <button type="submit" id="create-staff-button" disabled>Create Staff Account</button>
 
       </form>
       <br>
-      By creating an account, you agree to our <a class="normal">Terms</a> and have read and acknowledge the <a
-        class="normal">Global Privacy Statement</a>.
-      <br>
       <p id="error-message"></p>
-    </div>
-    <div class="signup-wrapper text-center">
-      <a href="/login">Already have an account? <span class="text-primary">Login Now!</span></a>
     </div>
   </div>
 
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-  <script src="/js/register.js"></script>
-  <script src="/js/passwordtoggle.js"></script>
+  <script src="/js/admin.js"></script> 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
 </body>
 

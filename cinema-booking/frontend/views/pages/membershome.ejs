@@ -19,7 +19,7 @@
 
 <body>
   <!-- Navbar -->
-  <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+  <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
     <div class="container">
@@ -63,7 +63,7 @@
               Select a Timeslot
             </button>
             <ul class="dropdown-menu" id="timingInnerMenu">
-              <li><a class="dropdown-item">Timing 1</a></li>
+              <li><a class="dropdown-item">Placeholder</a></li>
             </ul>
           </div>
           
@@ -80,24 +80,20 @@
         </div>
 
         <!-- Geolocation configuration for members -->
-        <div class="row">
+        <div class="row" id="locationRow">
           <div class="col-md-12">
             <div class="location-container">
-              <span id="location-label">Recommend based on location</span>
+              <span id="location-label">Get Nearest Cinema</span>
               <button id="location" class="btn btn-primary">
                 Location
                 <img src="/images/location.png" alt="location icon" />
               </button>
 
-              <button id="find-me">Show my location</button><br />
               <p id="status"></p>
-              <a id="map-link" target="_blank"></a>
 
             </div>
           </div>
         </div>
-        </section>
-
 
 
 

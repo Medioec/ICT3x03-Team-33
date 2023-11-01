@@ -17,3 +17,25 @@ exports.getMembersHomePage = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+exports.getCinemasPage  = [async (req, res) => {
+    try {
+        // const cinemaId = req.query.cinemaId;
+        
+        // // match showtimeId with cinemaId
+        // const showtimes = await movieService.getAllShowtimes();
+        
+        // // use showtimeId obtained to getShowtimeById
+        // const showtimeDetails = await movieService.getShowtimeById(showtimeId);
+
+        // // Get the loggedIn status from the request object
+        // const loggedIn = req.loggedIn;
+
+        // // Render the 'moviedetails.ejs' page with the movie data
+        // res.render('pages/cinemas.ejs', { showtimeDetails, loggedIn });
+    } catch (error) {
+        // Handle errors
+        console.error("Error in getBookingForMoviePage:", error);
+        // res.status(500).send('Internal Server Error: ' + error.message);
+    }
+}];

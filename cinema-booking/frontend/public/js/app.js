@@ -179,6 +179,7 @@ const showtimeInfoArray = [];
 
     if (dropdownFlags.cinemaSelected && !dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
       // Redirect to cinema page
+      window.location.href = "/allshowtimes";
       console.log("state: cinemaSelected && !movieSelected && !timingSelected");
     } else if (!dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
       // Redirect to movie details page with the selected movieId
@@ -188,6 +189,7 @@ const showtimeInfoArray = [];
       }
     } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
       // Redirect to movie details page with cinemaId
+      window.location.href = "/allshowtimes";
       console.log("state: cinemaSelected && movieSelected && !timingSelected");
     } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && dropdownFlags.timingSelected) {
       // Redirect to booking page with the selected showtimeId
