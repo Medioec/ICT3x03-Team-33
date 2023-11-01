@@ -198,6 +198,12 @@ networks:
   databaseservice-to-database:
     driver: bridge
     internal: true
+  scheduler-to-sessioncleaning:
+    driver: bridge
+    internal: true
+  sessioncleaning-to-database:
+    driver: bridge
+    internal: true
 
 volumes:
   postgres_container:
