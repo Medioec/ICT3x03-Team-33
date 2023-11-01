@@ -37,31 +37,32 @@
             </button>
             <ul class="dropdown-menu">
               <% movies.forEach((movie) => { %>
-                <li><a class="dropdown-item"><%= movie.title %></a></li>
+                <li>
+                  <a class="dropdown-item" data-movie-id="<%= movie.movieId %>"><%= movie.title %></a>
+                </li>
               <% }); %>
             </ul>
           </div>
           
           <div class="dropdown">
-            <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-              data-bs-toggle="dropdown">
+            <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
               Select a Cinema
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item">Golden Village Tampines</a></li>
-              <li><a class="dropdown-item">Shaw JCube</a></li>
-              <li><a class="dropdown-item">Cathay AMK Hub</a></li>
-              <li><a class="dropdown-item">GV Suntec City</a></li>
-              <li><a class="dropdown-item">The Projector</a></li>
+              <% cinemas.forEach((cinema) => { %>
+                <li>
+                  <a class="dropdown-item" data-cinema-name="<%= cinema %>"><%= cinema %></a>
+                </li>
+              <% }); %>
             </ul>
-          </div>
+          </div>          
           
           <div class="dropdown">
             <button id="timingDropdown" class="btn btn-secondary dropdown-toggle" type="button"
               data-bs-toggle="dropdown" disabled>
               Select a Timeslot
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" id="timingInnerMenu">
               <li><a class="dropdown-item">Timing 1</a></li>
             </ul>
           </div>
@@ -75,15 +76,6 @@
             <i class="bi bi-search"></i>
           </button>
         </div>
-        
-        
-        
-        <!-- nts: remove related css as well -->
-        <div class="row">
-          <div class="button-container">
-          </div>
-        </div>
-
 
     </div>
     </section>
@@ -112,6 +104,11 @@
   </main>
     <!-- footer -->
     <%- include('./partial/footer'); %>
+
+    <script>
+      window.moviesData = <%- JSON.stringify(movies) %>;
+      window.showtimeData = <%- JSON.stringify(showtimes) %>;
+    </script>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
