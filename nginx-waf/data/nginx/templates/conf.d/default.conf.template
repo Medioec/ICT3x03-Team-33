@@ -125,6 +125,9 @@ server {
     # Headers usually for HTTP to secure content and interaction within web app. Can remove if need be
     	# Instructs the browser not to override the response's Content-Type header
     	add_header X-Content-Type-Options "nosniff";
+    
+    # Disable deprecated header to prevent exploitation
+    add_header X-XSS-Protection 0;
 
 	# Informs the browser not to open files that are considered safe by the browser's security settings directly
 	add_header X-Download-Options "noopen";
