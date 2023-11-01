@@ -86,7 +86,7 @@
               <span id="location-label">Get Nearest Cinema</span>
               <button id="location" class="btn btn-primary">
                 Location
-                <img src="/images/location.png" alt="location icon" />
+                <i class="bi bi-geo-alt"></i>
               </button>
 
               <p id="status"></p>
@@ -127,6 +127,7 @@
     <script>
       window.moviesData = <%- JSON.stringify(movies) %>;
       window.showtimeData = <%- JSON.stringify(showtimes) %>;
+      window.cinemaData = <%- JSON.stringify(cinemas) %>;
     </script>
 
     <!-- Scripts -->

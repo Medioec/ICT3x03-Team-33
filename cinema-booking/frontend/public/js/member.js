@@ -5,21 +5,20 @@ function geoFindMe() {
 
   function success(position) {
     const userLat = position.coords.latitude;
-    const userLong = position.coords.longitude;
+    const userLng = position.coords.longitude;
 
     status.textContent = "";
 
     // After obtaining the user's location, find the nearest cinema
-    const userLocation = { lat: userLat, lng: userLong };
-    const nearestCinema = findNearestCinema(userLocation, cinemaLocations);
+    const userLocation = { lat: userLat, lng: userLng };
+    const nearestCinema = findNearestCinema(userLocation, cinemaLocations, cinemaData);
     if (nearestCinema) {
-      // pass over cinemaId in the url
-      const cinemaName = nearestCinema.name;
-      // check for cinemaName's cinemaId in the cinemaMapping
-      const cinemaId = cinemaMapping[cinemaName];
-      status.textContent = `The nearest cinema is ${nearestCinema.name}, ${cinemaId}.`;
+      // Pass over cinemaId in the URL
+      const cinemaName = nearestCinema.cinemaName;
+      const cinemaId = nearestCinema.cinemaId;
+      status.textContent = `The nearest cinema is ${cinemaName}, ${cinemaId}.`;
       // Redirect to the nearest cinema page
-      // window.location.href = "/cinemas?cinemaId=" + cinemaId;
+      window.location.href = "/cinemas?cinemaId=" + cinemaId;
     } else {
       status.textContent = "No cinemas found.";
     }
@@ -49,30 +48,24 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
   return earthRadius * c;
 }
 
-function findNearestCinema(userLocation, cinemaLocations) {
+function findNearestCinema(userLocation, cinemaLocations, cinemaData) {
   let nearestCinema = null;
   let minDistance = Infinity;
 
   for (const cinema of cinemaLocations) {
-    const distance = calculateDistance(userLocation.lat, userLocation.lng, cinema.lat, cinema.lng);
+    const cinemaDataItem = cinemaData.find((item) => item.cinemaName === cinema.name);
+    if (cinemaDataItem) {
+      const distance = calculateDistance(userLocation.lat, userLocation.lng, cinema.lat, cinema.lng);
 
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestCinema = cinema;
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCinema = cinemaDataItem;
+      }
     }
   }
 
   return nearestCinema;
 }
-
-  // Define the cinemaMapping
-  const cinemaMapping = {
-    'Golden Village Tampines': 1,
-    'Shaw JCube': 2,
-    'Cathay AMK Hub': 3,
-    'GV Suntec City': 4,
-    'The Projector': 5,
-};
 
 const cinemaLocations = [
   {

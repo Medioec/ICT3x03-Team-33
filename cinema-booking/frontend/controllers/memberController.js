@@ -9,8 +9,7 @@ exports.getMembersHomePage = async (req, res) => {
         // Get all movies and showtimes
         const movies = await movieService.getAllMovies();
         const showtimes = await movieService.getAllShowtimes();
-
-        const cinemas = ['Golden Village Tampines', 'Shaw JCube', 'Cathay AMK Hub', 'GV Suntec City', 'The Projector'];
+        const cinemas = movieService.getAllCinemas();
 
         return res.render('pages/membershome.ejs', { movies, cinemas, showtimes, loggedIn });
     } catch (error) {
@@ -20,19 +19,19 @@ exports.getMembersHomePage = async (req, res) => {
 
 exports.getCinemasPage  = [async (req, res) => {
     try {
-        // const cinemaId = req.query.cinemaId;
+        const cinemaId = req.query.cinemaId;
         
-        // // match showtimeId with cinemaId
-        // const showtimes = await movieService.getAllShowtimes();
+        // match showtimeId with cinemaId
+        const showtimes = await movieService.getAllShowtimes();
         
-        // // use showtimeId obtained to getShowtimeById
-        // const showtimeDetails = await movieService.getShowtimeById(showtimeId);
+        const filteredCinemaShowtimes = showtimes
+        .filter((showtime) => showtime.cinemaId === cinemaId);
 
-        // // Get the loggedIn status from the request object
-        // const loggedIn = req.loggedIn;
+        // Get the loggedIn status from the request object
+        const loggedIn = req.loggedIn;
 
-        // // Render the 'moviedetails.ejs' page with the movie data
-        // res.render('pages/cinemas.ejs', { showtimeDetails, loggedIn });
+        // Render the 'moviedetails.ejs' page with the movie data
+        res.render('pages/cinemas.ejs', { filteredCinemaShowtimes, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getBookingForMoviePage:", error);

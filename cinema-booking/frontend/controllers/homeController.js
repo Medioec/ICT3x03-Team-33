@@ -8,8 +8,7 @@ exports.getHomePage = [async (req, res) => {
         // Get all movies and showtimes
         const movies = await movieService.getAllMovies();
         const showtimes = await movieService.getAllShowtimes();
-
-        const cinemas = ['Golden Village Tampines', 'Shaw JCube', 'Cathay AMK Hub', 'GV Suntec City', 'The Projector'];
+        const cinemas = movieService.getAllCinemas();
 
         return res.render('index.ejs', { movies, cinemas, showtimes, loggedIn });
     } catch (error) {

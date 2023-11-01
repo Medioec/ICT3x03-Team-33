@@ -11,22 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
     timingSelected: false,
   };
 
-  const cinemaMapping = {
-    'Golden Village Tampines': 1,
-    'Shaw JCube': 2,
-    'Cathay AMK Hub': 3,
-    'GV Suntec City': 4,
-    'The Projector': 5,
-  };
-
   function enableTimingDropdown() {
     if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected) {
       updateTimingDropdown();
       timingDropdown.removeAttribute("disabled");
-      console.log("if enableTimingDropdown is true:", timingDropdown.textContent);
     } else {
       timingDropdown.setAttribute("disabled", "true");
-      console.log("if enableTimingDropdown is false", timingDropdown.textContent); 
     }
   }
 
@@ -47,24 +37,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-// Declare the showtimeInfoArray as a global variable
-const showtimeInfoArray = [];
+  // Declare the showtimeInfoArray as a global variable
+  const showtimeInfoArray = [];
 
   function updateTimingDropdown() {
-    const selectedCinema = cinemaDropdown.textContent;
+    const selectedCinemaName = cinemaDropdown.textContent;
     const selectedMovieTitle = movieDropdown.textContent;
 
-    const selectedCinemaId = cinemaMapping[selectedCinema];
+    const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
     const selectedMovie = moviesData.find(movie => movie.title === selectedMovieTitle);
 
     // Clear the existing dropdown items
     const dropdownMenu = document.getElementById('timingInnerMenu');
     dropdownMenu.innerHTML = '';
 
-    if (selectedCinemaId && selectedMovie) {
+    if (selectedCinema && selectedMovie) {
+      const cinemaId = selectedCinema.cinemaId;
       const movieId = selectedMovie.movieId;
 
-      const matchingShowtimes = showtimeData.filter(item => item.movieId === movieId && item.cinemaId === selectedCinemaId);
+      const matchingShowtimes = showtimeData.filter(item => item.movieId === movieId && item.cinemaId === cinemaId);
 
       // Sort matching showtimes by showDate and showTime
       matchingShowtimes.sort((a, b) => {
@@ -96,7 +87,6 @@ const showtimeInfoArray = [];
         // Push the showtime information to the global array
         showtimeInfoArray.push(showtimeInfo);
       });
-
     }
   }
 
@@ -125,10 +115,9 @@ const showtimeInfoArray = [];
     enableTimingDropdown();
   });
 
-    // Add event listeners for timingDropdown
+  // Add event listeners for timingDropdown
   $(timingDropdown).on("changed.bs.select", function (e, clickedIndex, newValue, oldValue) {
     dropdownFlags.timingSelected = true;
-    console.log("timingDropdown changed", dropdownFlags.timingSelected)
   });
 
   resetButton.addEventListener("click", function () {
@@ -152,57 +141,56 @@ const showtimeInfoArray = [];
 
   showtimesButton.addEventListener("click", function () {
     const selectedMovieTitle = movieDropdown.textContent;
-    const selectedCinema = cinemaDropdown.textContent;
+    const selectedCinemaName = cinemaDropdown.textContent;
     const selectedTiming = timingDropdown.textContent;
     const selectedMovie = moviesData.find(movie => movie.title === selectedMovieTitle);
     const movieId = selectedMovie.movieId;
-    const selectedCinemaId = cinemaMapping[selectedCinema];
-  
-    console.log("selectedMovie:", selectedMovieTitle);
-    console.log("selectedMovieId:", movieId);
-    console.log("selectedCinema:", selectedCinema);
-    console.log("selectedCinemaId:", selectedCinemaId);
-    console.log("selectedTiming:", selectedTiming);
-  
-    // Find the showtimeId by matching selectedTiming with showtimeInfoArray
-    const selectedShowtime = showtimeInfoArray.find(showtime => {
-      const showtimeString = `${showtime.showDate}, ${showtime.showTime}`;
-      return showtimeString === selectedTiming;
-    });
-  
-    if (selectedShowtime) {
-      const showtimeId = selectedShowtime.showtimeId;
-      console.log("selectedShowtimeId:", showtimeId);
-    } else {
-      console.log("No matching showtime found.");
-    }
+    const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
 
-    if (dropdownFlags.cinemaSelected && !dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-      // Redirect to cinema page
-      window.location.href = "/allshowtimes";
-      console.log("state: cinemaSelected && !movieSelected && !timingSelected");
-    } else if (!dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-      // Redirect to movie details page with the selected movieId
-      if (selectedMovie) {
-        const movieId = selectedMovie.movieId;
-        window.location.href = "/moviedetails?movieId=" + movieId;
-      }
-    } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-      // Redirect to movie details page with cinemaId
-      window.location.href = "/allshowtimes";
-      console.log("state: cinemaSelected && movieSelected && !timingSelected");
-    } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && dropdownFlags.timingSelected) {
-      // Redirect to booking page with the selected showtimeId
+    if (selectedCinema && selectedMovie) {
+      const cinemaId = selectedCinema.cinemaId;
+
+      console.log("selectedMovie:", selectedMovieTitle);
+      console.log("selectedMovieId:", movieId);
+      console.log("selectedCinema:", selectedCinemaName);
+      console.log("selectedCinemaId:", cinemaId);
+      console.log("selectedTiming:", selectedTiming);
+
+      // Find the showtimeId by matching selectedTiming with showtimeInfoArray
+      const selectedShowtime = showtimeInfoArray.find(showtime => {
+        const showtimeString = `${showtime.showDate}, ${showtime.showTime}`;
+        return showtimeString === selectedTiming;
+      });
+
       if (selectedShowtime) {
         const showtimeId = selectedShowtime.showtimeId;
-        const bookingURL = `/booking?showtimeId=${showtimeId}`;
-        window.location.href = bookingURL;
+        console.log("selectedShowtimeId:", showtimeId);
       } else {
-        console.log("No matching showtime found for booking.");
+        console.log("No matching showtime found.");
       }
-      console.log("state: cinemaSelected && movieSelected && timingSelected");
+
+      if (dropdownFlags.cinemaSelected && !dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+        // Redirect to cinema page
+        window.location.href = "/allshowtimes";
+      } else if (!dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+        // Redirect to movie details page with the selected movieId
+        if (selectedMovie) {
+          const movieId = selectedMovie.movieId;
+          window.location.href = "/moviedetails?movieId=" + movieId;
+        }
+      } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+        // Redirect to movie details page with cinemaId
+        window.location.href = "/allshowtimes";
+      } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && dropdownFlags.timingSelected) {
+        // Redirect to booking page with the selected showtimeId
+        if (selectedShowtime) {
+          const showtimeId = selectedShowtime.showtimeId;
+          window.location.href = `/booking?showtimeId=${showtimeId}`;
+        } else {
+          console.log("No matching showtime found for booking.");
+        }
+      }
     }
-    // other scenarios involving the "Showtimes" button are not possible (data not loaded in)
   });
 
   timingDropdown.setAttribute("disabled", "true");
@@ -210,6 +198,6 @@ const showtimeInfoArray = [];
   addDropdownController(movieDropdown, movieDropdown.nextElementSibling, "movieSelected");
   addDropdownController(cinemaDropdown, cinemaDropdown.nextElementSibling, "cinemaSelected");
   addDropdownController(timingDropdown, timingDropdown.nextElementSibling, "timingSelected");
-  
+
   updateTimingDropdown();
 });
