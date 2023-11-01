@@ -1,20 +1,14 @@
-let fetch;
-
-import('node-fetch').then(module => {
-    fetch = module.default;
-});
-
 async function fetchCsrfToken(req, res, next) {
     try {
-        // Ensure fetch is available before using it
-        if (!fetch) {
-            throw new Error('Fetch is not initialized yet.');
-        }
+        // Dynamically import node-fetch
+        const fetch = (await import('node-fetch')).default;
 
-        const response = await fetch('http://identity:8081/get_csrf_token');
+        // Fetch the CSRF token from the Flask backend
+        const response = await fetch('http://identity:8081/get_csrf_token', { credentials: 'include' });
         const data = await response.json();
 
         if (data.csrf_token) {
+            // Attach the CSRF token to the response so it can be used by the client-side code
             res.locals.csrfToken = data.csrf_token;
             next();
         } else {

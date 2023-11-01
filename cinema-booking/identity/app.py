@@ -398,6 +398,7 @@ def get_csrf_token():
   
     #Double Submit Cookie method
     response = jsonify({"csrf_token": token})
+    response.set_cookie('csrf_token', token,secure=False, httponly=False, samesite='Lax')
     #response.set_cookie("csrf_token", token, secure=False, httponly=False, samesite='Lax')  # Set the token manual as a cookie causes error 500, shld let flask session handle it automatically
     return response
     
@@ -406,6 +407,7 @@ def get_csrf_token():
 def handle_csrf_error(e):
     response = jsonify({"message": "CSRF token is missing or incorrect.", "error": str(e)})
     print("CSRF token is missing or incorrect." +str(e))
+    logger.error(str(e))
     response.status_code = 400
     return response
 

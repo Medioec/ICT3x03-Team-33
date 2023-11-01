@@ -16,6 +16,7 @@ exports.getLogin = [fetchCsrfToken, (req, res) => {
     // if logged in, don't try to login again
     if (loggedIn) {
         return res.redirect('/');
+        
     }
 
     res.render('login.ejs', { loggedIn, csrfToken: res.locals.csrfToken });

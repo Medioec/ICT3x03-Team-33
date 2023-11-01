@@ -1,3 +1,4 @@
+
 // Define a function to check if all registration fields and the form are valid
 function checkRegistrationFields() {
   const $emailInput = $("#email");
@@ -25,6 +26,7 @@ function onSuccess() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  // const token = getCsrfToken(); 
   const $registerButton = $("#register-button");
   const $emailInput = $("#email");
   const $userNameInput = $("#userName");
@@ -72,15 +74,13 @@ document.addEventListener("DOMContentLoaded", function () {
         //fetch token value from ejs
         const csrfToken = document.getElementById('csrfToken').value;
         await fetch("/registerRequest", {
-          method: "POST",
-          //This is necessary to ensure that cookies are sent with the request, even if it’s a cross-origin request. getting error 500.
-          credentials: 'include', 
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-CSRFToken": csrfToken
-          },
-          body: JSON.stringify(data),
+          method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken, // Include the CSRF token in the request headers
+      },
+      body: JSON.stringify(data),
+      credentials: 'include', // Ensure credentials are included
         })
         .then(response => 
         {

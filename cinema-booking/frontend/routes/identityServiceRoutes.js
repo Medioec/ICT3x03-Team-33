@@ -5,16 +5,26 @@
 const express = require('express');
 const cors = require('cors');
 const router = express.Router();
+const app = express();
+
+// Middleware to log headers
+app.use((req, res, next) => {
+  console.log('Headers:', req.headers);
+  next();
+});
 const identityServiceController = require('../controllers/identityServiceController');
+const fetchCsrfToken = require('../middleware/fetchCsrfToken');
 const checkHeaders = require('../middleware/checkHeaders');
 const checkLoggedIn = require('../middleware/checkLoggedIn');
 
 const corsOptions = {
-    origin: 'http://localhost:8080',
-    credentials: true
+  origin: 'http://localhost:8080',
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 };
 
 router.use(cors(corsOptions));
+router.use(fetchCsrfToken);
 
 // login
 router.get('/login', checkLoggedIn, identityServiceController.getLogin);
@@ -28,3 +38,4 @@ router.post('/registerRequest', checkLoggedIn, checkHeaders, identityServiceCont
 router.put('/logout', checkLoggedIn, checkHeaders, identityServiceController.logout);
 
 module.exports = router;
+
