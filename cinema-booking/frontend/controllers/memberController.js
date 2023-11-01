@@ -4,23 +4,16 @@ const paymentService = require('../models/paymentServiceModel');
 
 exports.getMembersHomePage = async (req, res) => {
     try {
-        // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
 
+        // Get all movies and showtimes
         const movies = await movieService.getAllMovies();
         const showtimes = await movieService.getAllShowtimes();
-        const movieId = req.query.movieId;
-        const movieDetails = await movieService.getMovieById(movieId);
-        //const showtimeDetails = await movieService.getShowtimeById();
 
-        console.log(movies);
-        
-        res.render('pages/membershome.ejs', { movies, movieDetails, showtimes, loggedIn });
+        const cinemas = ['Golden Village Tampines', 'Shaw JCube', 'Cathay AMK Hub', 'GV Suntec City', 'The Projector'];
 
-        //res.render('pages/membershome.ejs', { movies, showtimes, showtimeDetails, loggedIn });
-
+        return res.render('pages/membershome.ejs', { movies, cinemas, showtimes, loggedIn });
     } catch (error) {
-        // Handle errors
         res.status(500).send('Internal Server Error');
-    }    
+    }
 };

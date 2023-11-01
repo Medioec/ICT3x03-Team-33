@@ -11,6 +11,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <link rel="stylesheet" href="/css/nav.css" />
   <link rel="stylesheet" href="/css/style.css" />
@@ -25,93 +26,119 @@
 
       <!-- Movie Booking Section -->
       <section id="booking" class="text-center">
-        <div class="row">
-          <div class="button-container">
-            <div class="dropdown">
-              <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown">
-                Movie
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Movie 1</a></li>
-                <li><a class="dropdown-item" href="#">Movie 2</a></li>
-              </ul>
-            </div>
-            <div class="dropdown">
-              <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown">
-                Cinema
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Cinema 1</a></li>
-                <li><a class="dropdown-item" href="#">Cinema 2</a></li>
-              </ul>
-            </div>
-            <div class="dropdown">
-              <button id="timingDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                data-bs-toggle="dropdown">
-                Timing
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Timing 1</a></li>
-                <li><a class="dropdown-item" href="#">Timing 2</a></li>
-              </ul>
-            </div>
-            <button id="showtimes" class="btn btn-primary">
-              Showtimes
-              <img src="/images/search.png" alt="search icon" />
+        
+        <div class="flex-row button-container" id="bookingRow">
+        
+          <a class="bookingHeaders">QUICK BUY</a>
+
+          <div class="dropdown">
+            <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              Select a Movie
             </button>
+            <ul class="dropdown-menu">
+              <% movies.forEach((movie) => { %>
+                <li>
+                  <a class="dropdown-item" data-movie-id="<%= movie.movieId %>"><%= movie.title %></a>
+                </li>
+              <% }); %>
+            </ul>
           </div>
-        </div>
-    </div>
-    <!-- Geolocation configuration for members -->
-    <div class="row">
-      <div class="col-md-12">
-        <div class="location-container">
-          <span id="location-label">Recommend based on location</span>
-          <button id="location" class="btn btn-primary">
-            Location
-            <img src="/images/location.png" alt="location icon" />
+          
+          <div class="dropdown">
+            <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              Select a Cinema
+            </button>
+            <ul class="dropdown-menu">
+              <% cinemas.forEach((cinema) => { %>
+                <li>
+                  <a class="dropdown-item" data-cinema-name="<%= cinema %>"><%= cinema %></a>
+                </li>
+              <% }); %>
+            </ul>
+          </div>          
+          
+          <div class="dropdown">
+            <button id="timingDropdown" class="btn btn-secondary dropdown-toggle" type="button"
+              data-bs-toggle="dropdown" disabled>
+              Select a Timeslot
+            </button>
+            <ul class="dropdown-menu" id="timingInnerMenu">
+              <li><a class="dropdown-item">Timing 1</a></li>
+            </ul>
+          </div>
+          
+          <button id="reset" class="btn btn-secondary">
+            Reset
+          </button>
+
+          <button id="showtimes" class="btn btn-primary" disabled>
+            Showtimes
+            <i class="bi bi-search"></i>
           </button>
         </div>
-      </div>
-    </div>
-    </section>
-    <button id="find-me">Show my location</button><br />
-    <p id="status"></p>
-    <a id="map-link" target="_blank"></a>
 
+        </div>
 
-  <section id="trending">
-    <div class="container">
-      <div class="row">
-        <h2 class="showcase-heading">All Movies</h2>
-        
-        <% movies.forEach((movie) => { %>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class="showcase-box">
-              <!-- pass movieId and redirect to moviedetails page  -->
-              <a href="/moviedetails?movieId=<%= movie.movieId %>">
-              <!-- generate the image source dynamically -->
-              <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
-                  onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
-                  alt="poster" /></a>
+        <!-- Geolocation configuration for members -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="location-container">
+              <span id="location-label">Recommend based on location</span>
+              <button id="location" class="btn btn-primary">
+                Location
+                <img src="/images/location.png" alt="location icon" />
+              </button>
+
+              <button id="find-me">Show my location</button><br />
+              <p id="status"></p>
+              <a id="map-link" target="_blank"></a>
+
+            </div>
           </div>
-          <h3 class="movieTitle"><%= movie.title %></h3></div>
-        <% }); %>
+        </div>
+        </section>
+
+
+
+
+      </section>
+
+    <section id="trending">
+      <div class="container">
+        <div class="row">
+          <h2 class="showcase-heading">All Movies</h2>
+          
+          <% movies.forEach((movie) => { %>
+          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+            <div class="showcase-box">
+                <!-- pass movieId and redirect to moviedetails page  -->
+                <a href="/moviedetails?movieId=<%= movie.movieId %>">
+                <!-- generate the image source dynamically -->
+                <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
+                    onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
+                    alt="poster" /></a>
+            </div>
+            <h3 class="movieTitle"><%= movie.title %></h3></div>
+          <% }); %>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
   </main>
     <!-- footer -->
     <%- include('../partial/footer'); %>
 
+    <script>
+      window.moviesData = <%- JSON.stringify(movies) %>;
+      window.showtimeData = <%- JSON.stringify(showtimes) %>;
+    </script>
+
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="/js/member.js"></script>
+    <script src="/js/app.js"></script>
     <script src="/js/movielistings.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
-    
+
 </body>
 
 </html>

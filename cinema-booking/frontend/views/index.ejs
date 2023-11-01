@@ -77,29 +77,29 @@
           </button>
         </div>
 
-    </div>
-    </section>
+        </div>
+      </section>
 
-  <section id="trending">
-    <div class="container">
-      <div class="row">
-        <h2 class="showcase-heading">All Movies</h2>
-        
-        <% movies.forEach((movie) => { %>
-        <div class="col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class="showcase-box">
-              <!-- pass movieId and redirect to moviedetails page  -->
-              <a href="/moviedetails?movieId=<%= movie.movieId %>">
-              <!-- generate the image source dynamically -->
-              <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
-                  onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
-                  alt="poster" /></a>
-          </div>
-          <h3 class="movieTitle"><%= movie.title %></h3></div>
-        <% }); %>
+    <section id="trending">
+      <div class="container">
+        <div class="row">
+          <h2 class="showcase-heading">All Movies</h2>
+          
+          <% movies.forEach((movie) => { %>
+          <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+            <div class="showcase-box">
+                <!-- pass movieId and redirect to moviedetails page  -->
+                <a href="/moviedetails?movieId=<%= movie.movieId %>">
+                <!-- generate the image source dynamically -->
+                <img src="/images/movies/<%= movie.title.replace(/[:\s]/g, '_') %>.jpg"
+                    onerror="this.onerror=null; this.src='/images/movies/placeholder.jpg';"
+                    alt="poster" /></a>
+            </div>
+            <h3 class="movieTitle"><%= movie.title %></h3></div>
+          <% }); %>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
   </main>
     <!-- footer -->
