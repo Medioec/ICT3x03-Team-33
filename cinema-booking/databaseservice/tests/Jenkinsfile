@@ -27,6 +27,7 @@ pipeline {
                 script {
                     echo 'Running tests...'
                     sh 'python3 -m unittest discover -s tests'
+                    sh 'python -m unittest discover tests'
                     sh 'pytest test_credit_card_queries.py'
                 }
             }
