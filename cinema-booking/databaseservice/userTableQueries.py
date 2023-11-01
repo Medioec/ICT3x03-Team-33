@@ -132,12 +132,12 @@ def check_user():
         if user:
             # User found, return HTTP 200 OK
             # Log the successful retrieval of a user
-            logger.info("User found with username: {username}.")
+            logger.info(f"User found with username: {username}.")
             return jsonify({"message": "User found"}), 200
         else:
             # User not found, return HTTP 404 Not Found
             # Log the user not found error
-            logger.warning("User not found with username: {username}.")
+            logger.warning(f"User not found with username: {username}.")
             return jsonify({"message": "User not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -171,12 +171,12 @@ def check_email():
         if user:
             # Email found, return HTTP 200 OK
             # Log the successful retrieval of a user
-            logger.info("Email found with email: {email}.")
+            logger.info(f"Email found with email: {email}.")
             return jsonify({"message": "Email found"}), 200
         else:
             # Email not found, return HTTP 404 Not Found
             # Log the email not found error
-            logger.warning("Email not found with email: {email}.")
+            logger.warning(f"Email not found with email: {email}.")
             return jsonify({"message": "Email not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
