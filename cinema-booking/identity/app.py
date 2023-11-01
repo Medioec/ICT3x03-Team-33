@@ -478,16 +478,12 @@ def create_staff():
 
 ############################## VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
 # verifies if the link is valid  before loading form to set password
-@app.route("/activate_staff_account", methods=["POST"])
-def activate_staff_account():
+@app.route("/activate_staff_account/<token>", methods=["GET"])
+def activate_staff_account(token):
     try:
-        # get activation link
-        data = request.get_json()
-        activation_link = data['activation_link']
-
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
-        username = serializer.loads(activation_link, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
 
         # if activation link is invalid
         if username is None:
@@ -501,13 +497,12 @@ def activate_staff_account():
             return jsonify({"message": "Error occurred"}), 500
         
         # get info from db
-        userId = response.json()['userId']
         db_tokenHash = response.json()['passwordHash']
 
         # check if activation link matches link in db
         try:
             ph = PasswordHasher()
-            ph.verify(db_tokenHash, activation_link)
+            ph.verify(db_tokenHash, token)
             return jsonify({"message": "Valid activation link"}), 200
         
         except:
@@ -516,6 +511,54 @@ def activate_staff_account():
     except:
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
+
+############################## STAFF SET PASSWORD #########################################
+# let staff set their password
+@app.route("/staff_set_password/<token>", methods=["POST"])
+def staff_set_password(token):
+    try:
+        # get username from token
+        expiration_time_in_seconds = 86400 # 24 hour window
+        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        
+        # if activation link is invalid
+        if username is None:
+            return jsonify({"message": "Invalid activation link"}), 400
+        
+        # get password
+        data = request.get_json()
+        password = data['password']
+        
+        # if password is empty
+        if not password:
+            return jsonify({"message": "Please fill in all form data"}), 400
+
+        # validate password
+        if not user_utils.validatePassword(password):
+            print("password not meet reqs")
+            return jsonify({"message": "Password does not meet the requirements"}), 400
+    
+        # hash password
+        ph = PasswordHasher()
+        hash = ph.hash(password)
+
+        # replace activation link/token hash with password hash in db
+        data = {
+            "username": username,
+            "passwordHash": hash
+        }
+        
+        response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
+        # if database error
+        if response.status_code != 200:
+            return jsonify({"message": "Database update error"}), 500
+        
+        else:
+            return jsonify({"message": "Password set successfully"}), 200
+        
+    except:
+        return jsonify({"message": "Error occurred"}), 500    
+############################## END OF STAFF SET PASSWORD #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
