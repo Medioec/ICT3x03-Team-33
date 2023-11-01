@@ -184,3 +184,97 @@ def check_email():
         logger.error(f"Error in check_email: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####   End of check email     #####
+
+#####   Delete user by user id     #####
+@user_bp.route('/delete_user', methods=['DELETE'])
+def delete_user_by_id():
+    try:
+        # Get data from the request
+        data = request.get_json()
+        userId = data['userId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Checks to see if user exists
+        select_query = "SELECT * FROM cinemauser WHERE userId = %s"
+        
+        cursor.execute(select_query, (userId,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+        # Delete user if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            delete_query = "DELETE FROM cinemauser WHERE userId = %s"
+            cursor.execute(delete_query, (userId,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+            # log the successful deletion of a user session
+            logger.info("User deleted successfully. userId: {userId}")
+            return jsonify({"message": "User deleted successfully"}), 200
+
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in delete_user: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####   End of delete user by user id     #####
+
+#####     Update a user password by their username   #####
+@user_bp.route('/update_password_by_username', methods=['PUT'])
+def update_password_by_username():
+    # Log the updating of a user password
+    logger.info("Updating user password started.")
+    try:
+        # get username and password from json
+        data = request.get_json()
+        username = data['username']
+        passwordHash = data['passwordHash']
+        
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if user exists
+        select_query = "SELECT * FROM cinemauser WHERE username = %s"
+        
+        cursor.execute(select_query, (username,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+        # Update session if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            delete_query = "UPDATE cinemauser SET passwordHash = %s WHERE username = %s"
+            cursor.execute(delete_query, (passwordHash, username,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+            # log the successful update of a user session status
+            logger.info("User password updated successfully. username: {username}")
+            return jsonify({"message": "User password updated successfully"}), 200
+        else:
+            # Session does not exist
+            # log the error
+            logger.error("User not found. username: {username}")
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in update_password_by_username: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####     End of update user password by username    #####

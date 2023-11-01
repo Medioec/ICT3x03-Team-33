@@ -25,10 +25,13 @@ const identityServiceRoutes = require('./routes/identityServiceRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const memberRoutes = require('./routes/memberRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
 app.use(homeRoutes);
 app.use(identityServiceRoutes);
 app.use(staffRoutes);
 app.use(memberRoutes);
+app.use(adminRoutes);
 
 // catch-all route for handling undefined routes
 app.use((req, res) => {
