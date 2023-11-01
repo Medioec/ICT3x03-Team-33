@@ -19,3 +19,16 @@ proxy_pass $upstream;
 SET_REAL_IP_FROM
 real_ip_header ${REAL_IP_HEADER};
 real_ip_recursive ${REAL_IP_RECURSIVE};
+
+# Define the client certificate and private key
+proxy_ssl_certificate /etc/nginx/ssl/fullchain.pem;
+proxy_ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+
+# Define the CA certificate of the backend server
+proxy_ssl_trusted_certificate /etc/nginx/ssl/serverca.crt;
+
+# Enable client certificate verification when connecting to the backend
+proxy_ssl_verify on;
+proxy_ssl_verify_depth 2;  # Adjust depth based on your CA's chain length
+
+proxy_ssl_ciphers ECDHE:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SHA;

@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
-const port = process.env.PORT || 8080;
 
 // middleware
 app.use(cors());
@@ -33,6 +34,22 @@ app.use((req, res) => {
     res.status(404).send('Not Found');
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+// setting up https
+const privateKey = fs.readFileSync('privkey.pem', 'utf8');
+const certificate = fs.readFileSync('fullchain.pem', 'utf8');
+const ca = fs.readFileSync('serverca.crt', 'utf8');
+const credentials = { key: privateKey, cert: certificate, ca: ca, requestCert: true, rejectUnauthorized: true };
+
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.on('clientError', (err, socket) => {
+    console.error(err);
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  });
+  
+
+const port = 443;
+const hostname = 'frontend';
+
+httpsServer.listen(port);
+console.log(`Server is running at https://${hostname}:${port}/`);

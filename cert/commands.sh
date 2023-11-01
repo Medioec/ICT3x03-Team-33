@@ -1,3 +1,4 @@
+#!/bin/bash
 openssl genrsa -out servercakey.pem
 openssl req -new -x509 -key servercakey.pem -out serverca.crt
 openssl genrsa -out privkey.pem

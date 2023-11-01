@@ -1,5 +1,5 @@
 # Gunicorn config variables
-loglevel = "info"
+loglevel = "debug"
 errorlog = "-"  # stderr
 accesslog = "-"  # stdout
 worker_tmp_dir = "/dev/shm"
@@ -12,10 +12,10 @@ keyfile = "privkey.pem"
 certfile = "fullchain.pem"
 ca_certs = "serverca.crt"
 ssl_version = 2
-cert_reqs = 1
+cert_reqs = 2
 preload = True
-ciphers = "ECDHE:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SHA"
-ssl_options = {
-    "ciphers": ciphers,
-    "server_side": True
-}
+# ciphers = "ECDHE:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SHA"
+# ssl_options = {
+#     "ciphers": ciphers,
+#     "server_side": True
+# }

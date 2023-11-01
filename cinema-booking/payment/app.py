@@ -30,7 +30,7 @@ def makePayment():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     userId = response.json()["userId"]
@@ -40,7 +40,7 @@ def makePayment():
     creditCardId = data['creditCardId']
     
     url = f"https://databaseservice/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
-    response = requests.get(url, verify=False)
+    response = requests.get(url)
     
     if response.status_code == 404:
         return jsonify({"message": "Credit card not found"}), 404
@@ -57,7 +57,7 @@ def makePayment():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload, verify=False)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690001"})
     if response.status_code != 200:
@@ -97,7 +97,7 @@ def makePayment():
         }
 
         # Make an HTTP POST request to the databaseservice to create the transaction
-        response = requests.post("https://databaseservice/databaseservice/transactions/create_transaction", json=transaction_data, verify=False)
+        response = requests.post("https://databaseservice/databaseservice/transactions/create_transaction", json=transaction_data)
 
         # Transaction was added successfully, return the response from the databaseservice
         if response.status_code == 201:
@@ -130,7 +130,7 @@ def addCreditCard():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
@@ -153,7 +153,7 @@ def addCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload, verify=False)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690101"})
     if response.status_code != 200:
@@ -177,7 +177,7 @@ def addCreditCard():
     }
     
     # Make an HTTP POST request to the databaseservice to create the credit card
-    response = requests.post("https://databaseservice/databaseservice/creditcard/add_credit_card", json=credit_card_data, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/creditcard/add_credit_card", json=credit_card_data)
     
     if response.status_code == 201:
         # Credit card was added successfully, return the response from the databaseservice
@@ -203,7 +203,7 @@ def getCreditCard(userId, creditCardId):
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
@@ -213,7 +213,7 @@ def getCreditCard(userId, creditCardId):
     
     # Make an HTTP GET request to the databaseservice to retrieve the credit card
     url = f"https://databaseservice/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
-    response = requests.get(url, verify=False)
+    response = requests.get(url)
     
     if response.status_code == 200:
         # Credit cards were retrieved successfully, return the response from the databaseservice
@@ -223,7 +223,7 @@ def getCreditCard(userId, creditCardId):
             "sessionId": sessionId
         }
         try:
-            response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload, verify=False)
+            response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
         except:
             return jsonify({"error": "690201"})
         if response.status_code != 200:
@@ -268,7 +268,7 @@ def getAllCreditCards():
     
     # Make an HTTP GET request to the databaseservice to retrieve all credit cards
     url = f"https://databaseservice/databaseservice/creditcard/get_all_credit_cards/{userId}"
-    response = requests.get(url, verify=False)
+    response = requests.get(url)
     
     if response.status_code == 200:
         # Credit cards were retrieved successfully, return the response from the databaseservice
@@ -278,7 +278,7 @@ def getAllCreditCards():
             "sessionId": sessionId
         }
         try:
-            response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload, verify=False)
+            response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
         except:
             return jsonify({"error": "690201"})
         if response.status_code != 200:
@@ -327,7 +327,7 @@ def updateOneCreditCard():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
@@ -350,7 +350,7 @@ def updateOneCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload, verify=False)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690301"})
     if response.status_code != 200:
@@ -376,7 +376,7 @@ def updateOneCreditCard():
         
     # Make an HTTP UPDATE request to the databaseservice to update the credit card
     url = f"https://databaseservice/databaseservice/creditcard/update_credit_card"
-    response = requests.put(url, json=updated_credit_card_data, verify=False)
+    response = requests.put(url, json=updated_credit_card_data)
     
     if response.status_code == 200:
         # Credit card was updated successfully, return the response from the databaseservice
@@ -405,7 +405,7 @@ def deleteCreditCard():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
@@ -414,7 +414,7 @@ def deleteCreditCard():
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
     url = f"https://databaseservice/databaseservice/creditcard/delete_credit_card/{userId}/{creditCardId}"
-    response = requests.delete(url, verify=False)
+    response = requests.delete(url)
     
     if response.status_code == 200:
         # Credit card was deleted successfully, return the response from the databaseservice

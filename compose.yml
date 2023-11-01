@@ -11,6 +11,9 @@ services:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
             - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
+            - ./cert/certificates/nginx-waf-cert.pem:/etc/nginx/ssl/fullchain.pem:ro
+            - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
             - PROXY=1
             - MODSEC_AUDIT_ENGINE=On
@@ -30,6 +33,10 @@ services:
             - frontend-to-movie
         environment:
             - CAPTCHA_KEY=${CAPTCHA_KEY}
+        volumes:
+            - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
@@ -52,9 +59,9 @@ services:
             - "${IDENTITY_PORT}"
         volumes:
             - ./cinema-booking/identity/logs:/logs
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
-            - ${LOCAL_CA_PATH}:/app/serverca.crt:ro
+            - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
         logging:
             driver: "json-file"
             options:
@@ -75,9 +82,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
-            - ${LOCAL_CA_PATH}:/app/serverca.crt:ro
+            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem
+            - ./cert/certificates/movie-key.pem:/app/privkey.pem
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt
         ports:
             - "${MOVIE_PORT}"
         depends_on:
@@ -96,9 +103,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
-            - ${LOCAL_CA_PATH}:/app/serverca.crt:ro
+            - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
         ports:
             - "${BOOKING_PORT}"
         depends_on:
@@ -117,9 +124,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
-            - ${LOCAL_CA_PATH}:/app/serverca.crt:ro
+            - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
         ports:
             - "${PAYMENT_PORT}"
         depends_on:
@@ -146,9 +153,9 @@ services:
             - "${DBSERVICE_PORT}"
         volumes:
             - ./cinema-booking/databaseservice/logs:/logs
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
-            - ${LOCAL_CA_PATH}:/app/serverca.crt:ro
+            - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
         logging:
             driver: "json-file"
             options:
