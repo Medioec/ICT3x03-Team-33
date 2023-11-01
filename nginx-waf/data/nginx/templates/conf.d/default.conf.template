@@ -11,7 +11,7 @@ limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
 server {
     listen 80 default_server;
 
-    server_name 3x03.redapplepie.com;
+    server_name ${BASE_HOST};
 
     # Instructs the browser not to override the response's Content-Type header
     add_header X-Content-Type-Options "nosniff";
@@ -102,11 +102,11 @@ server {
 server {
     listen 443 ssl;
 
-    server_name 3x03.redapplepie.com;
+    server_name ${BASE_HOST};
     set $upstream http://frontend:8080;
 
-    ssl_certificate /etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${BASE_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${BASE_HOST}/privkey.pem;
     ssl_session_timeout 1d;
     ssl_session_cache shared:MozSSL:10m;
     ssl_session_tickets off;
@@ -159,7 +159,7 @@ server {
 
     proxy_hide_header Access-Control-Allow-Origin;
     
-    add_header Access-Control-Allow-Origin "https://3x03.redapplepie.com";
+    add_header Access-Control-Allow-Origin "https://${BASE_HOST}";
 
     proxy_hide_header X-Powered-By;
 
