@@ -480,10 +480,14 @@ def create_staff():
 # verifies if the link is valid  before loading form to set password
 @app.route("/activate_staff_account/<token>", methods=["GET"])
 def activate_staff_account(token):
+    print("in activate staff account")
     try:
+        print("token", token)
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
         username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+
+        print("username" + username)
 
         # if activation link is invalid
         if username is None:
@@ -498,6 +502,7 @@ def activate_staff_account(token):
         
         # get info from db
         db_tokenHash = response.json()['passwordHash']
+        print("db token hash" + db_tokenHash)
 
         # check if activation link matches link in db
         try:

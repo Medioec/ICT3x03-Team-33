@@ -8,6 +8,10 @@ staff_role = 'staff';
 
 router.get('/staff', checkUserRole(staff_role), staffController.getStaffDashboard);
 
+// activate account
+router.get('/activate', staffController.verifyStaffActivationLink);
+router.get('/setPassword', staffController.getStaffPasswordPage);
+router.post('/setPasswordRequest', staffController.setStaffPassword);
 // Add other routes as needed
 
 module.exports = router;
