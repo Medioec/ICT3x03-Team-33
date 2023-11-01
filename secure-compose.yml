@@ -10,14 +10,15 @@ services:
             - '${HTTPS_PORT}:443'
         volumes:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
-            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem:ro
+            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
         environment:
             - PROXY=1
             - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
             - HEALTH=${HEALTH}
+            - BASE_HOST=${BASE_HOST}
         restart: always
         privileged: true
 
@@ -134,7 +135,6 @@ services:
             - sessioncleaning
            
     sessioncleaning:
-        container_name: sessioncleaning
         build: 
             context: ./cinema-booking
             dockerfile: ./sessioncleaning/Dockerfile
