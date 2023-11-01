@@ -241,6 +241,32 @@ async function deleteShowtimeById(showtime_id) {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// CINEMA FUNCTIONS ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+// Function to retrieve all showtimes from the database
+async function getAllCinemas() {
+    try {
+        const response = await fetch('http://movie:8082/getAllCinemas', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error('Failed to get all cinemas');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in getAllCinemas:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createMovie,
     getAllMovies,
@@ -251,5 +277,6 @@ module.exports = {
     getAllShowtimes,
     getShowtimeById,
     updateShowtimeById,
-    deleteShowtimeById
+    deleteShowtimeById,
+    getAllCinemas
 };
