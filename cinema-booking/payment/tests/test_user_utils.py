@@ -1,6 +1,7 @@
 # test_user_utils.py
 
 import unittest
+from uuid import UUID
 from user_utils import (
     validateCreditCardNumber,
     validateCreditCardName,
@@ -35,7 +36,7 @@ class TestUserUtils(unittest.TestCase):
 
     def test_process_payment(self):
         payment_id = processPayment()
-        self.assertIsInstance(payment_id, str)
+        self.assertIsInstance(payment_id, UUID)
 
     def test_get_transaction_date_time(self):
         transaction_date_time = getTransactionDateTime()

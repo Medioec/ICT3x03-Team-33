@@ -1,6 +1,6 @@
 # test_app.py
 import unittest
-from app import app
+from booking.app import app
 
 class AppTestCase(unittest.TestCase):
 

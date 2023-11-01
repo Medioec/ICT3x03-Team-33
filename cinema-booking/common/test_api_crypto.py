@@ -1,4 +1,5 @@
 import unittest
+import json
 from api_crypto import (
     encrypted_api_get,
     encrypted_api_post,
