@@ -420,7 +420,6 @@ def create_staff():
         except Exception as e:
             return jsonify({"message": {str(e)}}), 500
 
-        print("before generate email link")
         try:
             # create a unique activation link
             # timestamp is embedded into token, will be checked when token is decoded
@@ -431,10 +430,7 @@ def create_staff():
 
         print("link generated")
 
-        # hash activation link and store in db -> will use this to verify when staff uses their activation link
-        ph = PasswordHasher()
-        hash = ph.hash(activation_link)
-
+        # store in db activation link in db -> will use this to verify when staff uses their activation link
         userId = user_utils.generateUUID()
         role = "staff"
 
@@ -443,8 +439,10 @@ def create_staff():
             "userId": userId,
             "email": email,
             "username": username,
-            "passwordHash": hash,
-            "userRole": role
+            "passwordHash": activation_link,
+            "userRole": role,
+            "activationLink": activation_link,
+            "isActivationLinkUsed": False
         }
         
         response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
@@ -454,9 +452,11 @@ def create_staff():
         print("added user to db")
 
         # send email to user with activation link
-        requestData = {"email": email,
+        requestData = {
+                    "email": email,
                     "activation_link": activation_link,
-                    "username": username}
+                    "username": username
+        }
         response = requests.post("http://email:587/send_staff_activation_email", json=requestData) 
 
         print("sent to email service")
@@ -481,7 +481,6 @@ def create_staff():
 @app.route("/activate_staff_account/<token>", methods=["GET"])
 def activate_staff_account(token):
     try:
-        print("token", token)
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
         username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
@@ -498,16 +497,15 @@ def activate_staff_account(token):
             return jsonify({"message": "Error occurred"}), 500
         
         # get info from db
-        db_tokenHash = response.json()['passwordHash']
+        db_activationLink = response.json()['activationLink']
+        isActivationLinkUsed = response.json()['isActivationLinkUsed']
 
-        # check if activation link matches link in db
-        try:
-            ph = PasswordHasher()
-            ph.verify(db_tokenHash, token)
+        # if activation link hasn't used and matches in db, link is valid
+        if (isActivationLinkUsed == False and db_activationLink == token):
             return jsonify({"message": "Valid activation link"}), 200
-        
-        except:
-            return jsonify({"message": "Invalid activation link"}), 400
+
+        # else token is invalid
+        return jsonify({"message": "Invalid activation link"}), 400
 
     except:
         return jsonify({"message": "Error occurred"}), 500    
@@ -535,18 +533,18 @@ def staff_set_password(token):
             return jsonify({"message": "Error occurred"}), 500
         
         # get info from db
-        db_tokenHash = response.json()['passwordHash']
+        db_activationLink = response.json()['activationLink']
+        isActivationLinkUsed = response.json()['isActivationLinkUsed']
 
-        # check if activation link matches link in db
-        try:
-            ph = PasswordHasher()
-            ph.verify(db_tokenHash, token)
-            
+        # if activation link hasn't used and matches in db, link is valid
+        if (isActivationLinkUsed == False and db_activationLink == token):
             # get password
             data = request.get_json()
             password = data['password']
+
             print("received password" + password)
             print("username", username)
+
             # if password is empty
             if not password:
                 return jsonify({"message": "Please fill in all form data"}), 400
@@ -557,14 +555,15 @@ def staff_set_password(token):
                 return jsonify({"message": "Password does not meet the requirements"}), 400
         
             # hash password
+            ph = PasswordHasher()
             hash = ph.hash(password)
 
             # replace activation link/token hash with password hash in db
             data = {
                 "username": username,
-                "passwordHash": hash
+                "passwordHash": hash,
+                "isActivationLinkUsed": True
             }
-            
             response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
             print("set password response", response.status_code)
 
@@ -575,9 +574,9 @@ def staff_set_password(token):
             else:
                 return jsonify({"message": "Password set successfully"}), 200
             
-        except:
-            return jsonify({"message": "Invalid activation link"}), 400
-        
+        # else token is invalid
+        return jsonify({"message": "Invalid activation link"}), 400
+            
     except:
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF STAFF SET PASSWORD #########################################

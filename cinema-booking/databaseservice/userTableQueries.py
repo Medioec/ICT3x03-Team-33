@@ -33,14 +33,16 @@ def add_user():
         username = data['username']
         passwordHash = data['passwordHash']
         userRole = data['userRole']
+        activationLink = data['activationLink']
+        isActivationLinkUsed = data['isActivationLinkUsed']
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
         # Insert data into the "cinemauser" table
-        insert_query = "INSERT INTO cinemauser (userId, email, username, passwordHash, userRole) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(insert_query, (userId, email, username, passwordHash, userRole))
+        insert_query = "INSERT INTO cinemauser (userId, email, username, passwordHash, userRole, activationLink, isActivationLinkUsed) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(insert_query, (userId, email, username, passwordHash, userRole, activationLink, isActivationLinkUsed))
         conn.commit()
 
         cursor.close()
@@ -89,7 +91,9 @@ def get_user_details():
                 "username": user[2],
                 "passwordHash": user[3],
                 "userRole": user[4],
-                "isUserBanned": user[5]
+                "isUserBanned": user[5],
+                "activationLink": user[6],
+                "isActivationLinkUsed": user[7]
             }
             
             # Log the successful retrieval of a user
@@ -239,6 +243,7 @@ def update_password_by_username():
         data = request.get_json()
         username = data['username']
         passwordHash = data['passwordHash']
+        isActivationLinkUsed = data['isActivationLinkUsed']
         
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -257,8 +262,8 @@ def update_password_by_username():
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()
 
-            update_query = "UPDATE cinemauser SET passwordHash = %s WHERE username = %s"
-            cursor.execute(update_query, (passwordHash, username,))
+            update_query = "UPDATE cinemauser SET passwordHash = %s, isActivationLinkUsed = %s WHERE username = %s"
+            cursor.execute(update_query, (passwordHash, isActivationLinkUsed, username,))
             conn.commit()
 
             cursor.close()
