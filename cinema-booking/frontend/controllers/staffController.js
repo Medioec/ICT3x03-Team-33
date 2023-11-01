@@ -14,48 +14,61 @@ exports.getStaffDashboard = async (req, res) => {
 
     } catch (error) {
         // Handle errors
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }    
 };
 
 exports.verifyStaffActivationLink = async (req, res) => {
-    console.log("in verify activation link req");
     try { 
         const token = req.query.token;
-        console.log("can get token", token);
 
         // verify if the link is valid
         const response = await identityService.verifyStaffActivationToken(token);
-        console.log(response);
-        console.log(response.status);
 
         if (response.status != 200){
-            res.status(403).send('Unauthorized Access');
+            return res.status(403).send('Unauthorized Access');
         }
         
-        res.redirect(`/setPassword/${token}`);
-        // res.status(200).send('Valid link');
+        res.redirect(`/setPassword?token=${token}`);
 
     } catch (error) {
         // Handle errors
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }    
 };
 
 exports.getStaffPasswordPage = async (req, res) => {
     try {
-        res.render('pages/staffactivation.ejs')
+        const token = req.query.token;
+
+        // verify if the link is valid
+        const response = await identityService.verifyStaffActivationToken(token);
+
+        if (response.status != 200){
+            return res.status(403).send('Unauthorized Access');
+        }
+
+        res.render('pages/staffactivateaccount.ejs')
+        
     } catch (error) {
         // Handle errors
-        res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Error');
     }    
 };
 
-exports.setStaffPassword = async (req, res) => {
+exports.setStaffPasswordRequest = async (req, res) => {
     try {
-        const response = await identityService.setStaffPassword(req.params.token);
-        console.log(response);
-        res.status(200).send("test");
+        const token = req.query.token;
+        console.log(token);
+        console.log("set password");
+
+        const response = await identityService.setStaffPasswordRequest(token, req.body);
+        console.log(response); 
+        if (response.status == 200) {
+            return res.status(200).send('Success');
+        }
+
+        res.status(500).send('Internal Server Error'); 
 
     } catch (error) {
         // Handle errors

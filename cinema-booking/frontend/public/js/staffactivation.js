@@ -7,12 +7,12 @@ function checkRegistrationFields() {
     const password = DOMPurify.sanitize($userPasswordInput.val());
   
     // Return true if all fields are filled correctly and the form is valid
-    return email && username && password && isFormValid;
+    return password && isFormValid;
   }
   
   // Define the onSuccess function to handle the captcha callback
   function onSuccess() {
-    const $registerButton = $("#register-button");
+    const $registerButton = $("#activate-account-button");
     if (checkRegistrationFields() && grecaptcha.getResponse()) {
       $registerButton.prop("disabled", false);
     } else {
@@ -21,7 +21,7 @@ function checkRegistrationFields() {
   }
   
   document.addEventListener("DOMContentLoaded", function () {
-    const $registerButton = $("#register-button");
+    const $registerButton = $("#activate-account-button");
     const $userPasswordInput = $("#userPassword");
   
     $userPasswordInput.on("input", function () {
@@ -43,7 +43,13 @@ function checkRegistrationFields() {
         };
   
         if (grecaptcha.getResponse()) { // Check if reCAPTCHA is completed
-          await fetch("/registerRequest", {
+          // get the URL params
+          const urlParams = new URLSearchParams(window.location.search);
+
+          // get the token
+          const token = urlParams.get('token');
+          console.log(token);
+          await fetch(`/setStaffPasswordRequest?token=${token}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

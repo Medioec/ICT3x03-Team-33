@@ -480,14 +480,11 @@ def create_staff():
 # verifies if the link is valid  before loading form to set password
 @app.route("/activate_staff_account/<token>", methods=["GET"])
 def activate_staff_account(token):
-    print("in activate staff account")
     try:
         print("token", token)
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
         username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
-
-        print("username" + username)
 
         # if activation link is invalid
         if username is None:
@@ -502,7 +499,6 @@ def activate_staff_account(token):
         
         # get info from db
         db_tokenHash = response.json()['passwordHash']
-        print("db token hash" + db_tokenHash)
 
         # check if activation link matches link in db
         try:
@@ -519,9 +515,10 @@ def activate_staff_account(token):
 
 ############################## STAFF SET PASSWORD #########################################
 # let staff set their password
-@app.route("/staff_set_password/<token>", methods=["POST"])
+@app.route("/staff_set_password/<token>", methods=["PUT"])
 def staff_set_password(token):
     try:
+        print("in staff set password api")
         # get username from token
         expiration_time_in_seconds = 86400 # 24 hour window
         username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
@@ -530,36 +527,56 @@ def staff_set_password(token):
         if username is None:
             return jsonify({"message": "Invalid activation link"}), 400
         
-        # get password
-        data = request.get_json()
-        password = data['password']
+        # if activation link is valid, double check against user info in db
+        requestData = {"username": username}
+        response = requests.post("http://databaseservice:8085/databaseservice/user/get_user_details", json=requestData)
         
-        # if password is empty
-        if not password:
-            return jsonify({"message": "Please fill in all form data"}), 400
+        if response.status_code !=200:
+            return jsonify({"message": "Error occurred"}), 500
+        
+        # get info from db
+        db_tokenHash = response.json()['passwordHash']
 
-        # validate password
-        if not user_utils.validatePassword(password):
-            print("password not meet reqs")
-            return jsonify({"message": "Password does not meet the requirements"}), 400
-    
-        # hash password
-        ph = PasswordHasher()
-        hash = ph.hash(password)
+        # check if activation link matches link in db
+        try:
+            ph = PasswordHasher()
+            ph.verify(db_tokenHash, token)
+            
+            # get password
+            data = request.get_json()
+            password = data['password']
+            print("received password" + password)
+            print("username", username)
+            # if password is empty
+            if not password:
+                return jsonify({"message": "Please fill in all form data"}), 400
 
-        # replace activation link/token hash with password hash in db
-        data = {
-            "username": username,
-            "passwordHash": hash
-        }
+            # validate password
+            if not user_utils.validatePassword(password):
+                print("password not meet reqs")
+                return jsonify({"message": "Password does not meet the requirements"}), 400
         
-        response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
-        # if database error
-        if response.status_code != 200:
-            return jsonify({"message": "Database update error"}), 500
-        
-        else:
-            return jsonify({"message": "Password set successfully"}), 200
+            # hash password
+            hash = ph.hash(password)
+
+            # replace activation link/token hash with password hash in db
+            data = {
+                "username": username,
+                "passwordHash": hash
+            }
+            
+            response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
+            print("set password response", response.status_code)
+
+            # if database error
+            if response.status_code != 200:
+                return jsonify({"message": "Database update error"}), 500
+            
+            else:
+                return jsonify({"message": "Password set successfully"}), 200
+            
+        except:
+            return jsonify({"message": "Invalid activation link"}), 400
         
     except:
         return jsonify({"message": "Error occurred"}), 500    

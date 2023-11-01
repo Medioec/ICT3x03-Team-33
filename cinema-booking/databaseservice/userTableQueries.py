@@ -257,14 +257,15 @@ def update_password_by_username():
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()
 
-            delete_query = "UPDATE cinemauser SET passwordHash = %s WHERE username = %s"
-            cursor.execute(delete_query, (passwordHash, username,))
+            update_query = "UPDATE cinemauser SET passwordHash = %s WHERE username = %s"
+            cursor.execute(update_query, (passwordHash, username,))
             conn.commit()
 
             cursor.close()
             conn.close()
             
             # log the successful update of a user session status
+            print("user password set", username)
             logger.info("User password updated successfully. username: {username}")
             return jsonify({"message": "User password updated successfully"}), 200
         else:

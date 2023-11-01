@@ -56,13 +56,14 @@ async function verifyStaffActivationToken(token) {
     return response;
 }
 
-async function setStaffPasswordRequest(token) {
+async function setStaffPasswordRequest(token, body) {
     const response = await fetch(`http://identity:8081/staff_set_password/${token}`, {
-        method: "POST",
+        method: "PUT",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify(body),
     });
 
     return response;

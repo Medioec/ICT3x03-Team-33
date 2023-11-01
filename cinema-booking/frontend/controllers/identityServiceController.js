@@ -74,7 +74,7 @@ exports.postRegister = async (req, res) => {
         }
 
         const data = await identityService.registerRequest(req.body);
-        return res.status(data.status).json({'message': 'Registration successful'});
+        return res.status(200).json({'message': 'Registration successful'});
         
     } catch (error) {
         res.status(500).json({ 'message': 'Internal Server Error' });
@@ -102,7 +102,7 @@ exports.logout = async (req, res) => {
         }
         
     } catch (error) {
-        res.status(500).json({ 'message': 'Internal Server Error' });
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 
