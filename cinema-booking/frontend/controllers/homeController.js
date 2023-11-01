@@ -95,42 +95,6 @@ exports.getAllShowtimesPage = [async (req, res) => {
     }
 }];
 
-
-
-exports.getAllMoviesPage = [async (req, res) => {
-    try {
-        // get all movies from movie service
-        const movies = await movieService.getAllMovies();
-
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
-
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/movielistings.ejs', { movies, loggedIn });
-    } catch (error) {
-        // Handle errors
-        console.error("Error in getAllMoviesPage:", error);
-        // res.status(500).send('Internal Server Error: ' + error.message);
-    }
-}];
-
-exports.getAllShowtimesPage = [async (req, res) => {
-    try {
-        // get all movies from movie service
-        const showtimes = await movieService.getAllShowtimes();
-
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
-
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/showtimes.ejs', { showtimes, loggedIn });
-    } catch (error) {
-        // Handle errors
-        console.error("Error in getAllShowtimesPage:", error);
-        // res.status(500).send('Internal Server Error: ' + error.message);
-    }
-}];
-
 exports.getBookingForMoviePage = [async (req, res) => {
     try {
         const showtimeId = req.query.showtimeId;
@@ -141,6 +105,26 @@ exports.getBookingForMoviePage = [async (req, res) => {
 
         // Render the 'moviedetails.ejs' page with the movie data
         res.render('pages/booking.ejs', { showtimeDetails, loggedIn });
+    } catch (error) {
+        // Handle errors
+        console.error("Error in getBookingForMoviePage:", error);
+        // res.status(500).send('Internal Server Error: ' + error.message);
+    }
+}];
+
+exports.getCinemasPage  = [async (req, res) => {
+    try {
+        const cinemaId = req.query.cinemaId;
+        // match showtimeId with cinemaId
+
+        // use showtimeId obtained to getShowtimeById
+        const showtimeDetails = await movieService.getShowtimeById(showtimeId);
+
+        // Get the loggedIn status from the request object
+        const loggedIn = req.loggedIn;
+
+        // Render the 'moviedetails.ejs' page with the movie data
+        res.render('pages/cinemas.ejs', { showtimeDetails, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getBookingForMoviePage:", error);
