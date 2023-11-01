@@ -37,6 +37,9 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
 
@@ -47,6 +50,9 @@ services:
         networks:
             - frontend-to-movie
             - movie-to-databaseservice
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
     
@@ -58,6 +64,9 @@ services:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
 
@@ -69,6 +78,9 @@ services:
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
 
@@ -82,6 +94,9 @@ services:
             - payment-to-databaseservice
             - booking-to-databaseservice
             - databaseservice-to-database
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             PYTHONUNBUFFERED: 1
             DB_HOST: database
