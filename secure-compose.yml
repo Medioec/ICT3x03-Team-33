@@ -121,6 +121,47 @@ services:
             # - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
 
+    ofelia-scheduler:
+        image: mcuadros/ofelia:v0.3.7
+        networks:
+            - scheduler-to-sessioncleaning
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: daemon --docker
+        labels:
+            - ofelia.enabled=true
+        depends_on:
+            - sessioncleaning
+           
+    sessioncleaning:
+        container_name: sessioncleaning
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./sessioncleaning/Dockerfile
+        networks:
+            - scheduler-to-sessioncleaning
+            - sessioncleaning-to-database
+        entrypoint: tail -f /dev/null
+        environment:
+            PYTHONUNBUFFERED: 1
+            DB_HOST: database
+            DB_NAME: ${DBSVC_NAME}
+            DB_NORMALUSER: ${DBSVC_NORMALUSER}
+            DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "1m"
+                max-file: "5"
+        labels:
+            - ofelia.enabled=true
+            - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
+            - ofelia.job-exec.sessioncleaning.no-overlap=true
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function        
+        depends_on:
+            - database
+
+
 networks:
   internet-access:
     driver: bridge
