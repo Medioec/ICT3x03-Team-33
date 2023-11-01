@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify(data),
         })
         .then(response => {
-          console.log("test");
           console.log("client response status code: ", response.status);
           return response.json(); // Parse response as JSON
         })

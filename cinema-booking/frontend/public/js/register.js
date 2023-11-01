@@ -83,6 +83,10 @@ document.addEventListener("DOMContentLoaded", function () {
           if (response.ok) {
             window.location.href = "/login";
           }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById("error-message").textContent = data.message;
         });
       } else {
         document.getElementById("error-message").textContent = "Please complete the reCAPTCHA.";
