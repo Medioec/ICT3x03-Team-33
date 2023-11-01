@@ -11,7 +11,7 @@ import uuid
 # check if username is available/does not exist in db
 def isUsernameAvailable(username):
     data = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/user/check_user", json=data)
+    response = requests.post("https://databaseservice/databaseservice/user/check_user", json=data, verify=False)
 
     # if username is not found in db, username is available
     if response.status_code == 404:
@@ -27,7 +27,7 @@ def isUsernameAvailable(username):
 # check if email is available/does not exist in db
 def isEmailAvailable(email):
     data = {"email": email}
-    response = requests.post("http://databaseservice:8085/databaseservice/user/check_email", json=data)
+    response = requests.post("https://databaseservice/databaseservice/user/check_email", json=data, verify=False)
 
     # if email is not found in db, email is available
     if response.status_code == 404:

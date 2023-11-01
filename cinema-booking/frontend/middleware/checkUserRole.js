@@ -1,3 +1,11 @@
+const https = require('https');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
+
 // function to check if the user is logged in and has the required role to access the page
 function checkUserRole(requiredRole) {
     return async (req, res, next) => {
@@ -21,13 +29,14 @@ function checkUserRole(requiredRole) {
             }
 
             // verify their role using identity service
-            const response = fetch("http://identity:8081/enhancedAuth", {
+            const response = fetch("https://identity/enhancedAuth", {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                }
+                },
+                agent: httpsAgent
             })
             .then(response => {
                 console.log(response);

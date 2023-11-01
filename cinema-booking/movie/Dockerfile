@@ -26,4 +26,4 @@ COPY movie/ /app
 EXPOSE 8082
 
 # Run your Flask app
-CMD ["python", "-u" ,"app.py"]
+CMD gunicorn --preload --certfile=fullchain.pem --keyfile=privkey.pem --conf gunicorn_conf.py --bind 0.0.0.0:443 wsgi:app

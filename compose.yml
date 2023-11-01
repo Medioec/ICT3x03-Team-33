@@ -49,6 +49,8 @@ services:
             - "${IDENTITY_PORT}"
         volumes:
             - ./cinema-booking/identity/logs:/logs
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         logging:
             driver: "json-file"
             options:
@@ -68,6 +70,9 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         ports:
             - "${MOVIE_PORT}"
         depends_on:
@@ -85,6 +90,9 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         ports:
             - "${BOOKING_PORT}"
         depends_on:
@@ -102,6 +110,9 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        volumes:
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         ports:
             - "${PAYMENT_PORT}"
         depends_on:
@@ -128,6 +139,8 @@ services:
             - "${DBSERVICE_PORT}"
         volumes:
             - ./cinema-booking/databaseservice/logs:/logs
+            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         logging:
             driver: "json-file"
             options:

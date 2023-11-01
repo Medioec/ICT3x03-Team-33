@@ -26,4 +26,4 @@ COPY payment/ /app
 EXPOSE 8084
 
 # Run your Flask app
-CMD ["python", "app.py"]
+CMD gunicorn --preload --certfile=fullchain.pem --keyfile=privkey.pem --conf gunicorn_conf.py --bind 0.0.0.0:443 wsgi:app

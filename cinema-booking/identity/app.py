@@ -112,7 +112,7 @@ def register():
         "userRole": role
     }
 
-    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    response = requests.post("https://databaseservice/databaseservice/user/add_user", json=data, verify=False)
     
     if response.status_code == 201:
         logger.info(f"User '{username}' registered successfully!")
@@ -159,7 +159,7 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role", json=requestData)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_userId_hash_role", json=requestData, verify=False)
 
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
@@ -249,8 +249,8 @@ def login():
         #"encrypted_dbHash": encrypted_dbHash  # Store the encrypted hash
     }
     
-    #response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/store_key_in_database", json=requestData)
+    #response = requests.post("https://databaseservice/databaseservice/usersessions/create_user_session", json=requestData)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/store_key_in_database", json=requestData, verify=False)
 
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
@@ -286,7 +286,7 @@ def logout():
     # set session status to inactive in db
     requestData = {"sessionId": sessionId, "currStatus": currStatus}
     
-    response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
+    response = requests.put("https://databaseservice/databaseservice/usersessions/update_session_status_by_id", json=requestData, verify=False)
 
     if response.status_code == 200:
         print("logout successful")
@@ -332,7 +332,7 @@ def enhancedAuth():
             
         # check against db to see if it's a legit token
         requestData = {"sessionId": sessionId}
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
         
         if response.status_code != 200:
             # log authentication failure
@@ -345,7 +345,7 @@ def enhancedAuth():
         
         # check that the user role in the db matches the user role in the token
         requestData = {"userId": userId}
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_role_by_id", json=requestData, verify=False)    
         dbRole = response.json()["userRole"]
 
         print("token role", role)
@@ -437,7 +437,7 @@ def create_staff():
         "userRole": role
     }
 
-    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    response = requests.post("https://databaseservice/databaseservice/user/add_user", json=data, verify=False)
     
     if response.status_code == 201:
         logger.info(f"User '{username}' registered successfully!")

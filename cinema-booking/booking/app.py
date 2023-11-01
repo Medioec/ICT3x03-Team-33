@@ -29,7 +29,7 @@ def generateBooking():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     userId = response.json()["userId"]
@@ -46,7 +46,7 @@ def generateBooking():
         "creditCardId": creditCardId,
     }
     
-    url = f"http://paymentservice:8084/paymentservice/makePayment"
+    url = f"https://paymentservice/paymentservice/makePayment"
     response = requests.post(url, json=data)
     if response.status_code != 200:
         if response.status_code == 400:
@@ -67,8 +67,8 @@ def generateBooking():
         }
         
         # Create booking with databaseservice 
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails//generate_booking_details"
-        response = requests.post(url, json=data)
+        url = f"https://databaseservice/databaseservice/bookingdetails//generate_booking_details"
+        response = requests.post(url, json=data, verify=False)
         if response.status_code == 201:
             return jsonify({"message": "Booking created successfully"}), 201
         elif response.status_code == 409:
@@ -90,13 +90,13 @@ def retrieveOneBooking(ticketId):
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         userId = response.json()["userId"]
         
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
-        response = requests.get(url)
+        url = f"https://databaseservice/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
+        response = requests.get(url, verify=False)
 
         if response.status_code == 404:
             return jsonify({"message": "Booking not found"}), 404
@@ -135,13 +135,13 @@ def retrieveAllBookings():
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        response = requests.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         userId = response.json()["userId"]
         
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
-        response = requests.get(url)
+        url = f"https://databaseservice/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
+        response = requests.get(url, verify=False)
 
         if response.status_code == 200:
             return response.json(), 200
