@@ -34,7 +34,7 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(log_format)
 logger.addHandler(stream_handler)
 
-logger.info("Identity Service started")
+logger.info(f"Identity Service started")
 
 app.config['JWT_SECRET_KEY'] = user_utils.generateSecretKey()
 
@@ -44,7 +44,7 @@ jwt = JWTManager(app)
 @app.route("/register", methods=["POST"])
 def register():
     # logs registration attempt
-    logger.info("Attempting registration...")
+    logger.info(f"Attempting registration...")
     
     # get data from registration form
     data = request.get_json()
@@ -99,7 +99,7 @@ def register():
     hash = ph.hash(password)
     
     # logs that password has been hashed
-    logger.info("Password has been hashed.")
+    logger.info(f"Password has been hashed.")
 
     role = "member"
     userId = user_utils.generateUUID()
@@ -137,7 +137,7 @@ def register():
 @app.route("/login", methods=["POST"])
 def login():
     # logs login attempt
-    logger.info("Attempting login...")
+    logger.info(f"Attempting login...")
     
     # get data from login form
     data = request.get_json()
@@ -270,7 +270,7 @@ def login():
 @jwt_required() # verifies jwt integrity + expiry
 def logout():
     # logs logout attempt
-    logger.info("Attempting logout...")
+    logger.info(f"Attempting logout...")
     
     # get sessionId from jwt
     sessionId = get_jwt_identity()
@@ -312,7 +312,7 @@ def unauthorized_callback(callback):
 @jwt_required() # verifies jwt integrity + expiry
 def basicAuth():
     #logs authentication attempt
-    logger.info("Basic authentication attempted. (user only)")
+    logger.info(f"Basic authentication attempted. (user only)")
     
     # logs login success
     logger.info(f"Login successful")
@@ -323,7 +323,7 @@ def basicAuth():
 @app.route("/enhancedAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
 def enhancedAuth():
-    logger.info("Enhanced authentication attempted (user and role).")
+    logger.info(f"Enhanced authentication attempted (user and role).")
     try:
         # get session id + role from token
         sessionId = get_jwt_identity()
@@ -370,7 +370,7 @@ def enhancedAuth():
 @jwt_required() # can only be accessed by admins
 def create_staff():
     # logs registration attempt
-    logger.info("Attempting staff creation...")
+    logger.info(f"Attempting staff creation...")
     
     # get data from registration form
     data = request.get_json()
@@ -424,7 +424,7 @@ def create_staff():
     hash = ph.hash(password)
     
     # logs that password has been hashed
-    logger.info("Password has been hashed.")
+    logger.info(f"Password has been hashed.")
 
     role = "staff"
     userId = user_utils.generateUUID()

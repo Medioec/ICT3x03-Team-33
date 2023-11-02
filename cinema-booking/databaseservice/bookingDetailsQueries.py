@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 booking_details_bp = Blueprint("bookingdetails", __name__)
 
 # log booking details queries started
-logger.info("Booking details queries started.")
+logger.info(f"Booking details queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @booking_details_bp.route('/generate_booking_details', methods=['POST'])
 def generate_booking_details():
     # Log the addition of a new booking entry
-    logger.info("Generating booking details started.")
+    logger.info(f"Generating booking details started.")
     try:
         data = request.get_json()
         userId = data['userId']
@@ -47,14 +47,14 @@ def generate_booking_details():
             conn.close()
             
             # Log the successful creation of a new booking entry
-            logger.info("Booking details added successfully.")
+            logger.info(f"Booking details added successfully.")
             return jsonify({"message": "Booking details added successfully", "ticketId": ticket_id}), 201
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
             conn.rollback()  # Rollback the transaction
             cursor.close()
             conn.close()
-            logger.warning("Duplicate entry detected: This booking already exists.")
+            logger.warning(f"Duplicate entry detected: This booking already exists.")
             return jsonify({"error": "Duplicate entry: This booking already exists."}), 409
     except Exception as e:
         logger.error(f"Error in generate_booking_details: {str(e)}")        
@@ -92,10 +92,10 @@ def get_booking_details_by_id(user_id, ticket_id):
                 }
                 return jsonify(bookingDetails), 200
             else:
-                logger.warning("Booking not found.")
+                logger.warning(f"Booking not found.")
                 return jsonify({"message": "Booking not found"}), 404
         else:
-            logger.warning("Unauthorized access to get_booking_details_by_id detected.")
+            logger.warning(f"Unauthorized access to get_booking_details_by_id detected.")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         logger.error(f"Error in get_booking_details_by_id: {str(e)}")
@@ -133,10 +133,10 @@ def get_all_bookings_by_userId(userId):
                 booking_details_list.append(one_booking)
 
             # Log the successful retrieval of all bookings by userId
-            logger.info("Bookings retrieved successfully.")
+            logger.info(f"Bookings retrieved successfully.")
             return jsonify(booking_details_list), 200
         else:
-            logger.warning("No bookings found.")
+            logger.warning(f"No bookings found.")
             return jsonify({"message": "No bookings found"}), 404
 
     except Exception as e:

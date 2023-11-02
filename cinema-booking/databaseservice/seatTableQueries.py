@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 seat_bp = Blueprint("seat", __name__)
 
 # Log seat queries started
-logger.info("Seat queries started.")
+logger.info(f"Seat queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @seat_bp.route('/add_seat', methods=['POST'])
 def add_seat():
     # Log the addition of a new seat entry
-    logger.info("Adding new seat started.")
+    logger.info(f"Adding new seat started.")
     try:
         data = request.get_json()
         seatId = data['seatId']
@@ -43,7 +43,7 @@ def add_seat():
             conn.close()
             
             # Log the successful creation of a new seat entry
-            logger.info("Seat added successfully with new seatId: {new_seat_id}.")
+            logger.info(f"Seat added successfully with new seatId: {new_seat_id}.")
             return jsonify({"message": "Seat added successfully", "seatId": new_seat_id}), 201
             
         except IntegrityError as e:
