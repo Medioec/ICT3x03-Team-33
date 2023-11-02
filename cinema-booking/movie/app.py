@@ -12,12 +12,11 @@ app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
 
-cert_path = '/app/fullchain.pem'
-key_path = '/app/privkey.pem'
-ca = '/app/serverca.crt'
 session = requests.Session()
-session.cert = (cert_path, key_path)
-session.verify = ca
+client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
+ca_cert = '/app/ca-cert.pem'
+session.cert = client_cert
+session.verify = ca_cert
 
 #####   throw error when JWT token is not valid     #####
 @jwt.unauthorized_loader

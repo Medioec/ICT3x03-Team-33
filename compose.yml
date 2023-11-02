@@ -36,7 +36,7 @@ services:
         volumes:
             - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
@@ -61,7 +61,7 @@ services:
             - ./cinema-booking/identity/logs:/logs
             - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:
@@ -82,9 +82,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem
-            - ./cert/certificates/movie-key.pem:/app/privkey.pem
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt
+            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/movie-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${MOVIE_PORT}"
         depends_on:
@@ -105,7 +105,7 @@ services:
         volumes:
             - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${BOOKING_PORT}"
         depends_on:
@@ -126,7 +126,7 @@ services:
         volumes:
             - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${PAYMENT_PORT}"
         depends_on:
@@ -155,7 +155,7 @@ services:
             - ./cinema-booking/databaseservice/logs:/logs
             - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/serverca.crt:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:

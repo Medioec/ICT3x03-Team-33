@@ -4,7 +4,7 @@ const fs = require('fs');
 const httpsAgent = new https.Agent({
     cert: fs.readFileSync('fullchain.pem'),
     key: fs.readFileSync('privkey.pem'),
-    ca: fs.readFileSync('serverca.crt'),
+    ca: fs.readFileSync('ca-cert.pem'),
     rejectUnauthorized: true
   });
 

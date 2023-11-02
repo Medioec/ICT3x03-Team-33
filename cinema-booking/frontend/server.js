@@ -37,7 +37,7 @@ app.use((req, res) => {
 // setting up https
 const privateKey = fs.readFileSync('privkey.pem', 'utf8');
 const certificate = fs.readFileSync('fullchain.pem', 'utf8');
-const ca = fs.readFileSync('serverca.crt', 'utf8');
+const ca = fs.readFileSync('ca-cert.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate, ca: ca, requestCert: true, rejectUnauthorized: true };
 
 const httpsServer = https.createServer(credentials, app);
