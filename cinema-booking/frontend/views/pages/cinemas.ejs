@@ -52,7 +52,7 @@
               <% Object.keys(groupedData[showDate]).forEach((cinemaId) => { %>
                 <div class="row" id="cinemaRow">
                     <!-- take in cinemaId = req.query.cinemaId in the controller  -->
-                    <h2 class="showcase-heading">Cinema: <%= cinemaData[cinemaId].cinemaName %></h2>
+                    <h2 class="showcase-heading">Cinema: <%= cinemaId %></h2>
                     <% Object.keys(groupedData[showDate][cinemaId]).forEach((movieId) => { %>
                     <div class="row" id="showtimeRow">
                       <div class="col-md-2 dateTab">

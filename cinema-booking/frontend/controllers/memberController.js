@@ -9,7 +9,7 @@ exports.getMembersHomePage = async (req, res) => {
         // Get all movies and showtimes
         const movies = await movieService.getAllMovies();
         const showtimes = await movieService.getAllShowtimes();
-        const cinemas = movieService.getAllCinemas();
+        const cinemas = await movieService.getAllCinemas();
 
         return res.render('pages/membershome.ejs', { movies, cinemas, showtimes, loggedIn });
     } catch (error) {
@@ -23,6 +23,7 @@ exports.getCinemasPage  = [async (req, res) => {
         
         // match showtimeId with cinemaId
         const showtimes = await movieService.getAllShowtimes();
+        const cinemaData = await movieService.getAllCinemas();
         
         const filteredCinemaShowtimes = showtimes
         .filter((showtime) => showtime.cinemaId === cinemaId);
@@ -31,7 +32,7 @@ exports.getCinemasPage  = [async (req, res) => {
         const loggedIn = req.loggedIn;
 
         // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/cinemas.ejs', { filteredCinemaShowtimes, loggedIn });
+        res.render('pages/cinemas.ejs', {showtimes, cinemaData, filteredCinemaShowtimes, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getBookingForMoviePage:", error);

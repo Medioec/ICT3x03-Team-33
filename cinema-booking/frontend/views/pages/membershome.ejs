@@ -51,7 +51,7 @@
             <ul class="dropdown-menu">
               <% cinemas.forEach((cinema) => { %>
                 <li>
-                  <a class="dropdown-item" data-cinema-name="<%= cinema %>"><%= cinema %></a>
+                  <a class="dropdown-item" data-cinema-name="<%= cinema.cinemaName %>"><%= cinema.cinemaName %></a>
                 </li>
               <% }); %>
             </ul>

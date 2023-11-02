@@ -21,13 +21,6 @@
   <!-- Navbar -->
   <%- include('./partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
-  <script>
-    window.moviesData = <%- JSON.stringify(movies) %>;
-    window.showtimeData = <%- JSON.stringify(showtimes) %>;
-    window.cinemaData = <%- JSON.stringify(cinemas) %>;
-    console.log(cinemas);
-  </script>
-
   <main>
     <div class="container">
 
@@ -56,13 +49,11 @@
               Select a Cinema
             </button>
             <ul class="dropdown-menu">
-              <ul class="dropdown-menu">
-                <% cinemas.forEach((cinema) => { %>
-                  <li>
-                    <a class="dropdown-item" data-movie-id="<%= cinema.cinemaName %>"><%= cinema.cinemaName %></a>
-                  </li>
-                <% }); %>
-              </ul>              
+              <% cinemas.forEach((cinema) => { %>
+                <li>
+                  <a class="dropdown-item" data-cinema-name="<%= cinema %>"><%= cinema.cinemaName %></a>
+                </li>
+              <% }); %>
             </ul>
           </div>          
           
@@ -113,6 +104,12 @@
   </main>
     <!-- footer -->
     <%- include('./partial/footer'); %>
+
+    <script>
+      window.moviesData = <%- JSON.stringify(movies) %>;
+      window.showtimeData = <%- JSON.stringify(showtimes) %>;
+      window.cinemaData = <%- JSON.stringify(cinemas) %>;
+    </script>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

@@ -1,5 +1,3 @@
-console.log(cinemaData);
-
 document.addEventListener("DOMContentLoaded", function () {
   var movieDropdown = document.getElementById("movieDropdown");
   var cinemaDropdown = document.getElementById("cinemaDropdown");
@@ -53,41 +51,49 @@ document.addEventListener("DOMContentLoaded", function () {
     dropdownMenu.innerHTML = '';
 
     if (selectedCinemaName && selectedMovie) {
-      const cinemaId = selectedCinemaName.cinemaId;
-      const movieId = selectedMovie.movieId;
+      // Find the cinemaId based on the selected cinemaName from cinemaData
+      const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
+      if (selectedCinema) {
+        const cinemaId = selectedCinema.cinemaId;
+        console.log("selectedCinemaName:", selectedCinemaName);
+        console.log("selectedCinemaId:", cinemaId);
+        const movieId = selectedMovie.movieId;
 
-      const matchingShowtimes = showtimeData.filter(item => item.movieId === movieId && item.cinemaId === cinemaId);
+        const matchingShowtimes = showtimeData.filter(item => item.movieId === movieId && item.cinemaId === cinemaId);
 
-      // Sort matching showtimes by showDate and showTime
-      matchingShowtimes.sort((a, b) => {
-        const aDate = new Date(a.showDate + ' ' + a.showTime);
-        const bDate = new Date(b.showDate + ' ' + b.showTime);
-        return aDate - bDate;
-      });
-
-      // Clear the showtimeInfoArray before populating it
-      showtimeInfoArray.length = 0;
-
-      addTimingDropdownController(timingDropdown.nextElementSibling);
-
-      matchingShowtimes.forEach(showtime => {
-        const dropdownItem = document.createElement('li');
-        const showtimeInfo = {
-          showDate: showtime.showDate,
-          showTime: showtime.showTime,
-          showtimeId: showtime.showtimeId,
-        };
-        dropdownItem.innerHTML = `<a class="dropdown-item">${showtime.showDate}, ${showtime.showTime}</a>`;
-        dropdownMenu.appendChild(dropdownItem);
-
-        dropdownItem.addEventListener("click", function () {
-          var selectedValue = `${showtime.showDate}, ${showtime.showTime}`;
-          updateTimingDropdownValue(selectedValue);
+        // Sort matching showtimes by showDate and showTime
+        matchingShowtimes.sort((a, b) => {
+          const aDate = new Date(a.showDate + ' ' + a.showTime);
+          const bDate = new Date(b.showDate + ' ' + b.showTime);
+          return aDate - bDate;
         });
 
-        // Push the showtime information to the global array
-        showtimeInfoArray.push(showtimeInfo);
-      });
+        // Clear the showtimeInfoArray before populating it
+        showtimeInfoArray.length = 0;
+
+        addTimingDropdownController(timingDropdown.nextElementSibling);
+
+        matchingShowtimes.forEach(showtime => {
+          const dropdownItem = document.createElement('li');
+          const showtimeInfo = {
+            showDate: showtime.showDate,
+            showTime: showtime.showTime,
+            showtimeId: showtime.showtimeId,
+          };
+          dropdownItem.innerHTML = `<a class="dropdown-item">${showtime.showDate}, ${showtime.showTime}</a>`;
+          dropdownMenu.appendChild(dropdownItem);
+
+          dropdownItem.addEventListener("click", function () {
+            var selectedValue = `${showtime.showDate}, ${showtime.showTime}`;
+            updateTimingDropdownValue(selectedValue);
+          });
+
+          // Push the showtime information to the global array
+          showtimeInfoArray.push(showtimeInfo);
+        });
+      } else {
+        console.log("No matching cinema found.");
+      }
     }
   }
 
@@ -148,47 +154,53 @@ document.addEventListener("DOMContentLoaded", function () {
     const movieId = selectedMovie.movieId;
 
     if (selectedCinemaName && selectedMovie) {
-      const cinemaId = selectedCinemaName.cinemaId;
+      // Find the cinemaId based on the selected cinemaName from cinemaData
+      const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
+      if (selectedCinema) {
+        const cinemaId = selectedCinema.cinemaId;
 
-      console.log("selectedMovie:", selectedMovieTitle);
-      console.log("selectedMovieId:", movieId);
-      console.log("selectedCinemaName:", selectedCinemaName);
-      console.log("selectedCinemaId:", cinemaId);
-      console.log("selectedTiming:", selectedTiming);
+        console.log("selectedMovie:", selectedMovieTitle);
+        console.log("selectedMovieId:", movieId);
+        console.log("selectedCinemaName:", selectedCinemaName);
+        console.log("selectedCinemaId:", cinemaId);
+        console.log("selectedTiming:", selectedTiming);
 
-      // Find the showtimeId by matching selectedTiming with showtimeInfoArray
-      const selectedShowtime = showtimeInfoArray.find(showtime => {
-        const showtimeString = `${showtime.showDate}, ${showtime.showTime}`;
-        return showtimeString === selectedTiming;
-      });
+        // Find the showtimeId by matching selectedTiming with showtimeInfoArray
+        const selectedShowtime = showtimeInfoArray.find(showtime => {
+          const showtimeString = `${showtime.showDate}, ${showtime.showTime}`;
+          return showtimeString === selectedTiming;
+        });
 
-      if (selectedShowtime) {
-        const showtimeId = selectedShowtime.showtimeId;
-        console.log("selectedShowtimeId:", showtimeId);
-      } else {
-        console.log("No matching showtime found.");
-      }
-
-      if (dropdownFlags.cinemaSelected && !dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-        // Redirect to cinema page
-        window.location.href = "/allshowtimes";
-      } else if (!dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-        // Redirect to movie details page with the selected movieId
-        if (selectedMovie) {
-          const movieId = selectedMovie.movieId;
-          window.location.href = "/moviedetails?movieId=" + movieId;
-        }
-      } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
-        // Redirect to movie details page with cinemaId
-        window.location.href = "/allshowtimes";
-      } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && dropdownFlags.timingSelected) {
-        // Redirect to booking page with the selected showtimeId
         if (selectedShowtime) {
           const showtimeId = selectedShowtime.showtimeId;
-          window.location.href = `/booking?showtimeId=${showtimeId}`;
+          console.log("selectedShowtimeId:", showtimeId);
         } else {
-          console.log("No matching showtime found for booking.");
+          console.log("No matching showtime found.");
         }
+
+        if (dropdownFlags.cinemaSelected && !dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+          // Redirect to cinema page
+          window.location.href = "/allshowtimes";
+        } else if (!dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+          // Redirect to movie details page with the selected movieId
+          if (selectedMovie) {
+            const movieId = selectedMovie.movieId;
+            window.location.href = "/moviedetails?movieId=" + movieId;
+          }
+        } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && !dropdownFlags.timingSelected) {
+          // Redirect to movie details page with cinemaId
+          window.location.href = "/allshowtimes";
+        } else if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected && dropdownFlags.timingSelected) {
+          // Redirect to booking page with the selected showtimeId
+          if (selectedShowtime) {
+            const showtimeId = selectedShowtime.showtimeId;
+            window.location.href = `/booking?showtimeId=${showtimeId}`;
+          } else {
+            console.log("No matching showtime found for booking.");
+          }
+        }
+      } else {
+        console.log("No matching cinema found.");
       }
     }
   });
