@@ -1,3 +1,5 @@
+console.log(cinemaData);
+
 document.addEventListener("DOMContentLoaded", function () {
   var movieDropdown = document.getElementById("movieDropdown");
   var cinemaDropdown = document.getElementById("cinemaDropdown");
@@ -44,15 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedCinemaName = cinemaDropdown.textContent;
     const selectedMovieTitle = movieDropdown.textContent;
 
-    const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
     const selectedMovie = moviesData.find(movie => movie.title === selectedMovieTitle);
 
     // Clear the existing dropdown items
     const dropdownMenu = document.getElementById('timingInnerMenu');
     dropdownMenu.innerHTML = '';
 
-    if (selectedCinema && selectedMovie) {
-      const cinemaId = selectedCinema.cinemaId;
+    if (selectedCinemaName && selectedMovie) {
+      const cinemaId = selectedCinemaName.cinemaId;
       const movieId = selectedMovie.movieId;
 
       const matchingShowtimes = showtimeData.filter(item => item.movieId === movieId && item.cinemaId === cinemaId);
@@ -145,14 +146,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedTiming = timingDropdown.textContent;
     const selectedMovie = moviesData.find(movie => movie.title === selectedMovieTitle);
     const movieId = selectedMovie.movieId;
-    const selectedCinema = cinemaData.find(cinema => cinema.cinemaName === selectedCinemaName);
 
-    if (selectedCinema && selectedMovie) {
-      const cinemaId = selectedCinema.cinemaId;
+    if (selectedCinemaName && selectedMovie) {
+      const cinemaId = selectedCinemaName.cinemaId;
 
       console.log("selectedMovie:", selectedMovieTitle);
       console.log("selectedMovieId:", movieId);
-      console.log("selectedCinema:", selectedCinemaName);
+      console.log("selectedCinemaName:", selectedCinemaName);
       console.log("selectedCinemaId:", cinemaId);
       console.log("selectedTiming:", selectedTiming);
 
