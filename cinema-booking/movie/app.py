@@ -12,6 +12,12 @@ app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
 
+session = requests.Session()
+client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
+ca_cert = '/app/ca-cert.pem'
+session.cert = client_cert
+session.verify = ca_cert
+
 #####   throw error when JWT token is not valid     #####
 @jwt.unauthorized_loader
 def unauthorized_callback(callback):
@@ -53,7 +59,7 @@ def createMovie():
             "lang": lang,
             "subtitles": subtitles
         }
-        response = requests.post("https://databaseservice/databaseservice/moviedetails/create_movie", json=data, verify=False)
+        response = session.post("https://databaseservice/databaseservice/moviedetails/create_movie", json=data)
         
         if response.status_code == 201:
             return jsonify({"message": "Adding movie successful", }), 201
@@ -67,7 +73,7 @@ def createMovie():
 @app.route('/getAllMovies', methods=["GET"])
 def getAllMovies():
     try:
-        response = requests.get("https://databaseservice/databaseservice/moviedetails/get_all_movies", verify=False)
+        response = session.get("https://databaseservice/databaseservice/moviedetails/get_all_movies")
         if response.status_code == 200:
             print(jsonify(response.json()))
 
@@ -85,7 +91,7 @@ def getMovieById(movie_id):
         #ensure movie_id is an integer
         validateInt = int(movie_id)
         url = f"https://databaseservice/databaseservice/moviedetails/get_movie_by_id/{validateInt}"
-        response = requests.get(url, verify=False)
+        response = session.get(url)
         if response.status_code == 200:
             return jsonify(response.json()), 200
         elif response.status_code == 404:
@@ -134,7 +140,7 @@ def updateMovieById(movie_id):
             "subtitles": subtitles
         }
         url = f"https://databaseservice/databaseservice/moviedetails/update_movie_by_id/{validateInt}"
-        response = requests.put(url, verify=False)
+        response = session.put(url)
         
         if response.status_code == 200:
             return jsonify({"message": "Update movie successful" }), 200
@@ -155,7 +161,7 @@ def deleteMovieById(movie_id):
         validateInt = int(movie_id)
         
         url = f"https://databaseservice/databaseservice/moviedetails/delete_movie_by_id/{validateInt}"
-        response = requests.delete(url, verify=False)
+        response = session.delete(url)
         if response.status_code == 200:
             return jsonify({"message": "Movie deleted successfully"}), 200
         elif response.status_code == 404:
@@ -202,7 +208,7 @@ def createShowtime():
             "showTime": show_time
         }
 
-        response = requests.post("https://databaseservice/databaseservice/showtimes/create_showtime", json=data, verify=False)
+        response = session.post("https://databaseservice/databaseservice/showtimes/create_showtime", json=data)
 
         if response.status_code == 201:
             return jsonify({"message": "Adding showtime successful"}), 201
@@ -217,7 +223,7 @@ def createShowtime():
 @app.route('/getAllShowtimes', methods=["GET"])
 def getAllShowtimes():
     try:
-        response = requests.get("https://databaseservice/databaseservice/showtimes/get_all_showtimes", verify=False)
+        response = session.get("https://databaseservice/databaseservice/showtimes/get_all_showtimes")
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
@@ -232,7 +238,7 @@ def getShowtimeById(showtime_id):
     try:
         validate_int = int(showtime_id)
         showtime_url = f"https://databaseservice/databaseservice/showtimes/get_showtime_by_id/{validate_int}"
-        response = requests.get(showtime_url, verify=False)
+        response = session.get(showtime_url)
         if response.status_code == 200:
             showtime_id = response.json()['showtimeId']
             movie_id = response.json()['movieId']
@@ -242,7 +248,7 @@ def getShowtimeById(showtime_id):
             show_time = response.json()['showTime']
             
             movie_url = f"https://databaseservice/databaseservice/moviedetails/get_movie_by_id/{movie_id}"
-            movie_response = requests.get(movie_url, verify=False)
+            movie_response = session.get(movie_url)
             
             if movie_response.status_code == 200:
                 movie_title = movie_response.json()['title']
@@ -253,14 +259,14 @@ def getShowtimeById(showtime_id):
                 movie_subtitles = movie_response.json()['subtitles']
                 
                 url = f"https://databaseservice/databaseservice/cinemas/get_cinema_by_id/{cinema_id}"
-                cinema_response = requests.get(url, verify=False)
+                cinema_response = session.get(url)
                 
                 if cinema_response.status_code == 200:
                     cinemaName = cinema_response.json()['cinemaName']
                     locationName = cinema_response.json()['locationName']
                     
                     theater_url = f"https://databaseservice/databaseservice/theaters/get_theater_by_number/{theater_id}"
-                    theater_response = requests.get(theater_url, verify=False)
+                    theater_response = session.get(theater_url)
                     
                     if theater_response.status_code == 200:
                         theaterNumber = theater_response.json()['theaterNumber']
@@ -333,7 +339,7 @@ def updateShowtimeById(showtime_id):
             return jsonify({"message": "showtime not in correct format (e.g 12:30 AM/PM)"}), 400
         
         url = f"https://databaseservice/databaseservice/showtimes/update_showtime_by_id/{validate_int}"
-        response = requests.put(url, json=data, verify=False)
+        response = session.put(url, json=data)
 
         if response.status_code == 200:
             return jsonify({"message": "Update showtime successful"}), 200
@@ -352,7 +358,7 @@ def deleteShowtimeById(showtime_id):
     try:
         validate_int = int(showtime_id)
         url = f"https://databaseservice/databaseservice/showtimes/delete_showtime_by_id/{validate_int}"
-        response = requests.delete(url, verify=False)
+        response = session.delete(url)
         if response.status_code == 200:
             return jsonify({"message": "Showtime deleted successfully"}), 200
         elif response.status_code == 404:

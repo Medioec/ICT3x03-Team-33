@@ -12,15 +12,15 @@ services:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
             - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
+            - ./cert/certificates/nginx-waf-cert.pem:/etc/nginx/ssl/fullchain.pem:ro
+            - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
             - PROXY=1
-            - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
-            - HEALTH=${HEALTH}
             - BASE_HOST=${BASE_HOST}
         restart: always
-        privileged: true
 
     frontend:
         build: ./cinema-booking/frontend
@@ -31,6 +31,12 @@ services:
             - frontend-to-movie
         environment:
             - CAPTCHA_KEY=${CAPTCHA_KEY}
+        volumes:
+            - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - identity
 
     identity:
         build: 
@@ -40,11 +46,22 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
-        volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        volumes:
+            - ./cinema-booking/identity/logs:/logs
+            - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
+            - databaseservice
 
     movie:
         build: 
@@ -54,10 +71,15 @@ services:
             - frontend-to-movie
             - movie-to-databaseservice
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/movie-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        depends_on:
+            - database
+            - databaseservice
     
     booking:
         build: 
@@ -67,11 +89,16 @@ services:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
-        volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        volumes:
+            - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - database
+            - databaseservice
 
     payment:
         build: 
@@ -82,10 +109,15 @@ services:
             - booking-to-payment
             - payment-to-databaseservice
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+        depends_on:
+            - database
+            - databaseservice
 
     databaseservice:
         build: 
@@ -97,21 +129,31 @@ services:
             - payment-to-databaseservice
             - booking-to-databaseservice
             - databaseservice-to-database
-        volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
         environment:
             PYTHONUNBUFFERED: 1
             DB_HOST: database
             DB_NAME: ${DBSVC_NAME}
             DB_NORMALUSER: ${DBSVC_NORMALUSER}
             DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
+        volumes:
+            - ./cinema-booking/databaseservice/logs:/logs
+            - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
 
     database:
         build:
             context: ./cinema-booking/database
         networks:
           - databaseservice-to-database
+          - sessioncleaning-to-database
         environment:
             POSTGRES_DB: ${SUPERUSER_DB_NAME}
             POSTGRES_USER: ${POSTGRES_SUPERUSER}
@@ -121,7 +163,6 @@ services:
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-            # - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
 
     ofelia-scheduler:

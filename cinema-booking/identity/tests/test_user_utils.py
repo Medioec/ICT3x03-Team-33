@@ -13,7 +13,7 @@ from user_utils import (
 
 class TestUserUtils(unittest.TestCase):
 
-    @patch('requests.post')
+    @patch('session.post')
     def test_isUsernameAvailable(self, mock_post):
         mock_post.return_value.status_code = 404
         result = isUsernameAvailable('john')
@@ -23,7 +23,7 @@ class TestUserUtils(unittest.TestCase):
         result = isUsernameAvailable('john')
         self.assertFalse(result)
 
-    @patch('requests.post')
+    @patch('session.post')
     def test_isEmailAvailable(self, mock_post):
         mock_post.return_value.status_code = 404
         result = isEmailAvailable('john@example.com')

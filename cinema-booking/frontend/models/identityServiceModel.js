@@ -1,10 +1,6 @@
-const https = require('https');
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
-const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-
 
 // mvc refresher:
 // model interacts with backend services -> query for data, sends user data to backend

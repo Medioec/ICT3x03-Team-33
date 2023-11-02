@@ -61,7 +61,7 @@ server {
     location / {
         client_max_body_size 0;
 
-        set $upstream http://localhost:9000;
+        set $upstream https://frontend;
         set $always_redirect on;
 
         if ($always_redirect = on) {
@@ -103,7 +103,7 @@ server {
     listen 443 ssl;
 
     server_name ${BASE_HOST};
-    set $upstream http://frontend:8080;
+    set $upstream https://frontend;
 
     ssl_certificate /etc/letsencrypt/live/${BASE_HOST}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${BASE_HOST}/privkey.pem;

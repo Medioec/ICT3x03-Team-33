@@ -1,5 +1,0 @@
-openssl genrsa -out servercakey.pem
-openssl req -new -x509 -key servercakey.pem -out serverca.crt
-openssl genrsa -out privkey.pem
-openssl req -new -key privkey.pem -out server_reqout.txt
-openssl x509 -req -in server_reqout.txt -days 3650 -sha256 -CAcreateserial -CA serverca.crt -CAkey servercakey.pem -out fullchain.pem

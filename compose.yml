@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     nginx-waf:
-        build: ./nginx-waf/
+        image: owasp/modsecurity-crs:nginx
         networks:
             - waf-to-frontend
         ports:
@@ -11,15 +11,15 @@ services:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
             - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
+            - ./cert/certificates/nginx-waf-cert.pem:/etc/nginx/ssl/fullchain.pem:ro
+            - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
             - PROXY=1
-            - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
-            - HEALTH=${HEALTH}
             - BASE_HOST=${BASE_HOST}
         restart: always
-        privileged: true
 
     frontend:
         build: ./cinema-booking/frontend
@@ -30,13 +30,15 @@ services:
             - frontend-to-movie
         environment:
             - CAPTCHA_KEY=${CAPTCHA_KEY}
+        volumes:
+            - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
             - identity
 
-    # ports for services exposed to test the containers
-    # will remove ports once we implement the APIs
     identity:
         build: 
             context: ./cinema-booking
@@ -52,8 +54,9 @@ services:
             - "${IDENTITY_PORT}"
         volumes:
             - ./cinema-booking/identity/logs:/logs
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:
@@ -74,8 +77,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/movie-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${MOVIE_PORT}"
         depends_on:
@@ -94,8 +98,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${BOOKING_PORT}"
         depends_on:
@@ -114,8 +119,9 @@ services:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
         volumes:
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${PAYMENT_PORT}"
         depends_on:
@@ -142,8 +148,9 @@ services:
             - "${DBSERVICE_PORT}"
         volumes:
             - ./cinema-booking/databaseservice/logs:/logs
-            - ${LOCAL_SSL_CERT_PATH}:/app/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/app/privkey.pem:ro
+            - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:
