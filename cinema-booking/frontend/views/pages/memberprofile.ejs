@@ -22,7 +22,76 @@
   <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
-
+  <!-- Container for credit cards -->
+  <div class="container mt-5">
+    <h2>Credit Cards</h2>
+    <div class="row mt-3">
+      <% for (let i = 0; i < creditCards.length; i++) { %>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Credit Card <%= creditCards[i].creditCardId %></h5>
+              <p class="card-text">Number: <%= creditCards[i].creditCardNumber %></p>
+              <p class="card-text">Name: <%= creditCards[i].creditCardName %></p>
+              <p class="card-text">Expiry: <%= creditCards[i].creditCardExpiry %></p>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateModal<%= creditCards[i].creditCardId %>">Update</button>
+              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<%= creditCards[i].creditCardId %>">Delete</button>
+            </div>
+          </div>
+        </div>
+        <!-- Update Modal -->
+        <!-- using updateOneCreditCard -->
+        <div class="modal fade" id="updateModal<%= creditCards[i].creditCardId %>" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update Credit Card <%= creditCards[i].creditCardId %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="/creditcards/<%= creditCards[i].creditCardId %>" method="POST">
+                  <div class="mb-3">
+                    <label for="creditCardNumber" class="form-label">Credit Card Number</label>
+                    <input type="text" class="form-control" id="creditCardNumber" name="creditCardNumber" value="<%= creditCards[i].creditCardNumber %>" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="creditCardName" class="form-label">Name on Credit Card</label>
+                    <input type="text" class="form-control" id="creditCardName" name="creditCardName" value="<%= creditCards[i].creditCardName %>" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="creditCardExpiry" class="form-label">Credit Card Expiry</label>
+                    <input type="text" class="form-control" id="creditCardExpiry" name="creditCardExpiry" value="<%= creditCards[i].creditCardExpiry %>" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Delete Modal -->
+        <!-- using deleteCreditCard -->
+        <div class="modal fade" id="deleteModal<%= creditCards[i].creditCardId %>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Credit Card <%= creditCards[i].creditCardId %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete this credit card?</p>
+              </div>
+              <div class="modal-footer">
+                <form action="/creditcards/<%= creditCards[i].creditCardId %>" method="POST">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
   </main>
     <!-- footer -->
     <%- include('../partial/footer'); %>

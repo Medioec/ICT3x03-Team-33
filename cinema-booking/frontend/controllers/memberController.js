@@ -55,7 +55,7 @@ exports.getMemberBookingPage = async (req, res) => {
         const bookingHistory = await bookingService.retrieveAllBookings(token);
         console.log(bookingHistory);
 
-        return res.render('pages/memberbooking.ejs', { loggedIn });
+        return res.render('pages/memberbooking.ejs', { bookingHistory, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
@@ -75,9 +75,10 @@ exports.getMemberPaymentPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
         const seats = req.query.seats;
-        const movieTitle = req.query.movieTitle;
+        const showtimes = req.query.showtimeId;
+        const showtimeDetails = await movieService.getShowtimeById(showtimes);
 
-        return res.render('pages/payment.ejs', {seats, movieTitle, loggedIn });
+        return res.render('pages/payment.ejs', {seats, showtimeDetails, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }

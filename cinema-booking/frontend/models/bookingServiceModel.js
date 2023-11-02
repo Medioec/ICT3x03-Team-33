@@ -1,5 +1,5 @@
 async function generateBooking(bookingData) {
-    const response = await fetch("http://bookingservice:8083/generateBooking", {
+    const response = await fetch("http://booking:8083/generateBooking", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -14,7 +14,7 @@ async function generateBooking(bookingData) {
 }
 
 async function retrieveOneBooking(token, ticketId) {
-    const response = await fetch(`http://bookingservice:8083/retrieveOneBooking/${ticketId}`, {
+    const response = await fetch(`http://booking:8083/retrieveOneBooking/${ticketId}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
@@ -28,7 +28,7 @@ async function retrieveOneBooking(token, ticketId) {
 }
 
 async function retrieveAllBookings(token) {
-    const response = await fetch("http://bookingservice:8083/retrieveAllBookings", {
+    const response = await fetch("http://booking:8083/retrieveAllBookings", {
         method: "GET",
         headers: {
             "Accept": "application/json",

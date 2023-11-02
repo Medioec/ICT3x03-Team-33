@@ -28,21 +28,27 @@
           <div class="col-md-6">
             <h2>Payment Information</h2>
             <form>
+              <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="useSavedCard">
+                <label class="form-check-label" for="useSavedCard">Use saved credit card?</label>
+                <!-- this section should only load if there is valid saved credit cards -->
+                <!-- use getAllCreditCards? -->
+              </div>
               <div class="form-group">
                 <label for="cardNumber">Card Number</label>
-                <input type="text" class="form-control" id="cardNumber" placeholder="Enter card number">
+                <input type="text" class="form-control" id="cardNumber" placeholder="Enter card number" disabled>
               </div>
               <div class="form-group">
                 <label for="cardName">Name on Card</label>
-                <input type="text" class="form-control" id="cardName" placeholder="Enter name on card">
+                <input type="text" class="form-control" id="cardName" placeholder="Enter name on card" disabled>
               </div>
               <div class="form-group">
                 <label for="expiryDate">Expiry Date</label>
-                <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY">
+                <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" disabled>
               </div>
               <div class="form-group">
                 <label for="cvv">CVV</label>
-                <input type="text" class="form-control" id="cvv" placeholder="Enter CVV">
+                <input type="text" class="form-control" id="cvv" placeholder="Enter CVV" disabled>
               </div>
               <button type="submit" class="btn btn-primary">Submit Payment</button>
             </form>
@@ -51,7 +57,11 @@
             <h2>Item Information</h2>
             <div class="card">
               <div class="card-body">
-                <h5 class="card-title">Movie Title: <%- JSON.stringify(movieTitle) %></h5>
+                <h5 class="card-title">Movie: <%- showtimeDetails.movieTitle %></h5>
+                <p class="card-text">Cinema: <%- showtimeDetails.cinemaName %></p>
+                <p class="card-text">Theater: <%- showtimeDetails.theaterId %></p>
+                <p class="card-text">Date: <%- showtimeDetails.showDate %></p>
+                <p class="card-text">Time: <%- showtimeDetails.showTime %></p>
                 <p class="card-text">Seat Number: <%- JSON.stringify(seats) %></p>
                 <p class="card-text">Price: $10.50</p>
               </div>
@@ -65,11 +75,6 @@
     <!-- footer -->
     <%- include('../partial/footer'); %>
 
-    <script>  
-      window.seats = <%- JSON.stringify(seats) %>;
-      window.movieTitle = <%- JSON.stringify(movieTitle) %>;
-    </script>
-    
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script src="/js/payment.js"></script>

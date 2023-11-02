@@ -33,7 +33,7 @@ async function getOneCreditCard(sessionId, userId, creditCardId) {
         creditCardId: creditCardId
     };
     
-    const response = await fetch("http://paymentservice:8084/getOneCreditCard", {
+    const response = await fetch("http://payment:8084/getOneCreditCard", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -52,7 +52,7 @@ async function getAllCreditCards(sessionId, userId) {
         userId: userId
     };
     
-    const response = await fetch("http://paymentservice:8084/getAllCreditCards", {
+    const response = await fetch("http://payment:8084/getAllCreditCards", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -67,7 +67,7 @@ async function getAllCreditCards(sessionId, userId) {
 }
 
 async function updateOneCreditCard(sessionId, creditCardData) {
-    const response = await fetch("http://paymentservice:8084/updateOneCreditCard", {
+    const response = await fetch("http://payment:8084/updateOneCreditCard", {
         method: "PUT",
         headers: {
             "Accept": "application/json",
@@ -87,7 +87,7 @@ async function deleteCreditCard(sessionId, userId, creditCardId) {
         creditCardId: creditCardId
     };
 
-    const response = await fetch("http://paymentservice:8084/deleteCreditCard", {
+    const response = await fetch("http://payment:8084/deleteCreditCard", {
         method: "DELETE",
         headers: {
             "Accept": "application/json",

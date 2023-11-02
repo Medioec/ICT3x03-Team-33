@@ -70,10 +70,10 @@ checkoutButton.addEventListener('click', () => {
         // Check if any seats are selected
         if (selectedSeats && selectedSeats.length > 0) {
             const selectedSeatIds = selectedSeats.join(',');
-            const movieTitle = showtimeDetails.movieTitle; // Get the movie title from showtimeDetails
+            const showtimeDetailsId = showtimeDetails.showtimeId; // Get the movie title from showtimeDetails
 
             // Construct the URL with selected seat IDs and movie title as query parameters
-            const paymentURL = `/payment?seats=${selectedSeatIds}&movieTitle=${encodeURIComponent(movieTitle)}`;
+            const paymentURL = `/payment?seats=${selectedSeatIds}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
             
             // Navigate to the payment page with selected seat IDs and movie title as query parameters
             window.location.href = paymentURL;
