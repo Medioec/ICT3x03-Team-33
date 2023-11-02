@@ -17,25 +17,56 @@ exports.getMembersHomePage = async (req, res) => {
     }
 };
 
-exports.getCinemasPage  = [async (req, res) => {
+exports.getCinemasPage = [async (req, res) => {
     try {
+        const loggedIn = req.loggedIn;
         const cinemaId = req.query.cinemaId;
-        
-        // match showtimeId with cinemaId
+        const cinemaIdNumber = parseInt(cinemaId);
+        const movies = await movieService.getAllMovies();
         const showtimes = await movieService.getAllShowtimes();
         const cinemaData = await movieService.getAllCinemas();
-        
-        const filteredCinemaShowtimes = showtimes
-        .filter((showtime) => showtime.cinemaId === cinemaId);
 
-        // Get the loggedIn status from the request object
-        const loggedIn = req.loggedIn;
+        // Filter showtimes for the selected cinemaId
+        const filteredCinemaShowtimes = showtimes.filter((showtime) => showtime.cinemaId === cinemaIdNumber);
 
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/cinemas.ejs', {showtimes, cinemaData, filteredCinemaShowtimes, loggedIn });
+        // Find the cinema with the matching cinemaId and extract the cinemaName
+        const selectedCinema = cinemaData.find((cinema) => cinema.cinemaId === cinemaIdNumber);
+        const cinemaName = selectedCinema ? selectedCinema.cinemaName : 'Cinema Not Found';
+
+        // Extract titles for each showtime
+        const titles = filteredCinemaShowtimes.map((showtime) => {
+            const matchingMovie = movies.find((movie) => movie.movieId === showtime.movieId);
+            return matchingMovie ? matchingMovie.title : 'Movie Title Not Found';
+        });
+
+        console.log("titles:", titles);
+
+        // Render the 'cinemas.ejs' page with the movie data, cinema name, and loggedIn status
+        res.render('pages/cinemas.ejs', { cinemaId, showtimes, cinemaData, titles, filteredCinemaShowtimes, cinemaName, loggedIn });
     } catch (error) {
-        // Handle errors
-        console.error("Error in getBookingForMoviePage:", error);
-        // res.status(500).send('Internal Server Error: ' + error.message);
+        res.status(500).send('Internal Server Error');
     }
 }];
+
+exports.getMemberBookingPage = async (req, res) => {
+    try {
+        const loggedIn = req.loggedIn;
+
+        const bookingHistory = await bookingService.retrieveAllBookings(req.sessionID);
+
+        return res.render('pages/memberbooking.ejs', { bookingHistory, loggedIn });
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+exports.getMemberProfilePage = async (req, res) => {
+    try {
+        const loggedIn = req.loggedIn;
+
+        return res.render('pages/memberprofile.ejs', { loggedIn });
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+};
+

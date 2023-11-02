@@ -10,6 +10,12 @@ router.get('/member', checkUserRole(member_role), memberController.getMembersHom
 // recommended cinemas
 router.get('/cinemas', checkUserRole(member_role), memberController.getCinemasPage);
 
+// view all bookings
+router.get('/viewbooking', checkUserRole(member_role), memberController.getMemberBookingPage);
+
+// profile page for cc info
+router.get('/memberprofile', checkUserRole(member_role), memberController.getMemberProfilePage);
+
 // Add other routes as needed
 
 module.exports = router;
