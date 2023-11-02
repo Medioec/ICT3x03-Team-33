@@ -12,7 +12,9 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 		username VARCHAR(255) UNIQUE NOT NULL,
 		passwordHash VARCHAR(255) NOT NULL,
 		userRole VARCHAR(255) NOT NULL,
-		isUserBanned BOOLEAN NOT NULL DEFAULT FALSE
+		isUserBanned BOOLEAN NOT NULL DEFAULT FALSE,
+		activationLink VARCHAR(255),
+		isLinkUsed BOOLEAN DEFAULT FALSE
 	);
 
 	CREATE TABLE UserSessions (
@@ -122,11 +124,29 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 
 	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
 	VALUES (
-		'550e8400-e29b-41d4-a716-446655440000', -- Replace with a generated UUID
-		'fakeuser123@example.com', -- Replace with a fake email address
-		'fake_user123', -- Replace with a fake username
-		'fake_password_hash', -- Replace with a fake password hash
-		'user' -- Replace with the desired user role
+		'$ADMIN_ID', 
+		'$ADMIN_EMAIL', 
+		'$ADMIN_USERNAME', 
+		'$ADMIN_PASSWORDHASH', 
+		'$ADMIN_USERROLE'
+	);
+
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	VALUES (
+		'$STAFF_ID',
+		'$STAFF_EMAIL',
+		'$STAFF_USERNAME',
+		'$STAFF_PASSWORDHASH',
+		'$STAFF_USERROLE'
+	);
+
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	VALUES (
+		'$MEMBER_ID',
+		'$MEMBER_EMAIL',
+		'$MEMBER_USERNAME',
+		'$MEMBER_PASSWORDHASH',
+		'$MEMBER_USERROLE'
 	);
 
 	SELECT * FROM CinemaUser;

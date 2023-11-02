@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 credit_card_bp = Blueprint("credit_card", __name__)
 
 # Log credit card queries started
-logger.info("Credit card queries started.")
+logger.info(f"Credit card queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -29,7 +29,7 @@ psycopg2.extras.register_uuid()
 @credit_card_bp.route('/add_credit_card', methods=['POST'])
 def add_credit_card():
     # Log the addition of a new credit card entry
-    logger.info("Adding new credit card started.")
+    logger.info(f"Adding new credit card started.")
     try:
         data = request.get_json()
         userId = data['userId']
@@ -49,7 +49,7 @@ def add_credit_card():
             conn.close()
             
             # Log the successful creation of a new credit card entry
-            logger.info("Credit card added successfully.")
+            logger.info(f"Credit card added successfully.")
             return jsonify({"message": "CreditCard added successfully"}), 201
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
@@ -57,7 +57,7 @@ def add_credit_card():
             cursor.close()
             conn.close()
             # Log the duplicate entry error
-            logger.warning("Duplicate entry detected: This credit card already exists. userId: {userId}")
+            logger.warning(f"Duplicate entry detected: This credit card already exists. userId: {userId}")
             return jsonify({"error": "Duplicate entry: This transaction already exists."}), 409
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -67,7 +67,7 @@ def add_credit_card():
 @credit_card_bp.route('/get_credit_card_by_id/<uuid:userId>/<int:creditCardId>', methods=['GET'])
 def get_credit_card_by_id(userId, creditCardId):
     # Log the retrieval of a credit card entry
-    logger.info("Retrieving credit card started.")
+    logger.info(f"Retrieving credit card started.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -90,15 +90,15 @@ def get_credit_card_by_id(userId, creditCardId):
                     "blob": base64.b64encode(credit_card[2]).decode() # encode to b64 string
                 }
                 # Log the successful retrieval of a credit card entry
-                logger.info("Credit card retrieved successfully.")
+                logger.info(f"Credit card retrieved successfully.")
                 return jsonify(one_credit_card), 200
             else:
                 # Log the error
-                logger.error("Credit card not found.")
+                logger.error(f"Credit card not found.")
                 return jsonify({"message": "Credit Card not found"}), 404
         else:
             # Log the error
-            logger.error("Access denied: No permissions. userId: {userId}")
+            logger.error(f"Access denied: No permissions. userId: {userId}")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         # Log the error
@@ -110,7 +110,7 @@ def get_credit_card_by_id(userId, creditCardId):
 @credit_card_bp.route('/get_all_credit_cards/<uuid:userId>', methods=['GET'])
 def get_all_credit_cards(userId):
     # Log the retrieval of all credit cards
-    logger.info("Retrieving all credit cards started.")
+    logger.info(f"Retrieving all credit cards started.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -137,15 +137,15 @@ def get_all_credit_cards(userId):
                     all_credit_cards_list.append(one_credit_card)
 
                 # Log the successful retrieval of all credit cards
-                logger.info("Credit cards retrieved successfully.")
+                logger.info(f"Credit cards retrieved successfully.")
                 return jsonify(all_credit_cards_list), 200
             else:
                 # Log the error
-                logger.error("No credit cards found for this user. userId: {userId}")
+                logger.error(f"No credit cards found for this user. userId: {userId}")
                 return jsonify({"message": "No credit cards found for this user"}), 404
         else:
             # Log the error
-            logger.error("User not found. userId: {userId}")
+            logger.error(f"User not found. userId: {userId}")
             return jsonify({"message": "User not found"}), 404
     except Exception as e:
         # Log the error
@@ -157,7 +157,7 @@ def get_all_credit_cards(userId):
 @credit_card_bp.route('/update_credit_card', methods=['PUT'])
 def update_credit_card():
     # Log the update of a credit card entry
-    logger.info("Updating credit card started.")
+    logger.info(f"Updating credit card started.")
     try:
         data = request.get_json()
         creditCardId = data.get('creditCardId')
@@ -185,12 +185,12 @@ def update_credit_card():
             conn.close()
             
             # Log the successful update of a credit card entry
-            logger.info("Credit card updated successfully.")
+            logger.info(f"Credit card updated successfully.")
             return jsonify({"message": "Credit card updated successfully"}), 200
         else:
             # If the user does not own the credit card, reject the request with a 403 Forbidden response
             # Log the error
-            logger.error("Access denied: No permissions. userId: {userId}")
+            logger.error(f"Access denied: No permissions. userId: {userId}")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         # Log the error
@@ -202,7 +202,7 @@ def update_credit_card():
 @credit_card_bp.route('/delete_credit_card_by_id/<uuid:userId>/<int:creditCardId>', methods=['DELETE'])
 def delete_credit_card_by_id(userId, creditCardId):
     # Log the deletion of a credit card entry
-    logger.info("Deleting credit card started.")
+    logger.info(f"Deleting credit card started.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -225,12 +225,12 @@ def delete_credit_card_by_id(userId, creditCardId):
             conn.close()
             
             # Log the successful deletion of a credit card entry
-            logger.info("Credit card deleted successfully.")
+            logger.info(f"Credit card deleted successfully.")
             return jsonify({"message": "Credit card deleted successfully"}), 200
         else:
             # If the user does not own the credit card, reject the request with a 403 Forbidden response
             # Log the error
-            logger.error("Access denied: No permissions. userId: {userId}")
+            logger.error(f"Access denied: No permissions. userId: {userId}")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         # Log the error

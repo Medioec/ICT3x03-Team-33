@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 user_bp = Blueprint("user", __name__)
 
 # Log user queries started
-logger.info("User queries started.")
+logger.info(f"User queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -24,7 +24,7 @@ db_config = {
 @user_bp.route('/add_user', methods=['POST'])
 def add_user():
     # Log the addition of a new user
-    logger.info("Adding new user started.")
+    logger.info(f"Adding new user started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -48,7 +48,7 @@ def add_user():
 
         # Return HTTP 201 Created to indicate successful resource creation
         # log the successful creation of a new user
-        logger.info("User added successfully. username: {username}")
+        logger.info(f"User added successfully. username: {username}")
         return jsonify({"message": "User added successfully"}), 201
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -61,7 +61,7 @@ def add_user():
 @user_bp.route('/get_user_details', methods=['POST'])    
 def get_user_details():
     # Log the retrieval of a user
-    logger.info("Retrieving user details started.")
+    logger.info(f"Retrieving user details started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -93,12 +93,12 @@ def get_user_details():
             }
             
             # Log the successful retrieval of a user
-            logger.info("User retrieved successfully. username: {username}")
+            logger.info(f"User retrieved successfully. username: {username}")
             return jsonify(user_details), 200
         else:
             # User not found, return HTTP 404 Not Found
             # Log the user not found error
-            logger.warning("User not found with username: {username}.")
+            logger.warning(f"User not found with username: {username}.")
             return jsonify({"message": "User not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -111,7 +111,7 @@ def get_user_details():
 @user_bp.route('/check_user', methods=['POST'])    
 def check_user():
     # Log checking if username is taken
-    logger.info("Checking if username is taken started.")
+    logger.info(f"Checking if username is taken started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -132,12 +132,12 @@ def check_user():
         if user:
             # User found, return HTTP 200 OK
             # Log the successful retrieval of a user
-            logger.info("User found with username: {username}.")
+            logger.info(f"User found with username: {username}.")
             return jsonify({"message": "User found"}), 200
         else:
             # User not found, return HTTP 404 Not Found
             # Log the user not found error
-            logger.warning("User not found with username: {username}.")
+            logger.warning(f"User not found with username: {username}.")
             return jsonify({"message": "User not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -150,7 +150,7 @@ def check_user():
 @user_bp.route('/check_email', methods=['POST'])
 def check_email():
     # Log checking if email is taken
-    logger.info("Checking if email is taken started.")
+    logger.info(f"Checking if email is taken started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -171,12 +171,12 @@ def check_email():
         if user:
             # Email found, return HTTP 200 OK
             # Log the successful retrieval of a user
-            logger.info("Email found with email: {email}.")
+            logger.info(f"Email found with email: {email}.")
             return jsonify({"message": "Email found"}), 200
         else:
             # Email not found, return HTTP 404 Not Found
             # Log the email not found error
-            logger.warning("Email not found with email: {email}.")
+            logger.warning(f"Email not found with email: {email}.")
             return jsonify({"message": "Email not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors

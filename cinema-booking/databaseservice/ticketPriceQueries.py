@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 ticket_price_bp = Blueprint("ticket_price", __name__)
 
 # Log ticket price queries started
-logger.info("Ticket price queries started.")
+logger.info(f"Ticket price queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -24,7 +24,7 @@ db_config = {
 @ticket_price_bp.route('/create_ticket_price', methods=['POST'])
 def create_ticket_price():
     # Log the addition of a new ticket price entry
-    logger.info("Adding new ticket price started.")
+    logger.info(f"Adding new ticket price started.")
     try:
         data = request.get_json()
         ticketPriceCategory = data['ticketPriceCategory']
@@ -42,7 +42,7 @@ def create_ticket_price():
         conn.close()
 
         # Log the successful creation of a new ticket price entry
-        logger.info("Ticket price added successfully with new ticketPriceId: {new_ticket_price_id}.")
+        logger.info(f"Ticket price added successfully with new ticketPriceId: {new_ticket_price_id}.")
         return jsonify({"message": "Ticket price added successfully", "ticketPriceId": new_ticket_price_id}), 201
     except Exception as e:
         # Log the error
@@ -75,7 +75,7 @@ def get_ticket_price_by_id(ticket_price_id):
             }
             
             # Log the successful retrieval of a ticket price entry
-            logger.info("Ticket price retrieved successfully.")
+            logger.info(f"Ticket price retrieved successfully.")
             return jsonify(one_ticket_price), 200
         else:
             # Ticket price Id does not exist
@@ -92,7 +92,7 @@ def get_ticket_price_by_id(ticket_price_id):
 @ticket_price_bp.route('/get_all_ticket_prices', methods=['GET'])
 def get_all_ticket_prices():
     # Log the retrieval of all ticket prices
-    logger.info("Retrieving all ticket prices.")
+    logger.info(f"Retrieving all ticket prices.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -114,7 +114,7 @@ def get_all_ticket_prices():
             all_ticket_prices_list.append(ticketPrice)
 
         # Log the successful retrieval of all ticket prices
-        logger.info("All ticket prices retrieved successfully.")
+        logger.info(f"All ticket prices retrieved successfully.")
         return jsonify(all_ticket_prices_list), 200
     except Exception as e:
         # Log the error
@@ -157,7 +157,7 @@ def update_ticket_price_by_id(ticket_price_id):
             conn.close()
             
             # Log the successful update of a ticket price entry
-            logger.info("Ticket price updated successfully. ticketPriceId: {ticket_price_id}.")
+            logger.info(f"Ticket price updated successfully. ticketPriceId: {ticket_price_id}.")
             return jsonify({"message": "Ticket prices  updated successfully"}), 200            
         else:
             # Ticket price does not exist
@@ -200,7 +200,7 @@ def delete_ticket_price_by_id(ticket_price_id):
             conn.close()
             
             # Log the successful deletion of a ticket price entry
-            logger.info("Ticket price deleted successfully. ticketPriceId: {ticket_price_id}.")
+            logger.info(f"Ticket price deleted successfully. ticketPriceId: {ticket_price_id}.")
             return jsonify({"message": "Ticket price deleted successfully"}), 200
         else:
             # Ticket price Id does not exist
