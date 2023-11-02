@@ -12,12 +12,12 @@ app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
 
-cert_path = 'fullchain.pem'
-key_path = 'privkey.pem'
-ca = 'serverca.crt'
+# required for tls e.g. use session.get(url) to make request instead
 session = requests.Session()
-session.cert = (cert_path, key_path)
-session.verify = ca
+client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
+ca_cert = '/app/ca-cert.pem'
+session.cert = client_cert
+session.verify = ca_cert
 
 #####   throw error when JWT token is not valid     #####
 @jwt.unauthorized_loader
@@ -36,7 +36,7 @@ def generateBooking():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     userId = response.json()["userId"]
@@ -75,7 +75,7 @@ def generateBooking():
         
         # Create booking with databaseservice 
         url = f"https://databaseservice/databaseservice/bookingdetails//generate_booking_details"
-        response = session.post(url, json=data, verify=False)
+        response = session.post(url, json=data)
         if response.status_code == 201:
             return jsonify({"message": "Booking created successfully"}), 201
         elif response.status_code == 409:
@@ -97,13 +97,13 @@ def retrieveOneBooking(ticketId):
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         userId = response.json()["userId"]
         
         url = f"https://databaseservice/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
-        response = session.get(url, verify=False)
+        response = session.get(url)
 
         if response.status_code == 404:
             return jsonify({"message": "Booking not found"}), 404
@@ -142,13 +142,13 @@ def retrieveAllBookings():
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData, verify=False)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         userId = response.json()["userId"]
         
         url = f"https://databaseservice/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
-        response = session.get(url, verify=False)
+        response = session.get(url)
 
         if response.status_code == 200:
             return response.json(), 200

@@ -9,7 +9,7 @@ class TestApp(unittest.TestCase):
         app.testing = True
         self.client = app.test_client()
 
-    @patch('requests.post')
+    @patch('session.post')
     def test_get_all_credit_cards(self, mock_post):
         # Mocking the response from the databaseservice
         mock_post.return_value.json.return_value = {'encryptionKey': 'ENCRYPTION_KEY'}
@@ -19,7 +19,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('creditCardNumber', response.json[0])
 
-    @patch('requests.put')
+    @patch('session.put')
     def test_update_one_credit_card(self, mock_put):
         # Mocking the response from the databaseservice
         mock_put.return_value.json.return_value = {'message': 'Credit card updated'}
@@ -29,7 +29,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['message'], 'Credit card updated')
 
-    @patch('requests.delete')
+    @patch('session.delete')
     def test_delete_credit_card(self, mock_delete):
         # Mocking the response from the databaseservice
         mock_delete.return_value.json.return_value = {'message': 'Credit card deleted'}
@@ -39,8 +39,8 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['message'], 'Credit card deleted')
 
-    @patch('requests.post')
-    @patch('requests.get')
+    @patch('session.post')
+    @patch('session.get')
     def test_get_all_credit_cards_success(self, mock_get, mock_post):
         # Mocking the response from the databaseservice
         mock_get.return_value.json.return_value = [{'creditCardId': '1', 'blob': 'BLOB'}]
@@ -53,8 +53,8 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('creditCardNumber', response.json[0])
 
-    @patch('requests.post')
-    @patch('requests.get')
+    @patch('session.post')
+    @patch('session.get')
     def test_get_all_credit_cards_no_credit_cards(self, mock_get, mock_post):
         # Mocking the response from the databaseservice
         mock_get.return_value.status_code = 404
@@ -63,7 +63,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json['message'], 'No credit cards found')
 
-    @patch('requests.post')
+    @patch('session.post')
     def test_update_one_credit_card_success(self, mock_post):
         # Mocking the response from the databaseservice
         mock_post.return_value.json.return_value = {'message': 'Credit card updated'}
@@ -73,7 +73,7 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json['message'], 'Credit card updated')
 
-    @patch('requests.delete')
+    @patch('session.delete')
     def test_delete_credit_card_success(self, mock_delete):
         # Mocking the response from the databaseservice
         mock_delete.return_value.json.return_value = {'message': 'Credit card deleted'}

@@ -1,10 +1,6 @@
-const https = require('https');
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-
-const httpsAgent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-
 
 // function to check if the user is logged in and has the required role to access the page
 function checkUserRole(requiredRole) {

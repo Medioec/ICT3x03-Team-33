@@ -14,8 +14,8 @@ ca_certs = "ca-cert.pem"
 ssl_version = 2
 cert_reqs = 2
 preload = True
-# ciphers = "ECDHE:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SHA"
-# ssl_options = {
-#     "ciphers": ciphers,
-#     "server_side": True
-# }
+ciphers = "ECDHE:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4:!SHA"
+ssl_options = {
+    "ciphers": ciphers,
+    "server_side": True
+}
