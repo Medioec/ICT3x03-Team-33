@@ -3,7 +3,8 @@ async function generateBooking(bookingData) {
         method: "POST",
         headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(bookingData),
     });
@@ -12,12 +13,13 @@ async function generateBooking(bookingData) {
     return responseData;
 }
 
-async function retrieveOneBooking(sessionId, ticketId) {
+async function retrieveOneBooking(token, ticketId) {
     const response = await fetch(`http://bookingservice:8083/retrieveOneBooking/${ticketId}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         }
     });
 
@@ -25,12 +27,13 @@ async function retrieveOneBooking(sessionId, ticketId) {
     return responseData;
 }
 
-async function retrieveAllBookings(sessionId) {
+async function retrieveAllBookings(token) {
     const response = await fetch("http://bookingservice:8083/retrieveAllBookings", {
         method: "GET",
         headers: {
             "Accept": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         }
     });
 

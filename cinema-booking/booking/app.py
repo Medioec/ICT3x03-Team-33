@@ -125,7 +125,8 @@ def retrieveOneBooking(ticketId):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/retrieveAllBookings/', methods=["GET"])
+@app.route('/retrieveAllBookings', methods=["GET"])
+@jwt_required()
 def retrieveAllBookings():
     try:
         # get sessionId from jwt

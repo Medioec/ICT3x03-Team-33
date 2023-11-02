@@ -16,6 +16,9 @@ router.get('/viewbooking', checkUserRole(member_role), memberController.getMembe
 // profile page for cc info
 router.get('/memberprofile', checkUserRole(member_role), memberController.getMemberProfilePage);
 
+// checkout only for members
+router.get('/payment', checkUserRole(member_role), memberController.getMemberPaymentPage);
+
 // Add other routes as needed
 
 module.exports = router;

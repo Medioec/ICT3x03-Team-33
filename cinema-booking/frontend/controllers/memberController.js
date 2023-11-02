@@ -39,8 +39,6 @@ exports.getCinemasPage = [async (req, res) => {
             return matchingMovie ? matchingMovie.title : 'Movie Title Not Found';
         });
 
-        console.log("titles:", titles);
-
         // Render the 'cinemas.ejs' page with the movie data, cinema name, and loggedIn status
         res.render('pages/cinemas.ejs', { cinemaId, showtimes, cinemaData, titles, filteredCinemaShowtimes, cinemaName, loggedIn });
     } catch (error) {
@@ -51,10 +49,13 @@ exports.getCinemasPage = [async (req, res) => {
 exports.getMemberBookingPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
+        const token = req.cookies.token;
+        console.log(token);
 
-        const bookingHistory = await bookingService.retrieveAllBookings(req.sessionID);
+        const bookingHistory = await bookingService.retrieveAllBookings(token);
+        console.log(bookingHistory);
 
-        return res.render('pages/memberbooking.ejs', { bookingHistory, loggedIn });
+        return res.render('pages/memberbooking.ejs', { loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
@@ -65,6 +66,18 @@ exports.getMemberProfilePage = async (req, res) => {
         const loggedIn = req.loggedIn;
 
         return res.render('pages/memberprofile.ejs', { loggedIn });
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+exports.getMemberPaymentPage = async (req, res) => {
+    try {
+        const loggedIn = req.loggedIn;
+        const seats = req.query.seats;
+        const movieTitle = req.query.movieTitle;
+
+        return res.render('pages/payment.ejs', {seats, movieTitle, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }

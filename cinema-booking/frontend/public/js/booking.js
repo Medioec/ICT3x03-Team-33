@@ -65,7 +65,24 @@ resetButton.addEventListener('click', () => {
 checkoutButton.addEventListener('click', () => {
     if (loggedIn === 'true') {
         // User is logged in, continue with checkout logic
+        const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats'));
+
+        // Check if any seats are selected
+        if (selectedSeats && selectedSeats.length > 0) {
+            const selectedSeatIds = selectedSeats.join(',');
+            const movieTitle = showtimeDetails.movieTitle; // Get the movie title from showtimeDetails
+
+            // Construct the URL with selected seat IDs and movie title as query parameters
+            const paymentURL = `/payment?seats=${selectedSeatIds}&movieTitle=${encodeURIComponent(movieTitle)}`;
+            
+            // Navigate to the payment page with selected seat IDs and movie title as query parameters
+            window.location.href = paymentURL;
+        } else {
+            // Handle the case where no seats are selected
+            alert('Please select at least one seat before proceeding to checkout.');
+        }
     } else {
+        // User is not logged in, display the login modal
         loginModal.style.display = 'block';
         modalOverlay.style.display = 'block';
     }
