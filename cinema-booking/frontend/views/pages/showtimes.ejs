@@ -7,10 +7,10 @@
     <title>All Showtimes</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
 
     <link rel="stylesheet" href="/css/nav.css" />
     <link rel="stylesheet" href="/css/style.css" />
@@ -21,71 +21,59 @@
     <body>
         <!-- Navbar -->
         <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
-        
-           <!-- ///////////////MAKE SURE TO REMOVE////////////// -->
-           <!-- log showtimes to the console for debugging -->
-        <% var data = JSON.stringify(showtimes) %>
-        <script>
-            try {
-                console.log(<%- JSON.stringify(data) %>);
-            } catch (error) {
-                console.error("Error logging showtimes:", error);
-            }
-        </script>
 
         <div class="container">
+            <% const groupedData = {}; %>
+          
             <% showtimes.forEach((showtime) => { %>
-                <a href="/showtimedetails?showtime_id=<%= showtime.showtimeId %>">
-                    <h4><%= showtime.showtimeId %></h4></a>
-            <% }); %>
-        </div>
-
-        <div class="container">
-            <!-- Get unique showDates -->
-            <% let uniqueShowDates = [...new Set(showtimes.map(showtime => showtime.showDate))]; %>
+              <% const showDate = showtime.showDate;
+              const cinemaId = showtime.cinemaId;
+              const movieId = showtime.movieId;
+              const showTime = showtime.showTime;
             
-            <!-- Loop through unique showDates -->
-            <% uniqueShowDates.forEach(uniqueDate => { %>
-                <div class="col-auto dateTab">
-                    <button id="showtimes" class="btn dateButton">
-                        <h4><%= uniqueDate %></h4>
-                    </button>
-                </div>
-                <!-- Get showtimes for the current showDate -->
-                <% let showtimesForDate = showtimes.filter(showtime => showtime.showDate === uniqueDate); %>
-                
-                <!-- Get unique cinemaIds for the current showDate -->
-                <% let uniqueCinemaIds = [...new Set(showtimesForDate.map(showtime => showtime.cinemaId))]; %>
-                
-                <!-- Loop through unique cinemaIds -->
-                <% uniqueCinemaIds.forEach(uniqueCinemaId => { %>
-                    <div class="row movieRow">
-                        <div class="col-md-4">
-                            <h5>Cinema <%= uniqueCinemaId %></h5>
-                            <a class="subtitles">Subtitles: </a>
-                            <div class="row"><a class="ratings">Rating: </a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Get showtimes for the current cinemaId and showDate -->
-                    <% let showtimesForCinema = showtimesForDate.filter(showtime => showtime.cinemaId === uniqueCinemaId); %>
-                    
-                    <!-- Get unique movieIds for the current cinemaId and showDate -->
-                    <% let uniqueMovieIds = [...new Set(showtimesForCinema.map(showtime => showtime.movieId))]; %>
-                    
-                    <!-- Loop through unique movieIds -->
-                    <% uniqueMovieIds.forEach(uniqueMovieId => { %>
-                        <h6>Movie <%= uniqueMovieId %></h6>
-                        <!-- Get showtimes for the current cinemaId, showDate, and movieId -->
-                        <% let showtimesForMovie = showtimesForCinema.filter(showtime => showtime.movieId === uniqueMovieId); %>
-                        <!-- Loop through showtimes for the current movieId -->
-                        <% showtimesForMovie.forEach(showtime => { %>
-                            <button id="showtimes" class="btn btn-primary"><%= showtime.showTime %></button>
-                        <% }); %>
-                    <% }); %>
-                <% }); %>
+              if (!groupedData[showDate]) {
+                groupedData[showDate] = {};
+              }
+            
+              if (!groupedData[showDate][cinemaId]) {
+                groupedData[showDate][cinemaId] = {};
+              }
+            
+              if (!groupedData[showDate][cinemaId][movieId]) {
+                groupedData[showDate][cinemaId][movieId] = [];
+              }
+            
+              groupedData[showDate][cinemaId][movieId].push({ showTime, showtimeId: showtime.showtimeId });
+              %>
             <% }); %>
-        </div>
+          
+            <% Object.keys(groupedData).forEach((showDate) => { %>
+              <h2>Showing all showtimes for: <%= showDate %></h2>
+              <% Object.keys(groupedData[showDate]).forEach((cinemaId) => { %>
+                <div class="row" id="cinemaRow">
+                  <h2 class="showcase-heading">Cinema ID: <%= cinemaId %></h2>
+                  <% Object.keys(groupedData[showDate][cinemaId]).forEach((movieId) => { %>
+                    <div class="row" id="showtimeRow">
+                      <div class="col-md-2 dateTab">
+                        <h1>Movie ID: <%= movieId %></h1>
+                      </div>
+                      <div class="col-md-8 dateTab">
+                        <% groupedData[showDate][cinemaId][movieId].sort((a, b) => {
+                          // Custom sort function to arrange showTime slots chronologically
+                          const aDate = new Date(`2000-01-01 ${a.showTime}`);
+                          const bDate = new Date(`2000-01-01 ${b.showTime}`);
+                          return aDate - bDate;
+                        }).forEach((show) => { %>
+                          <a class="btn btn-primary" href="/booking?showtimeId=<%= show.showtimeId %>" role="button"><%= show.showTime %></a>
+                        <% }); %>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              <% }); %>
+            <% }); %>
+          </div>
+          
 
     </body>
 
@@ -93,8 +81,7 @@
 
 <%- include('../partial/footer'); %>
 
-<script src="/js/moviedetails.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    </body>
 
 </html>
