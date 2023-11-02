@@ -48,7 +48,7 @@ services:
             - identity-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
-            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
         volumes:
             - ./cinema-booking/identity/logs:/logs
             - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
@@ -76,7 +76,7 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
-            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
         depends_on:
             - database
             - databaseservice
@@ -91,7 +91,7 @@ services:
             - booking-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
-            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
         volumes:
             - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
@@ -114,7 +114,7 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
-            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
         depends_on:
             - database
             - databaseservice
