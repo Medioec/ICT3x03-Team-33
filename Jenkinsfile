@@ -18,6 +18,7 @@ pipeline {
             agent { label 'builtin' }
             steps {
                 sh 'chmod 700 -R scripts/'
+                sh './scripts/cert-gen.sh'
                 sh './scripts/docker-deploy.sh test'
                 sh 'docker ps'
                 echo 'Add test step here'
@@ -36,6 +37,7 @@ pipeline {
             agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
+                sh './scripts/cert-gen.sh'
                 sh './scripts/docker-deploy.sh stg'
                 echo 'Add test step here'
                 sh './scripts/test.sh stg'
@@ -52,6 +54,7 @@ pipeline {
             agent { label 'host' }
             steps {
                 sh 'chmod 700 -R scripts/'
+                sh './scripts/cert-gen.sh'
                 sh './scripts/docker-deploy.sh prod'
                 echo 'Add test step here'
                 sh './scripts/test.sh prod'

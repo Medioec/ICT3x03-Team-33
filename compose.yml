@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     nginx-waf:
-        build: ./nginx-waf/
+        image: owasp/modsecurity-crs:nginx
         networks:
             - waf-to-frontend
         ports:
@@ -16,13 +16,10 @@ services:
             - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
             - PROXY=1
-            - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
-            - HEALTH=${HEALTH}
             - BASE_HOST=${BASE_HOST}
         restart: always
-        privileged: true
 
     frontend:
         build: ./cinema-booking/frontend
@@ -42,8 +39,6 @@ services:
         depends_on:
             - identity
 
-    # ports for services exposed to test the containers
-    # will remove ports once we implement the APIs
     identity:
         build: 
             context: ./cinema-booking
