@@ -129,16 +129,18 @@ def addCreditCard():
     sessionId = get_jwt_identity()
     if not sessionId:
         return jsonify({"message": "Error: No token sent"}), 500
-    
+
     # use sessionId to get userId from db
-    requestData = {"sessionId": sessionId}    
+    requestData = {"sessionId": sessionId}
     response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
 
     # validate cc information
     if not user_utils.validateCreditCardNumber(creditCardNumber):
@@ -213,7 +215,9 @@ def getCreditCard(userId, creditCardId):
     
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
     
     # Make an HTTP GET request to the databaseservice to retrieve the credit card
     url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"

@@ -24,8 +24,18 @@ async function addCreditCard(token, creditCardData) {
         body: JSON.stringify(creditCardData),
     });
 
-    return response;
+    if (response.status === 200) {
+        // Handle a successful response
+        return response;
+    } else if (response.status === 400) {
+        // Handle a 400 Bad Request response
+        throw new Error('Bad Request - Invalid credit card data');
+    } else {
+        // Handle other response status codes as needed
+        throw new Error('Internal Server Error');
+    }
 }
+
 
 async function getOneCreditCard(sessionId, creditCardId) {
     const requestData = {

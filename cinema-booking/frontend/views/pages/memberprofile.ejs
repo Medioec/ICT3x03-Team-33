@@ -28,16 +28,31 @@
     
     <div class="row" id="ccRow">
       <h2>All Credit Cards</h2>
-
-      
-
-      <div class="col-md-3">
-          <button type="submit" class="btn btn-primary" id="addNewCard">ADD NEW CREDIT CARD</button>
-      </div>
+     
+      <div class="row" id="ccRow">
+        <% if (creditCards && creditCards.length > 0) { %>
+          <% creditCards.forEach((card) => { %>
+            <!-- Render credit card information for each card -->
+            <div class="col-md-4">
+              <div class="card" id="ccCard">
+                <div class="card-body">
+                  <h5 class="card-title">Card Number: <%= card.creditCardNumber %></h5>
+                  <p class="card-text">Name on Card: <%= card.creditCardName %></p>
+                  <p class="card-text">Expiry Date: <%= card.creditCardExpiry %></p>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <!-- if there are no existing credit cards -->
+          <p>No existing credit cards.</p>
+        <% } %>
     </div>
     
     <div class="row" id="ccRow">
- 
+
+      <h2>Add new credit card</h2>
+
         <form class="row g-3 needs-validation" novalidate>
           <div class="row" id="ccRow">
         

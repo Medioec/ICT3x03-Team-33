@@ -76,7 +76,6 @@ const captchaFeedback = document.getElementById('captchaError');
         .then(response => {
             if (response.ok) {
                 console.log('Credit card added successfully');
-                window.location.href = "/memberprofile";
             }
         })
     
