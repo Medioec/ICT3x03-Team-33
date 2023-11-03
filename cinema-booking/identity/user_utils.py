@@ -80,9 +80,9 @@ def validatePassword(password):
     if password in BLACKLISTED_PASSWORDS:
         return False, "Password is in the blacklist."
 
-    # Check password against Have I Been Pwned API
-    if check_pwned_api(password):
-        return False, "Password has been breached before according to Have I Been Pwned."
+    # # Check password against Have I Been Pwned API
+    # if check_pwned_api(password):
+    #     return False, "Password has been breached before according to Have I Been Pwned."
 
     # Check password strength
     strength_score = password_strength(password)
