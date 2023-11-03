@@ -65,10 +65,7 @@ exports.getMemberProfilePage = async (req, res) => {
         const loggedIn = req.loggedIn;
         const token = req.cookies.token;
 
-        console.log("Token:", token); // Log the token for debugging
-
         const creditCards = await paymentService.getAllCreditCards(token);
-        console.log("Credit Cards:", creditCards); // Log the credit cards data
 
         return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
     } catch (error) {
@@ -81,15 +78,19 @@ exports.getMemberProfilePage = async (req, res) => {
 exports.getMemberPaymentPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
-        
+        const token = req.cookies.token;
+
         // seat & movie information selected by user passed over 
-        const seats = req.query.seats;
+        const seat = req.query.seat;
+        console.log(seat);
+        
         const showtimes = req.query.showtimeId;
         
         // necessary details 
         const showtimeDetails = await movieService.getShowtimeById(showtimes);
+        const creditCards = await paymentService.getAllCreditCards(token);
 
-        return res.render('pages/payment.ejs', {seats, showtimeDetails, loggedIn });
+        return res.render('pages/payment.ejs', {seat, showtimeDetails, creditCards, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }

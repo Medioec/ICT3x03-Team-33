@@ -67,7 +67,6 @@ async function getAllCreditCards(token) {
             },
         });
         const responseData = await response.json();
-        console.log("API Response Data:", responseData); // Log the API response data
         return responseData;
     } catch (error) {
         console.error("Error in getAllCreditCards:", error); // Log the error
