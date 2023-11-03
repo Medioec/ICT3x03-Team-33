@@ -44,6 +44,7 @@ services:
             context: ./cinema-booking
             dockerfile: ./identity/Dockerfile
         networks:
+            - internet-access
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
