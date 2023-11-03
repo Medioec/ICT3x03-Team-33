@@ -14,6 +14,7 @@ import requests
 import user_utils
 import base64
 import logging
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -160,6 +161,7 @@ def register():
 ############################## END OF REGISTRATION #########################################
 
 ############################## LOGIN #########################################
+# 1st half of login flow -> if username and pasword valid -> generate otp and send to user's email
 @app.route("/login", methods=["POST"])
 def login():
     # logs login attempt
@@ -184,7 +186,7 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role_linkUsed", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_details", json=requestData)
 
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
@@ -204,9 +206,85 @@ def login():
     if not isLinkedUsed:
         return jsonify({"message": "Account is not activated"}), 403
 
-    # password hash from DB
+    # if account activated, get password hash and email from DB
     dbHash = response.json()["passwordHash"]
+    email =response.json()["email"]
     
+    # verify password
+    try:
+        ph = PasswordHasher()
+        ph.verify(dbHash, password)
+    
+    # if password hashes do not match, throw error
+    except Exception as e:
+        # log login failure
+        logger.error(f"Password verification failed for username '{username}'. Reason: {e}")
+        return jsonify({"message": "Username or password was incorrect"}), 404
+    
+    # if username and password are valid, generate otp, insert into db and send to user's email
+    otp, expiryTimestamp = user_utils.generateOTPWithTimestamp(len=6, expires_in_seconds=60)
+    
+    # insert otp into db
+    requestData = {"username": username,
+                   "otp": otp,
+                   "expiryTimestamp": expiryTimestamp}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/set_otp_by_username", json=requestData)
+    if response.status_code != 200:
+        # log otp insertion failure
+        logger.error(f"OTP insertion for {username} failed. Error: {response.json()['message']}")
+        return jsonify({"message": "Error occurred"}), response.status_code
+    
+    # send otp to user's email
+    requestData = {
+                "email": email,
+                "otp": otp,
+                "username": username
+    }
+    response = requests.post("http://email:587/send_otp", json=requestData)
+    if response.status_code != 200:
+
+        # log otp email failure
+        logger.error(f"Email sending of OTP to {username} failed. Error: {response.json()['message']}")
+        return jsonify({"message": "Error occurred"}), response.status_code
+
+    return jsonify({"message": "OTP sent"}), 200
+    
+# 2nd half of login flow -> get user inputted otp, verify otp and return session token
+@app.route("/verify_otp", methods=["POST"])
+def verify_otp():
+    # logs OTP input attempt
+    logger.info(f"Attempting login...")
+    
+    # get data from OTP form
+    data = request.get_json()
+    username = data['username']
+    user_input_otp = data['otp']
+    current_time = int(time.time())
+
+    # get otp and expiry timestamp from db
+    requestData = {"username": username}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user", json=requestData)
+    if response.status_code != 200:
+        # log otp retrieval failure
+        logger.error(f"OTP retrieval for {username} failed. Error: {response.json()['message']}")
+        return jsonify({"message": "Error occurred"}), response.status_code
+    
+    db_otp = response.json()["otp"]
+    db_timestamp = response.json()["expiryTimestamp"]
+    password = response.json()["passwordHash"]
+    
+    # check if OTP has expired
+    if current_time > db_timestamp:
+        # log otp expiry
+        logger.error(f"OTP for {username} has expired.")
+        return jsonify({"message": "OTP has expired"}), 400
+    
+    if user_input_otp != db_otp:
+        # log otp verification failure
+        logger.error(f"OTP verification for {username} failed.")
+        return jsonify({"message": "OTP is incorrect"}), 400
+    
+    # if OTP is correct, generate session token and return to client
     # Generate a Fernet encryption key using password
     fix_salt = b'\x00' * 16
     phlogin = PasswordHasher(parallelism=1, memory_cost=262144, time_cost=4, salt_len=16)
@@ -230,17 +308,6 @@ def login():
     
     # Example of Decryption
     # decrypted_data = cipher_suite.decrypt(encrypted_data)
-    
-    try:
-        # verify password
-        ph = PasswordHasher()
-        ph.verify(dbHash, password)
-    
-    # if password hashes do not match, throw error
-    except Exception as e:
-        # log login failure
-        logger.error(f"Password verification failed for username '{username}'. Reason: {e}")
-        return jsonify({"message": "Username or password was incorrect"}), 404
 
     # generate session token
     try:
@@ -628,5 +695,15 @@ def activate_member_account(token):
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF ACTIVATE MEMBER ACCOUNT #########################################
 
+############################## GENERATE OTP #########################################
+# generates otp and sends to user's email
+# @app.route("/generate_otp", methods=["GET"])
+# def generate_otp(token):
+#     try:
+
+
+#     except:
+#         return jsonify({"message": "Error occurred"}), 500   
+############################## END OF GENERATE OTP #########################################
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)

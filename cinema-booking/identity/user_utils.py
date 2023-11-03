@@ -9,6 +9,8 @@ import secrets
 import uuid
 from itsdangerous import URLSafeTimedSerializer
 import string
+import pyotp
+import time
 
 # check if username is available/does not exist in db
 def isUsernameAvailable(username):
@@ -62,7 +64,6 @@ def validatePassword(password):
 
     # Regular expression pattern check
     # ensure that password is 12 - 32 characters 
-    print("password validity: {}".format(12 <= len(password) <= 32))
     return (12 <= len(password) <= 32)
 
 # generate uuid for inserting into db
@@ -92,8 +93,26 @@ def validateEmailLinks(serializer, token, link_type, expiration_time_in_seconds)
     except: 
         return None
 
-# generates a random 6 character alphanumeric string for OTP
-def generateOTP(length=6):
-    alphabet = string.ascii_letters + string.digits
-    otp = ''.join(secrets.choice(alphabet) for i in range(length))
-    return otp
+def generateOTPWithTimestamp(len, expires_in_seconds):
+    characters = string.ascii_letters + string.digits
+    otp = ''.join(secrets.choice(characters) for _ in range(len))
+
+    current_time = int(time.time())
+    expiry_timestamp = current_time + expires_in_seconds
+
+    return otp, expiry_timestamp
+
+# def generateOTPWithTimestamp(totp, expires_in_seconds):
+#     current_totp = totp.now()
+
+#     current_time = int(time.time())
+#     expiry_timestamp = current_time + expires_in_seconds
+
+#     return current_totp, expiry_timestamp
+
+# def generateOTP(totp):
+#     current_totp = totp.now()
+#     return current_totp
+
+# def verifyOTP(totp, user_input):
+#     return totp.verify(user_input)

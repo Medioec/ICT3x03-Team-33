@@ -164,7 +164,7 @@ def send_otp():
 
                 <h2 style="color: #333;">Hello, {}</h2>
 
-                <p>Enter the code below to sign in to CineGo:</p>
+                <p>Enter the code below within the next 60 seconds to sign in to CineGo:</p>
 
                 <h1 style="color: #333;">{}</h1>
 

@@ -114,8 +114,6 @@ def get_user_details():
         select_query = "SELECT * FROM cinemauser WHERE username = %s"
         cursor.execute(select_query, (username,))
         user = cursor.fetchone()
-
-        print (user)
         
         cursor.close()
         conn.close()
@@ -130,7 +128,9 @@ def get_user_details():
                 "userRole": user[4],
                 "isUserBanned": user[5],
                 "activationLink": user[6],
-                "isLinkUsed": user[7]
+                "isLinkUsed": user[7],
+                "otp": user[8],
+                "expiryTimestamp": user[9],
             }
             
             # Log the successful retrieval of a user
@@ -326,7 +326,7 @@ def update_password_linkUsed_by_username():
 @user_bp.route('/update_linkUsed_by_username', methods=['PUT'])
 def update_linkUsed_by_username():
     # Log the updating of a user password
-    logger.info("Updating user password started.")
+    logger.info("Updating user link status started.")
     try:
         # get username and password from json
         data = request.get_json()
@@ -358,8 +358,8 @@ def update_linkUsed_by_username():
             conn.close()
             
             # log the successful update of a user session status
-            logger.info("User link used updated successfully. username: {username}")
-            return jsonify({"message": "User link used updated successfully"}), 200
+            logger.info("User link status updated successfully. username: {username}")
+            return jsonify({"message": "User link status updated successfully"}), 200
         else:
             # Session does not exist
             # log the error
@@ -368,6 +368,105 @@ def update_linkUsed_by_username():
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
-        logger.error(f"Error in update_password_by_username: {str(e)}")
+        logger.error(f"Error in update_linkUsed_by_username: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####     End of update user password by username    #####
+
+
+#####    Set OTP hash   #####
+@user_bp.route('/set_otp_by_username', methods=['PUT'])
+def set_otp():
+    # Log the setting of a user OTP
+    logger.info("Setting user OTP started.")
+    try:
+        # get username and password from json
+        data = request.get_json()
+        username = data['username']
+        otp = data['otp']
+        expiryTimestamp = data['expiryTimestamp']
+        
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if user exists
+        select_query = "SELECT * FROM cinemauser WHERE username = %s"
+        
+        cursor.execute(select_query, (username,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+        # Update session if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            update_query = "UPDATE cinemauser SET otp = %s, expiryTimestamp = %s WHERE username = %s"
+            cursor.execute(update_query, (otp, expiryTimestamp, username,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+            # log the successful update of a user session status
+            logger.info("OTP set successfully. username: {username}")
+            return jsonify({"message": "OTP set successfully"}), 200
+        else:
+            # Session does not exist
+            # log the error
+            logger.error("User not found. username: {username}")
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in set_otp_by_username: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####     End of set otp by username    #####
+
+
+##### Get OTP information #####
+@user_bp.route('/get_otp_passwordHash', methods=['POST'])    
+def get_otp_details():
+    # Log the retrieval of a user
+    logger.info(f"Retrieving OTP details started.")
+    try:
+        # Get data from the request
+        data = request.get_json()
+        username = data['username']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        select_data_query = "SELECT passwordHash, otp, expiryTimestamp FROM CinemaUser WHERE username = %s "
+        cursor.execute(select_data_query, (username,))
+        data_result = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # Separate the data into two attributes in a JSON response
+        if data_result:
+            # Assuming there's one result
+            passwordHash, otp, expiryTimestamp = data_result[0]
+            response_data = {
+                "passwordHash": passwordHash,
+                "otp": otp,
+                "expiryTimestamp": expiryTimestamp
+            }
+
+            # Log the successful retrieval of a user
+            logger.info(f"OTP details retrieved successfully. username: {username}")
+            return jsonify(response_data), 200
+        else:
+            # User not found, return HTTP 404 Not Found
+            # Log the user not found error
+            logger.warning(f"User not found with username: {username}.")
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in get_user_details: {str(e)}")
+        return jsonify({"error": str(e)}), 500 
+#####   End of get OTP information     #####    
