@@ -105,19 +105,43 @@ def register():
     # logs that password has been hashed
     logger.info(f"Password has been hashed.")
 
+    try:
+        # create a unique activation link
+        # timestamp is embedded into token, will be checked when token is decoded
+        link_type = "activate-member-account"
+        activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
+    except Exception as e:
+        return jsonify({"message": "Error occurred"}), 500
+    
+    logger.info(f"Activation link created.")
+
     role = "member"
     userId = user_utils.generateUUID()
     
+    # insert all info into db
     data = {
         "userId": userId,
         "email": email,
         "username": username,
-        "passwordHash": hash,
-        "userRole": role
+        "passwordHash": activation_link,
+        "userRole": role,
+        "activationLink": activation_link,
     }
-
-    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
     
+    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+    if response.status_code != 201:
+        return jsonify({"message": "Database insert error"}), 500
+    
+    # send email to user with activation link
+    requestData = {
+                "email": email,
+                "activation_link": activation_link,
+                "username": username
+    }
+    response = requests.post("http://email:587/send_member_activation_email", json=requestData) 
+        
+        
+
     if response.status_code == 201:
         logger.info(f"User '{username}' registered successfully!")
         return jsonify({"message": "Registration successful"}), 200
@@ -426,7 +450,7 @@ def create_staff():
             link_type = "activate-staff-account"
             activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
         except Exception as e:
-            print("error generating email link", e)
+            return jsonify({"message": "Error occurred"}), 500
 
         # store in db activation link in db -> will use this to verify when staff uses their activation link
         userId = user_utils.generateUUID()
@@ -458,8 +482,6 @@ def create_staff():
             # delete user from db
             data = {"userId": userId}
             delete_response = requests.delete("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
-
-            print("delete_response", delete_response)
 
             return jsonify({"message": "Error sending email"}), 500
         

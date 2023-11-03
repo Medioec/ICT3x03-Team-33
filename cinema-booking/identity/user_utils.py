@@ -8,6 +8,7 @@ import re
 import secrets 
 import uuid
 from itsdangerous import URLSafeTimedSerializer
+import string
 
 # check if username is available/does not exist in db
 def isUsernameAvailable(username):
@@ -90,3 +91,9 @@ def validateEmailLinks(serializer, token, link_type, expiration_time_in_seconds)
 
     except: 
         return None
+
+# generates a random 6 character alphanumeric string for OTP
+def generateOTP(length=6):
+    alphabet = string.ascii_letters + string.digits
+    otp = ''.join(secrets.choice(alphabet) for i in range(length))
+    return otp

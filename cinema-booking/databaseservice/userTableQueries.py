@@ -33,14 +33,15 @@ def add_user():
         username = data['username']
         passwordHash = data['passwordHash']
         userRole = data['userRole']
+        activationLink = data['activationLink']
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
         # Insert data into the "cinemauser" table
-        insert_query = "INSERT INTO cinemauser (userId, email, username, passwordHash, userRole) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(insert_query, (userId, email, username, passwordHash, userRole))
+        insert_query = "INSERT INTO cinemauser (userId, email, username, passwordHash, userRole, activationLink) VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(insert_query, (userId, email, username, passwordHash, userRole, activationLink))
         conn.commit()
 
         cursor.close()
