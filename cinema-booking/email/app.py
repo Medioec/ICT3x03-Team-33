@@ -139,5 +139,60 @@ def send_member_activation_email():
         return jsonify({"message": f"Error sending email: {str(e)}"}), 500
 ############################## END OF SEND MEMBER ACTIVATION LINK #########################################
 
+############################## SEND OTP #########################################
+@app.route("/send_otp", methods=["POST"])
+def send_otp():
+    # get email from request
+    data = request.get_json()
+    recipient_email = data["email"]
+    username = data["username"]
+    otp = data["otp"]
+
+    # create email
+    subject = "Code to Sign In to CineGo"
+    body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>OTP for Signing In to CineGo</title>
+        </head>
+        <body style="font-family: 'Arial', sans-serif;">
+
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd;">
+
+                <h2 style="color: #333;">Hello, {}</h2>
+
+                <p>Enter the code below to sign in to CineGo:</p>
+
+                <h1 style="color: #333;">{}</h1>
+
+                <p style="color: #999; font-size: 12px;">This email was sent by CineGo. Please do not reply to this email.</p>
+
+            </div>
+
+        </body>
+        </html>
+    """.format(username, otp)
+
+    message = MIMEMultipart()
+    message['Subject'] = subject
+    message.attach(MIMEText(body, 'html'))
+
+    try:
+        # Establish a connection to Gmail's SMTP server
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+            smtp_server.login(sender_email, sender_password)
+            
+            # Send the email
+            smtp_server.sendmail(sender_email, recipient_email, message.as_string())
+
+        return jsonify({"message": "Email sent!"}), 200
+    
+    except Exception as e:
+        return jsonify({"message": f"Error sending email: {str(e)}"}), 500
+############################## END OF SEND OTP #########################################
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=587)
