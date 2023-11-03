@@ -43,8 +43,6 @@ async function logoutRequest(token) {
 }
 
 async function verifyStaffActivationToken(token) {
-    console.log("model verify staff activation");
-    console.log(token);
     const response = await fetch(`http://identity:8081/activate_staff_account/${token}`, {
         method: "GET",
         headers: {

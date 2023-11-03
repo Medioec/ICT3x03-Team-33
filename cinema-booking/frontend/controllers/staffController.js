@@ -5,7 +5,6 @@ const identityService = require('../models/identityServiceModel');
 exports.getStaffDashboard = async (req, res) => {
     try {
         const movies = await movieService.getAllMovies();
-        console.log(movies);
         
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
@@ -59,11 +58,8 @@ exports.getStaffPasswordPage = async (req, res) => {
 exports.setStaffPasswordRequest = async (req, res) => {
     try {
         const token = req.query.token;
-        console.log(token);
-        console.log("set password");
-
         const response = await identityService.setStaffPasswordRequest(token, req.body);
-        console.log(response); 
+
         if (response.status == 200) {
             return res.status(200).send('Success');
         }

@@ -428,8 +428,6 @@ def create_staff():
         except Exception as e:
             print("error generating email link", e)
 
-        print("link generated")
-
         # store in db activation link in db -> will use this to verify when staff uses their activation link
         userId = user_utils.generateUUID()
         role = "staff"
@@ -442,14 +440,11 @@ def create_staff():
             "passwordHash": activation_link,
             "userRole": role,
             "activationLink": activation_link,
-            "isActivationLinkUsed": False
         }
         
-        response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
+        response = requests.post("http://databaseservice:8085/databaseservice/user/add_staff", json=data)
         if response.status_code != 201:
             return jsonify({"message": "Database insert error"}), 500
-
-        print("added user to db")
 
         # send email to user with activation link
         requestData = {
@@ -458,8 +453,6 @@ def create_staff():
                     "username": username
         }
         response = requests.post("http://email:587/send_staff_activation_email", json=requestData) 
-
-        print("sent to email service")
 
         if response.status_code != 200:
             # delete user from db
@@ -483,7 +476,7 @@ def activate_staff_account(token):
     try:
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
-        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        username = user_utils.validateEmailLinks(serializer, token, "activate-staff-account", expiration_time_in_seconds)
 
         # if activation link is invalid
         if username is None:
@@ -498,10 +491,10 @@ def activate_staff_account(token):
         
         # get info from db
         db_activationLink = response.json()['activationLink']
-        isActivationLinkUsed = response.json()['isActivationLinkUsed']
+        isLinkUsed = response.json()['isLinkUsed']
 
         # if activation link hasn't used and matches in db, link is valid
-        if (isActivationLinkUsed == False and db_activationLink == token):
+        if (isLinkUsed == False and db_activationLink == token):
             return jsonify({"message": "Valid activation link"}), 200
 
         # else token is invalid
@@ -519,7 +512,7 @@ def staff_set_password(token):
         print("in staff set password api")
         # get username from token
         expiration_time_in_seconds = 86400 # 24 hour window
-        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        username = user_utils.validateEmailLinks(serializer, token, "activate-staff-account", expiration_time_in_seconds)
         
         # if activation link is invalid
         if username is None:
@@ -534,10 +527,10 @@ def staff_set_password(token):
         
         # get info from db
         db_activationLink = response.json()['activationLink']
-        isActivationLinkUsed = response.json()['isActivationLinkUsed']
+        isLinkUsed = response.json()['isLinkUsed']
 
         # if activation link hasn't used and matches in db, link is valid
-        if (isActivationLinkUsed == False and db_activationLink == token):
+        if (isLinkUsed == False and db_activationLink == token):
             # get password
             data = request.get_json()
             password = data['password']
@@ -562,9 +555,9 @@ def staff_set_password(token):
             data = {
                 "username": username,
                 "passwordHash": hash,
-                "isActivationLinkUsed": True
+                "isLinkUsed": True
             }
-            response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
+            response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_linkUsed_by_username", json=data)
             print("set password response", response.status_code)
 
             # if database error
