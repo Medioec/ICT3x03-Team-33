@@ -2,7 +2,8 @@
     This file contains utility functions for the identity service.
     These include: checking availability of username and email, validating password, generating random number and generating uuid.
 '''
-
+from zxcvbn import zxcvbn
+import hashlib
 import requests
 import re
 import secrets 
@@ -59,16 +60,41 @@ def validateUsername(username):
 with open('/app/wordlist/blacklistedPW.txt', 'r', encoding='latin-1') as f:
     BLACKLISTED_PASSWORDS = set(line.strip() for line in f)
 
-# ensure that password is valid
+def check_pwned_api(password):
+    # Hash the password with SHA-1
+    sha1password = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    first5_char, tail = sha1password[:5], sha1password[5:]
+    url = f'https://api.pwnedpasswords.com/range/{first5_char}'
+    response = requests.get(url)
+    
+    # Check if the password has been breached
+    return tail in (line.split(':')[0] for line in response.text.splitlines())
+
+def password_strength(password):
+    results = zxcvbn(password)
+    # returns the strength score
+    return results['score']
+
 def validatePassword(password):
     # Check if password is in the blacklist
     if password in BLACKLISTED_PASSWORDS:
-        return False
+        return False, "Password is in the blacklist."
+
+    # Check password against Have I Been Pwned API
+    if check_pwned_api(password):
+        return False, "Password has been breached before according to Have I Been Pwned."
+
+    # Check password strength
+    strength_score = password_strength(password)
+    if strength_score < 3:  # You can set the threshold as you see fit
+        return False, f"Password is too weak (score: {strength_score})."
 
     # Regular expression pattern check
     # ensure that password is 12 - 32 characters 
-    print("password validity: {}".format(12 <= len(password) <= 32))
-    return (12 <= len(password) <= 32)
+    if not (12 <= len(password) <= 32):
+        return False, "Password length must be between 12 and 32 characters."
+
+    return True, "Password is valid."
 
 # generate uuid for inserting into db
 def generateUUID():
