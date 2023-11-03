@@ -66,6 +66,7 @@ exports.getMemberProfilePage = async (req, res) => {
         const token = req.cookies.token;
 
         const creditCards = await paymentService.getAllCreditCards(token);
+        console.log(creditCards);
 
         return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
     } catch (error) {

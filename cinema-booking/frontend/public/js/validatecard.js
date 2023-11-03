@@ -106,21 +106,21 @@ const captchaFeedback = document.getElementById('captchaError');
   
     function validateCreditCardExpiry(creditCardExpiry) {
         try {
-          if (creditCardExpiry.length !== 5 || creditCardExpiry.charAt(2) !== '/') {
-            return false;
-          }
-      
-          const month = parseInt(creditCardExpiry.substring(0, 2), 10) - 1;
-          const year = parseInt(`20${creditCardExpiry.substring(3, 5)}`, 10);
-      
-          const expiryDate = new Date(year, month, 1);
-          const currentDate = new Date();
-      
-          return expiryDate > currentDate;
+            if (creditCardExpiry.length !== 5 || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(creditCardExpiry)) {
+                return false;
+            }
+    
+            const month = parseInt(creditCardExpiry.substring(0, 2), 10) - 1;
+            const year = parseInt(`20${creditCardExpiry.substring(3, 5)}`, 10);
+    
+            const expiryDate = new Date(year, month, 1);
+            const currentDate = new Date();
+    
+            return expiryDate > currentDate;
         } catch (error) {
-          return false;
+            return false;
         }
-    }  
+    }    
   
     function validateCvv(cvv) {
       return /^\d{3,4}$/.test(cvv);
