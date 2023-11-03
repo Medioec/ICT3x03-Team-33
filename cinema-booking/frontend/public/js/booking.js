@@ -10,31 +10,32 @@ const modalCloseBtn = document.getElementById('modalCloseBtn');
 const modalCancelButton = document.getElementById('cancelButton');
 const loggedIn = checkoutButton.getAttribute('data-loggedin');
 
-populateUI();
+// uncomment the following line to populate the UI with the cached selected seat ID
+// populateUI();
 
-let ticketPrice = 0;
-let selectedSeatsCount = -1;
+let ticketPrice = 10.50; // Assuming a default price per ticket
+let selectedSeatsCount = 0;
 
 function updateSelectedCount() {
-    selectedSeats = document.querySelectorAll('.row .seat.selected');
-    const selectedSeatIds = [...selectedSeats].map(seat => seat.id);
-    localStorage.setItem('selectedSeats', JSON.stringify(selectedSeatIds));
-    selectedSeatsCount = selectedSeats.length;
+    const selectedSeat = document.querySelector('.row .seat.selected');
+    const selectedSeatId = selectedSeat ? selectedSeat.id : null;
+    // This affects the caching of the selected seat ID in localStorage
+    // localStorage.setItem('selectedSeat', JSON.stringify(selectedSeatId));
+    selectedSeatsCount = selectedSeat ? 1 : 0;
 
     count.innerText = selectedSeatsCount;
-    ticketPrice = selectedSeatsCount > 0 ? 10.50 : 0;
     total.innerText = selectedSeatsCount * ticketPrice;
 
-    // Display selected seat IDs in the selectedSeatsDisplay element
-    selectedSeatsDisplay.innerText = selectedSeatIds.join(', ');
+    // Display selected seat ID in the selectedSeatsDisplay element
+    selectedSeatsDisplay.innerText = selectedSeatId ? selectedSeatId : '';
 }
 
 function populateUI() {
-    const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats'));
+    const selectedSeat = JSON.parse(localStorage.getItem('selectedSeat'));
 
-    if (selectedSeats !== null && selectedSeats.length > 0) {
-        seats.forEach((seat, index) => {
-            if (selectedSeats.indexOf(index) > -1) {
+    if (selectedSeat !== null) {
+        seats.forEach(seat => {
+            if (seat.id === selectedSeat) {
                 seat.classList.add('selected');
             }
         });
@@ -48,6 +49,13 @@ container.addEventListener('click', (e) => {
         !e.target.classList.contains('reserved') &&
         !e.target.classList.contains('display')
     ) {
+        // Deselect any existing selected seat
+        const currentSelected = container.querySelector('.seat.selected');
+        if (currentSelected && currentSelected !== e.target) {
+            currentSelected.classList.remove('selected');
+        }
+        
+        // Toggle the clicked seat
         e.target.classList.toggle('selected');
         updateSelectedCount();
     }
@@ -56,30 +64,31 @@ container.addEventListener('click', (e) => {
 // Add an event listener to the reset button
 const resetButton = document.getElementById('resetButton');
 resetButton.addEventListener('click', () => {
-    selectedSeats.forEach(seat => seat.classList.remove('selected'));
-    localStorage.removeItem('selectedSeats');
-
+    const selectedSeat = container.querySelector('.seat.selected');
+    if (selectedSeat) {
+        selectedSeat.classList.remove('selected');
+    }
+    localStorage.removeItem('selectedSeat');
     updateSelectedCount();
 });
 
 checkoutButton.addEventListener('click', () => {
     if (loggedIn === 'true') {
         // User is logged in, continue with checkout logic
-        const selectedSeats = JSON.parse(localStorage.getItem('selectedSeats'));
+        const selectedSeat = JSON.parse(localStorage.getItem('selectedSeat'));
 
-        // Check if any seats are selected
-        if (selectedSeats && selectedSeats.length > 0) {
-            const selectedSeatIds = selectedSeats.join(',');
-            const showtimeDetailsId = showtimeDetails.showtimeId; // Get the movie title from showtimeDetails
+        // Check if a seat is selected
+        if (selectedSeat) {
+            const showtimeDetailsId = showtimeDetails.showtimeId; // Get the showtime ID from showtimeDetails
 
-            // Construct the URL with selected seat IDs and movie title as query parameters
-            const paymentURL = `/payment?seats=${selectedSeatIds}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
+            // Construct the URL with selected seat ID and showtime ID as query parameters
+            const paymentURL = `/payment?seat=${encodeURIComponent(selectedSeat)}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
             
-            // Navigate to the payment page with selected seat IDs and movie title as query parameters
+            // Navigate to the payment page with selected seat ID and showtime ID as query parameters
             window.location.href = paymentURL;
         } else {
-            // Handle the case where no seats are selected
-            alert('Please select at least one seat before proceeding to checkout.');
+            // Handle the case where no seat is selected
+            alert('Please select a seat before proceeding to checkout.');
         }
     } else {
         // User is not logged in, display the login modal
