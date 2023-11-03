@@ -71,7 +71,6 @@ def register():
         return jsonify({"message": "Username does not meet the requirements"}), 400
     
     if not user_utils.validatePassword(password):
-        print("password not meet reqs")
         return jsonify({"message": "Password does not meet the requirements"}), 400
     
     # check if username exists in db
@@ -139,25 +138,25 @@ def register():
                 "username": username
     }
     response = requests.post("http://email:587/send_member_activation_email", json=requestData) 
-        
-        
 
-    if response.status_code == 201:
-        logger.info(f"User '{username}' registered successfully!")
-        return jsonify({"message": "Registration successful"}), 200
-    
     # if email unsuccessful, delete user from db so admin can try again
-    else:
+    if response.status_code != 200:
+        # delete user from db
+        data = {"userId": userId}
+        delete_response = requests.delete("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
+
         try:
             logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
             response_json = response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
             return jsonify({"message": error_message}), response.status_code
-    
+        
         except json.JSONDecodeError as e:
             return jsonify({"message": "Error occurred"}), 500
-        
+
+    return jsonify({"message": "Registration successful"}), 200
+
 ############################## END OF REGISTRATION #########################################
 
 
@@ -183,7 +182,6 @@ def login():
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
         return jsonify({"message": str(e)}), 500
-
 
     # get password hash and role from db
     requestData = {"username": username}
@@ -238,8 +236,6 @@ def login():
     except Exception as e:
         # log login failure
         logger.error(f"Password verification failed for username '{username}'. Reason: {e}")
-
-        print(f"Exception during password verification: {e}")
         return jsonify({"message": "Username or password was incorrect"}), 404
 
     # generate session token
@@ -288,7 +284,6 @@ def login():
         return jsonify({"message": error_message}), response.status_code
     
     else:
-        print("token generated successfully", sessionToken)
         # return session token to client 
         return jsonify({"sessionToken": sessionToken}), 200
 ############################## END OF LOGIN #########################################
@@ -317,7 +312,6 @@ def logout():
     response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
-        print("logout successful")
         # log logout success
         logger.info(f"Logout successful")
         return jsonify({"message": "Logout successful"}), 200
@@ -332,7 +326,6 @@ def logout():
 def unauthorized_callback(callback):
     # log unauthorized access
     logger.error(f"Unauthorized access detected")
-    print("unauthorized callback")
     return jsonify({"message": "Unauthorized access"}), 401
 
 # check if user is logged in with valid token
@@ -369,15 +362,11 @@ def enhancedAuth():
 
         # get userId from db
         userId = response.json()["userId"]
-        print("userId", userId)
         
         # check that the user role in the db matches the user role in the token
         requestData = {"userId": userId}
         response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
         dbRole = response.json()["userRole"]
-
-        print("token role", role)
-        print("db role", dbRole)
 
         if role != dbRole:
             # log unauthorized access
@@ -386,7 +375,6 @@ def enhancedAuth():
         else:
             # log authentication success
             logger.info(f"Authentication successful")
-            print("authenticated")
             return jsonify({"message": "Authenticated"}), 200
     
     except:
@@ -483,7 +471,7 @@ def create_staff():
             data = {"userId": userId}
             delete_response = requests.delete("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
 
-            return jsonify({"message": "Error sending email"}), 500
+            return jsonify({"message": "Error occurred"}), 500
         
         else:
             return jsonify({"message": "Email sent"}), 200
@@ -531,7 +519,6 @@ def activate_staff_account(token):
 @app.route("/staff_set_password/<token>", methods=["PUT"])
 def staff_set_password(token):
     try:
-        print("in staff set password api")
         # get username from token
         expiration_time_in_seconds = 86400 # 24 hour window
         username = user_utils.validateEmailLinks(serializer, token, "activate-staff-account", expiration_time_in_seconds)
@@ -557,16 +544,12 @@ def staff_set_password(token):
             data = request.get_json()
             password = data['password']
 
-            print("received password" + password)
-            print("username", username)
-
             # if password is empty
             if not password:
                 return jsonify({"message": "Please fill in all form data"}), 400
 
             # validate password
             if not user_utils.validatePassword(password):
-                print("password not meet reqs")
                 return jsonify({"message": "Password does not meet the requirements"}), 400
         
             # hash password
@@ -580,7 +563,6 @@ def staff_set_password(token):
                 "isLinkUsed": True
             }
             response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_linkUsed_by_username", json=data)
-            print("set password response", response.status_code)
 
             # if database error
             if response.status_code != 200:
