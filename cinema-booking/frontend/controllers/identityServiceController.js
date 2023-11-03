@@ -85,8 +85,9 @@ exports.postRegister = async (req, res) => {
             return res.status(data.status).json({ message: 'Registration successful' });
         } else {
             // If data includes a message, send that, otherwise send a generic error message
-            const message = data.message || 'An error occurred during registration';
-            return res.status(data.status).json({ message });
+            const jresponse = await data.json();
+            const message = jresponse.message || "An error occurred during registration";
+            return res.status(data.status).json({ 'message': message });
         }
         
     } catch (error) {

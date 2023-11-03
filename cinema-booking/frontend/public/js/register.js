@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
           } else {
             // Handle non-200 responses
             const errorData = await response.json();
-            document.getElementById("error-message").textContent = "An error occurred. Please try again. " + errorData.message;
+            document.getElementById("error-message").textContent = errorData.message;
           }
         } catch (error) {
           // Handle network errors or issues parsing the response

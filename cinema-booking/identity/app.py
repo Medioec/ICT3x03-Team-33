@@ -87,7 +87,7 @@ def register():
     
     except Exception as e:
         logger.error(f"Error during username availability check: {str(e)}")
-        return jsonify({"message": {str(e)}}), 500
+        return jsonify({"message": "Internal Server Error"}), 500
     
     # check if email address is valid
     try:
@@ -101,7 +101,7 @@ def register():
         if not user_utils.isEmailAvailable(email):
             return jsonify({"message": "Email is already in use"}), 409
     except Exception as e:
-        return jsonify({"message": {str(e)}}), 500
+        return jsonify({"message": "Internal Server Error"}), 500
 
     ph = PasswordHasher()
     hash = ph.hash(password)
@@ -162,7 +162,7 @@ def login():
             logger.warning(f"Login attempt with non-existent username '{username}'.")
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
-        return jsonify({"message": str(e)}), 500
+        return jsonify({"message": "Internal Server Error"}), 500
 
 
     # get password hash and role from db
@@ -219,7 +219,6 @@ def login():
         # log login failure
         logger.error(f"Password verification failed for username '{username}'. Reason: {e}")
 
-        print(f"Exception during password verification: {e}")
         return jsonify({"message": "Username or password was incorrect"}), 404
 
     # generate session token
@@ -422,7 +421,7 @@ def create_staff():
         if not user_utils.isEmailAvailable(email):
             return jsonify({"message": "Email is already in use"}), 409
     except Exception as e:
-        return jsonify({"message": {str(e)}}), 500
+        return jsonify({"message": "Internal Server Error"}), 500
 
     # TODO
     # CREATE UNIQUE ACTIVATION LINK + EXPIRY
