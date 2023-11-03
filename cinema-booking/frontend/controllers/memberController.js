@@ -50,7 +50,6 @@ exports.getMemberBookingPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
         const token = req.cookies.token;
-        console.log(token);
 
         const bookingHistory = await bookingService.retrieveAllBookings(token);
         console.log(bookingHistory);
@@ -64,12 +63,20 @@ exports.getMemberBookingPage = async (req, res) => {
 exports.getMemberProfilePage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
+        const token = req.cookies.token;
+
+        console.log("Token:", token); // Log the token for debugging
+
+        const creditCards = await paymentService.getAllCreditCards(token);
+        console.log("Credit Cards:", creditCards); // Log the credit cards data
 
         return res.render('pages/memberprofile.ejs', { loggedIn });
     } catch (error) {
+        console.error("Error in getMemberProfilePage:", error); // Log the error
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 exports.getMemberPaymentPage = async (req, res) => {
     try {
@@ -89,18 +96,23 @@ exports.getMemberPaymentPage = async (req, res) => {
 };
 
 exports.postCreditCard = async (req, res) => {
-    try{
+    try {
         const token = req.cookies.token;
-        const creditCardDetails = req.body;
+        const creditCardDetails = req.body; // Retrieve credit card details from the request body
+
+        // Ensure that the creditCardDetails object contains the necessary properties
+        if (!creditCardDetails) {
+            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
+        }
 
         const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
         console.log(creditCard);
 
         if (creditCard.status === 200) {
-            return res.status(200).json({'message': 'Credit Card added successfully'});
+            return res.status(200).json({ message: 'Credit Card added successfully' });
         }
-    }
-    catch(error){
+    } catch (error) {
         res.status(500).send('Internal Server Error');
     }
 };
+

@@ -27,6 +27,7 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
+            - frontend-to-payment
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
@@ -117,6 +118,7 @@ services:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
+            - frontend-to-payment
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
@@ -241,6 +243,8 @@ networks:
   frontend-to-booking:
     driver: bridge
   frontend-to-movie:
+    driver: bridge
+  frontend-to-payment:
     driver: bridge
   booking-to-payment:
     driver: bridge

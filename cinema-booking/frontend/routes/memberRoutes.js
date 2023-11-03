@@ -19,6 +19,9 @@ router.get('/memberprofile', checkUserRole(member_role), memberController.getMem
 // checkout only for members
 router.get('/payment', checkUserRole(member_role), memberController.getMemberPaymentPage);
 
+// add credit card
+router.post('/addcreditcard', checkUserRole(member_role), memberController.postCreditCard);
+
 // Add other routes as needed
 
 module.exports = router;

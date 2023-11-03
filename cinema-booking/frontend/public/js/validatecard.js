@@ -1,3 +1,15 @@
+// Define the onSuccess function to handle the captcha callback
+function onSuccess() {
+    if (grecaptcha.getResponse()) {
+        captchaState = true;
+        console.log(captchaState);
+        captchaFeedback.textContent = '';
+    }
+}
+
+let captchaState = false;
+const captchaFeedback = document.getElementById('captchaError');
+
 (() => {
     'use strict';
   
@@ -38,10 +50,39 @@
         const sanitizedCreditCardExpiry = DOMPurify.sanitize(creditCardExpiryInput.value);
         const sanitizedCvv = DOMPurify.sanitize(cvvInput.value);
         
-        if (!form.checkValidity()) {
+        const formData = {
+            creditCardNumber: sanitizedCreditCardNumber,
+            creditCardName: sanitizedCreditCardName,
+            creditCardExpiry: sanitizedCreditCardExpiry,
+            cvv: sanitizedCvv,
+          };
+        
+          const creditCardData = JSON.stringify(formData);
+        if (!form.checkValidity() || captchaState === false) {
             event.preventDefault();
             event.stopPropagation();
+            captchaFeedback.textContent = 'Please complete the captcha!';
         }
+        else{       
+            fetch("/addcreditcard", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: creditCardData,
+        })
+    
+        .then(response => {
+            if (response.ok) {
+                console.log('Credit card added successfully');
+                window.location.href = "/memberprofile";
+            }
+        })
+    
+        .catch(error => {
+            console.error('Error occurred', error);
+        });}
 
       form.classList.add('was-validated');
     }, false);
@@ -87,7 +128,7 @@
     }
   
     //////////////////////////////////////////////////////////////////////////
-
+    
     //////////////////////////////////////////////////////////////////////////
 
     creditCardNumberInput.addEventListener('input', () => {

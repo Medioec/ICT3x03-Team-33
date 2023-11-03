@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity, get_jwt)
 import os
 import requests
 import user_utils
@@ -113,6 +113,8 @@ def makePayment():
     # If we reach this point, we've exhausted all retry attempts, break out of loop to prevent infinite loop
     return jsonify({"message": "Exceeded maximum retry attempts"}), 500
 
+###################################################################################################################################
+
 @app.route('/addCreditCard', methods=["POST"])
 @jwt_required()
 def addCreditCard():
@@ -189,6 +191,8 @@ def addCreditCard():
         # Handle other errors
         return jsonify({"message": "Error adding the credit card"}), 500
 
+###################################################################################################################################
+
 @app.route('/getOneCreditCard', methods=["POST"])
 @jwt_required()
 def getCreditCard(userId, creditCardId):
@@ -255,17 +259,29 @@ def getCreditCard(userId, creditCardId):
     else:
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit card"}), 500
-    
+
+###################################################################################################################################
+
 @app.route('/getAllCreditCards', methods=["POST"])
 @jwt_required()
 def getAllCreditCards():
-    data = request.get_json()
-    userId = data['userId']
+    # get sessionId from jwt
+    sessionId = get_jwt_identity()
+    if not sessionId:
+        return jsonify({"message": "Error: No token sent"}), 500
+
+    # use sessionId to get userId from db
+    requestData = {"sessionId": sessionId}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    if response.status_code != 200:
+        return jsonify({"message": "Database error"}), 500
     
-    # TODO - Will need to pass in session information in POST request. To take from JWT
-    sessionId = data['sessionId']
-    hash = data['hash']
+    # set information retrieved via sessionId
+    userId = response.json()["userId"]
     
+    token = get_jwt()
+    hash = token["hash"]
+
     # Make an HTTP GET request to the databaseservice to retrieve all credit cards
     url = f"http://databaseservice:8085/databaseservice/creditcard/get_all_credit_cards/{userId}"
     response = requests.get(url)
@@ -308,6 +324,8 @@ def getAllCreditCards():
     else:
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit cards"}), 500
+
+###################################################################################################################################
 
 @app.route('/updateOneCreditCard', methods=["PUT"])
 @jwt_required()
@@ -390,6 +408,8 @@ def updateOneCreditCard():
     else:
         # Handle other errors
         return jsonify({"message": "Error updating the credit card"}), 500
+
+###################################################################################################################################
 
 @app.route('/deleteCreditCard', methods=["DELETE"])
 @jwt_required()
