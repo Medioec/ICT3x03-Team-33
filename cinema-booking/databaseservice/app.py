@@ -33,7 +33,7 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(log_format)
 logger.addHandler(stream_handler)
 
-logger.info("Database Service started")
+logger.info(f"Database Service started")
 
 # To use the endpoints in userQueries.py, access it via the url prefix '/databaseservice/user'. e.g. http://localhost:8085/databaseservice/user/add_user
 # User table queries

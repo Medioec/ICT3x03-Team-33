@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 theater_bp = Blueprint("theater", __name__)
 
 # Log theater queries started
-logger.info("Theater queries started.")
+logger.info(f"Theater queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @theater_bp.route('/add_theater', methods=['POST'])
 def add_theater():
     # Log the addition of a new theater entry
-    logger.info("Adding new theater started.")
+    logger.info(f"Adding new theater started.")
     try:
         data = request.get_json()
         theaterNumber = data['theaterNumber']
@@ -43,7 +43,7 @@ def add_theater():
             conn.close()
             
             # Log the successful creation of a new theater entry
-            logger.info("Theater added successfully with new theaterNumber: {new_theater_number}.")
+            logger.info(f"Theater added successfully with new theaterNumber: {new_theater_number}.")
             return jsonify({"message": "Theater added successfully", "theaterNumber": new_theater_number}), 201
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
@@ -98,7 +98,7 @@ def get_theater_by_number(theater_number):
 @theater_bp.route('/get_all_theaters', methods=['GET'])
 def get_all_theaters():
     # Log the retrieval of all theaters
-    logger.info("Retrieving all theaters from the database.")
+    logger.info(f"Retrieving all theaters from the database.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -119,11 +119,11 @@ def get_all_theaters():
                 theater_list.append(theater_details)
 
             # Log the successful retrieval of all theaters
-            logger.info("All theaters retrieved successfully.")
+            logger.info(f"All theaters retrieved successfully.")
             return jsonify(theater_list), 200
         else:
             # No theaters found
-            logger.info("No theaters found.")
+            logger.info(f"No theaters found.")
             return jsonify({"message": "No theaters found"}), 404
     except Exception as e:
         # Log the error

@@ -16,8 +16,8 @@ router.get('/allmovies',checkLoggedIn, homeController.getAllMoviesPage);
 // all showtimes from navbar
 router.get('/allshowtimes',checkLoggedIn, homeController.getAllShowtimesPage);
 
-// showtimedetails page
-router.get('/showtimedetails',checkLoggedIn, homeController.getShowtimesDetailsPage);
+// seat selection for selected movie
+router.get('/booking',checkLoggedIn, homeController.getBookingForMoviePage);
 
 // Add other routes as needed
 module.exports = router;

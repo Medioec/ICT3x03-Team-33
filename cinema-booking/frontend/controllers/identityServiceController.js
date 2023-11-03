@@ -6,6 +6,7 @@
 
 // models
 const identityService = require('../models/identityServiceModel');
+const logger = require('../middleware/logger');
 
 exports.getLogin = (req, res) => {
     // Get the loggedIn status from the request object
@@ -30,7 +31,7 @@ exports.postLogin = async (req, res) => {
             // get user role
             const userRole = decodedToken.userRole;
 
-            console.log("controller: ", userRole);
+            //console.log("controller: ", userRole);
 
             res.cookie('token', data.sessionToken, {
                 path: '/',
@@ -41,14 +42,17 @@ exports.postLogin = async (req, res) => {
 
             // set loggedIn status
             req.loggedIn = true;
-            return res.status(200).json({'message': 'Login successful', 'userRole': userRole});
+            logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+            return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
 
         } else {
             req.loggedIn = false;
-            return res.status(401).json({ 'message': 'Login failed. Invalid credentials.' });
+            logger('info', 'Invalid login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+            return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        return res.status(500).json({ 'message': 'Internal Server Error' });
+        logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.socket.remoteAddress + ': ' + error.message);
+        return res.status(500).json({'status': 'fail', 'message': 'Internal Server Error' });
     }
 };
 
