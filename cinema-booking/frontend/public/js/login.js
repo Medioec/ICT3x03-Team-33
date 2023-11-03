@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify(data),
         })
         .then(response => {
-          console.log("client response status code: ", response.status);
           return response.json(); // Parse response as JSON
         })
         .then(data => {
@@ -61,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("error-message").textContent = data.message;
             throw new Error(data.message);
           }
-          console.log("client response: ", data.userRole);
       
           switch (data.userRole) {
             case "member":
@@ -71,6 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
             case "staff":
               window.location.href = "/staff";
               break;
+
+            // TODO ADD A CASE FOR ADMIN
           }
         })
         .catch(error => {

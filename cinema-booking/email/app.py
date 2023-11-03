@@ -75,7 +75,6 @@ def send_staff_activation_email():
         return jsonify({"message": f"Error sending email: {str(e)}"}), 500
 ############################## END OF SEND STAFF ACTIVATION LINK #########################################
 
-
 ############################## SEND MEMBER ACTIVATION LINK #########################################
 @app.route("/send_member_activation_email", methods=["POST"])
 def send_member_activation_email():
@@ -86,7 +85,7 @@ def send_member_activation_email():
     activation_link = data["activation_link"]
 
     # TODO: replace with actual url in production
-    activation_link = f'http://localhost:8080/activate?token={activation_link}'
+    activation_link = f'http://localhost:8080/verify?token={activation_link}'
 
     # create email
     subject = "Activate Your CineGo Account Now!"

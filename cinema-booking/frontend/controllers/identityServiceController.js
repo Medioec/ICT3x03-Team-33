@@ -23,17 +23,17 @@ exports.getLogin = (req, res) => {
 exports.postLogin = async (req, res) => {
     try {
         const data = await identityService.loginRequest(req.body);
-
-        if (data.sessionToken) {
-            const decodedToken = JSON.parse(atob(data.sessionToken.split('.')[1]));
+        
+        if (data.status === 200) {
+            json_response = await data.json();
+            console.log(json_response);
+            const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
             const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
 
             // get user role
             const userRole = decodedToken.userRole;
 
-            //console.log("controller: ", userRole);
-
-            res.cookie('token', data.sessionToken, {
+            res.cookie('token', json_response.sessionToken, {
                 path: '/',
                 maxAge: expiryDelta,
                 httpOnly: true
@@ -44,9 +44,14 @@ exports.postLogin = async (req, res) => {
             req.loggedIn = true;
             logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
             return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
+        }   
 
-        } else {
-            req.loggedIn = false;
+        else if (data.status == 403) {
+            logger('info', 'Member account not activated' + req.body.username + ' from ' + req.socket.remoteAddress);
+            return res.status(data.status).json({'status': 'fail', 'message': 'Activate your account first!' });
+        }
+
+        else {
             logger('info', 'Invalid login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
             return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
         }
@@ -78,7 +83,15 @@ exports.postRegister = async (req, res) => {
         }
 
         const data = await identityService.registerRequest(req.body);
-        return res.status(200).json({'message': 'Registration successful'});        
+        // Check if the data includes a status that indicates success
+        if (data.status === 201 || data.status === 200) {
+            return res.status(data.status).json({ message: 'Registration successful' });
+        } else {
+            // If data includes a message, send that, otherwise send a generic error message
+            const message = data.message || 'An error occurred during registration';
+            return res.status(data.status).json({ message });
+        }
+
     } catch (error) {
         return res.status(500).json({ 'message': 'Internal Server Error' });
     }

@@ -12,8 +12,7 @@ async function loginRequest(body) {
         body: JSON.stringify(body),
     });
 
-    responseData = await response.json();
-    return responseData;
+    return response;
 }
 
 async function registerRequest(body) {
@@ -67,10 +66,23 @@ async function setStaffPasswordRequest(token, body) {
     return response;
 }
 
+async function verifyMemberActivationToken(token) {
+    const response = await fetch(`http://identity:8081/activate_member_account/${token}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    });
+
+    return response;
+}
+
 module.exports = {
     loginRequest,
     registerRequest,
     logoutRequest,
     verifyStaffActivationToken,
-    setStaffPasswordRequest
+    setStaffPasswordRequest,
+    verifyMemberActivationToken
 };

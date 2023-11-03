@@ -270,7 +270,7 @@ def delete_user_by_id():
         return jsonify({"error": str(e)}), 500
 #####   End of delete user by user id     #####
 
-#####     Update a user password by their username   #####
+#####     For staff account activation - Update a user password by their username   #####
 @user_bp.route('/update_password_linkUsed_by_username', methods=['PUT'])
 def update_password_linkUsed_by_username():
     # Log the updating of a user password
@@ -310,6 +310,56 @@ def update_password_linkUsed_by_username():
             print("user password set", username)
             logger.info("User password updated successfully. username: {username}")
             return jsonify({"message": "User password updated successfully"}), 200
+        else:
+            # Session does not exist
+            # log the error
+            logger.error("User not found. username: {username}")
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in update_password_by_username: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####     End of update user password by username    #####
+
+#####     For member account activation/email verification - Update linkUsed status by their username   #####
+@user_bp.route('/update_linkUsed_by_username', methods=['PUT'])
+def update_linkUsed_by_username():
+    # Log the updating of a user password
+    logger.info("Updating user password started.")
+    try:
+        # get username and password from json
+        data = request.get_json()
+        username = data['username']
+        isLinkUsed = data['isLinkUsed']
+        
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Checks to see if user exists
+        select_query = "SELECT * FROM cinemauser WHERE username = %s"
+        
+        cursor.execute(select_query, (username,))
+        session = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+        
+        # Update session if it exists
+        if session:
+            conn = psycopg2.connect(**db_config)
+            cursor = conn.cursor()
+
+            update_query = "UPDATE cinemauser SET isLinkUsed = %s WHERE username = %s"
+            cursor.execute(update_query, (isLinkUsed, username,))
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+            # log the successful update of a user session status
+            logger.info("User link used updated successfully. username: {username}")
+            return jsonify({"message": "User link used updated successfully"}), 200
         else:
             # Session does not exist
             # log the error

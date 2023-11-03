@@ -122,7 +122,7 @@ def register():
         "userId": userId,
         "email": email,
         "username": username,
-        "passwordHash": activation_link,
+        "passwordHash": hash,
         "userRole": role,
         "activationLink": activation_link,
     }
@@ -202,7 +202,7 @@ def login():
     # check if account is activated
     isLinkedUsed = response.json()["isLinkUsed"]
     if not isLinkedUsed:
-        return jsonify({"message": "Account is not activated"}), 400
+        return jsonify({"message": "Account is not activated"}), 403
 
     # password hash from DB
     dbHash = response.json()["passwordHash"]
@@ -582,7 +582,7 @@ def staff_set_password(token):
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF STAFF SET PASSWORD #########################################
 
-############################## VERIFY MEMBER ACCOUNT ACTIVATION LINK #########################################
+############################## ACTIVATE MEMBER ACCOUNT #########################################
 # verifies if the link is valid  before loading form to set password
 @app.route("/activate_member_account/<token>", methods=["GET"])
 def activate_member_account(token):
@@ -608,14 +608,25 @@ def activate_member_account(token):
 
         # if activation link hasn't used and matches in db, link is valid
         if (isLinkUsed == False and db_activationLink == token):
-            return jsonify({"message": "Valid activation link"}), 200
+            # update isLinkUsed to True
+            data = {
+                "username": username,
+                "isLinkUsed": True
+            }
+            response = requests.put("http://databaseservice:8085/databaseservice/user/update_linkUsed_by_username", json=data)
+            # if database error
+            if response.status_code != 200:
+                return jsonify({"message": "Database update error"}), 500
+            
+            else:
+                return jsonify({"message": "Account activated"}), 200
 
         # else token is invalid
         return jsonify({"message": "Invalid activation link"}), 400
 
     except:
         return jsonify({"message": "Error occurred"}), 500    
-############################## END OF VERIFY MEMBER ACCOUNT ACTIVATION LINK #########################################
+############################## END OF ACTIVATE MEMBER ACCOUNT #########################################
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
