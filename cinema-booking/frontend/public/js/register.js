@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(data),
           });
   
-          if (response.status === 201) { // Check for 200 OK
+          if (response.ok) {
             window.location.href = "/login";
           } else {
             // Handle non-200 responses
