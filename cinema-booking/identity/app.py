@@ -73,9 +73,10 @@ def register():
     if not user_utils.validateUsername(username):
         return jsonify({"message": "Username does not meet the requirements"}), 400
     
-    if not user_utils.validatePassword(password):
-        print("password not meet reqs")
-        return jsonify({"message": "Password does not meet the requirements"}), 400
+    is_valid, validation_message = user_utils.validatePassword(password)
+    if not is_valid:
+        logger.info(f"Password validation failed: {validation_message}")
+        return jsonify({"message": validation_message}), 400
     
     # check if username exists in db
     try:
