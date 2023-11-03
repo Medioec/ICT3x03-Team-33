@@ -24,7 +24,6 @@ def send_staff_activation_email():
 
     # TODO: replace with actual url in production
     activation_link = f'http://localhost:8080/activate?token={activation_link}'
-    print("activation link: {}".format(activation_link))
 
     # create email
     subject = "Activate Your Account"
@@ -62,17 +61,13 @@ def send_staff_activation_email():
     message['Subject'] = subject
     message.attach(MIMEText(body, 'html'))
 
-    print("message created")
-
     try:
         # Establish a connection to Gmail's SMTP server
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
             smtp_server.login(sender_email, sender_password)
-            print("smtp server logged in")
             
             # Send the email
             smtp_server.sendmail(sender_email, recipient_email, message.as_string())
-            print("email sent")
 
         return jsonify({"message": "Email sent!"}), 200
     
@@ -92,7 +87,6 @@ def send_member_activation_email():
 
     # TODO: replace with actual url in production
     activation_link = f'http://localhost:8080/activate?token={activation_link}'
-    print("activation link: {}".format(activation_link))
 
     # create email
     subject = "Activate Your CineGo Account Now!"
@@ -132,17 +126,13 @@ def send_member_activation_email():
     message['Subject'] = subject
     message.attach(MIMEText(body, 'html'))
 
-    print("message created")
-
     try:
         # Establish a connection to Gmail's SMTP server
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
             smtp_server.login(sender_email, sender_password)
-            print("smtp server logged in")
             
             # Send the email
             smtp_server.sendmail(sender_email, recipient_email, message.as_string())
-            print("email sent")
 
         return jsonify({"message": "Email sent!"}), 200
     

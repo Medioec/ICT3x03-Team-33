@@ -106,11 +106,11 @@ def get_user_session():
         return jsonify({"error": str(e)}), 500
 #####     End of create session     #####
 
-##### Retrieves userId, password hash and user role from database #####
-@user_sessions_bp.route('/get_userId_hash_role', methods=['POST'])
+##### Retrieves userId, password hash, user role and link status from database #####
+@user_sessions_bp.route('/get_userId_hash_role_linkUsed', methods=['POST'])
 def get_userId_hash_role():
     # Log the getting user pwhash and role
-    logger.info(f"Getting user pwhash and role started.")
+    logger.info(f"Getting user pwhash, role and link used started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -121,7 +121,7 @@ def get_userId_hash_role():
         cursor = conn.cursor()
 
         # Construct the SQL query to retrieve the password hash and user role using username
-        select_data_query = "SELECT userId, passwordHash, userRole FROM CinemaUser WHERE username = %s "
+        select_data_query = "SELECT userId, passwordHash, userRole, isLinkUsed FROM CinemaUser WHERE username = %s "
         cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 
@@ -132,15 +132,16 @@ def get_userId_hash_role():
         # Separate the data into two attributes in a JSON response
         if data_result:
             # Assuming there's one result
-            userId, passwordHash, userRole = data_result[0]
+            userId, passwordHash, userRole, isLinkUsed = data_result[0]
             response_data = {
                 "userId": userId,
                 "passwordHash": passwordHash,
-                "userRole": userRole
+                "userRole": userRole,
+                "isLinkUsed": isLinkUsed
             }
             
             # log the successful retrieval of a user pwhash and role
-            logger.info(f"User pwhash and role retrieved successfully. username: {username}")
+            logger.info(f"User pwhash, role and linked used retrieved successfully. username: {username}")
             return jsonify(response_data), 200
         else:
             # User does not exist
@@ -150,7 +151,7 @@ def get_userId_hash_role():
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
-        logger.error(f"Error in get_userId_hash_role: {str(e)}")
+        logger.error(f"Error in get_userId_hash_role_linkStatus: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####   End of pw hash retrieval   #####
 

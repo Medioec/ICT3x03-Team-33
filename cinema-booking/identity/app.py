@@ -159,7 +159,6 @@ def register():
 
 ############################## END OF REGISTRATION #########################################
 
-
 ############################## LOGIN #########################################
 @app.route("/login", methods=["POST"])
 def login():
@@ -185,7 +184,7 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role_linkUsed", json=requestData)
 
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
@@ -200,6 +199,11 @@ def login():
         except json.JSONDecodeError as e:
             return jsonify({"message": "JSON response decode error"}), 500
     
+    # check if account is activated
+    isLinkedUsed = response.json()["isLinkUsed"]
+    if not isLinkedUsed:
+        return jsonify({"message": "Account is not activated"}), 400
+
     # password hash from DB
     dbHash = response.json()["passwordHash"]
     
