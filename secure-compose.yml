@@ -16,6 +16,8 @@ services:
             - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
             - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
+            - HTTP_PORT=${HTTP_PORT}
+            - HTTPS_PORT=${HTTPS_PORT}
             - PROXY=1
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
