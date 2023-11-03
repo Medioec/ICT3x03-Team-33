@@ -74,8 +74,12 @@ exports.getMemberProfilePage = async (req, res) => {
 exports.getMemberPaymentPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
+        
+        // seat & movie information selected by user passed over 
         const seats = req.query.seats;
         const showtimes = req.query.showtimeId;
+        
+        // necessary details 
         const showtimeDetails = await movieService.getShowtimeById(showtimes);
 
         return res.render('pages/payment.ejs', {seats, showtimeDetails, loggedIn });
@@ -84,3 +88,19 @@ exports.getMemberPaymentPage = async (req, res) => {
     }
 };
 
+exports.postCreditCard = async (req, res) => {
+    try{
+        const token = req.cookies.token;
+        const creditCardDetails = req.body;
+
+        const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
+        console.log(creditCard);
+
+        if (creditCard.status === 200) {
+            return res.status(200).json({'message': 'Credit Card added successfully'});
+        }
+    }
+    catch(error){
+        res.status(500).send('Internal Server Error');
+    }
+};

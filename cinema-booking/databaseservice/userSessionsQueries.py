@@ -224,14 +224,14 @@ def store_key_in_database():
         return jsonify({
             "loginResult": "Success",  # This can be dynamic based on your login logic
             "expiryTimestamp": expiryTimestamp,
-            "message" : "your mother pass, passaway"
+            "message" : "Login session created successfully"
             }), 201
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in store_key_in_database: {str(e)}")
         return jsonify({"error": str(e),
-                        "message":"your mother failure"}), 500
+                        "message":"Database Error"}), 500
 ##### End of Store encryption key associated with SessionID #####    
 
 #####     Delete a user session by its ID     #####

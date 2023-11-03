@@ -13,13 +13,13 @@ async function makePayment(sessionId, paymentData) {
     return responseData;
 }
 
-async function addCreditCard(sessionId, creditCardData) {
+async function addCreditCard(token, creditCardData) {
     const response = await fetch("http://paymentservice:8084/addCreditCard", {
         method: "POST",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(creditCardData),
     });
@@ -47,7 +47,7 @@ async function getOneCreditCard(sessionId, userId, creditCardId) {
     return responseData;
 }
 
-async function getAllCreditCards(sessionId, userId) {
+async function getAllCreditCards(token, userId) {
     const requestData = {
         userId: userId
     };
@@ -57,7 +57,7 @@ async function getAllCreditCards(sessionId, userId) {
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(requestData),
     });
