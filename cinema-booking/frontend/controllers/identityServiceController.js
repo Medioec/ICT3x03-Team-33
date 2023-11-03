@@ -76,16 +76,26 @@ exports.postRegister = async (req, res) => {
 
         // if logged in, don't try to register
         if (loggedIn) {
-            return res.status(401).json({ message: 'Unauthorized request'});
+            return res.status(401).json({ message: 'Unauthorized request' });
         }
 
         const data = await identityService.registerRequest(req.body);
-        return res.status(data.status).json({'message': 'Registration successful'});
+        // Check if the data includes a status that indicates success
+        if (data.status === 201) {
+            return res.status(data.status).json({ message: 'Registration successful' });
+        } else {
+            // If data includes a message, send that, otherwise send a generic error message
+            const message = data.message || 'An error occurred during registration';
+            return res.status(data.status).json({ message });
+        }
         
     } catch (error) {
-        res.status(500).json({ 'message': 'Internal Server Error' });
+        // Send the error message from the catch block, if available
+        const message = error.message || 'Internal Server Error';
+        res.status(500).json({ 'message': message });
     }
 };
+
 
 exports.logout = async (req, res) => {
     try {
