@@ -79,12 +79,12 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(data),
           });
   
-          if (response.status === 200) { // Check for 200 OK
+          if (response.ok) { // Check for 200 OK
             window.location.href = "/login";
           } else {
             // Handle non-200 responses
             const errorData = await response.json();
-            document.getElementById("error-message").textContent = "An error occurred. Please try again. " +errorData.message;
+            document.getElementById("error-message").textContent = "An error occurred. Please try again. " + errorData.message;
           }
         } catch (error) {
           // Handle network errors or issues parsing the response
