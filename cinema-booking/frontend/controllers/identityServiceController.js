@@ -44,16 +44,16 @@ exports.postLogin = async (req, res) => {
 
             // set loggedIn status
             req.loggedIn = true;
-            logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+            logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.ip);
             return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
 
         } else {
             req.loggedIn = false;
-            logger('info', 'Invalid login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+            logger('info', 'Invalid login for user ' + req.body.username + ' from ' + req.ip);
             return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.socket.remoteAddress + ': ' + error.message);
+        logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.ip + ': ' + error.message);
         return res.status(500).json({'status': 'fail', 'message': 'Internal Server Error' });
     }
 };
