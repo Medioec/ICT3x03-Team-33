@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     nginx-waf:
-        build: ./nginx-waf/
+        image: owasp/modsecurity-crs:nginx
         networks:
             - internet-access
             - waf-to-frontend
@@ -20,7 +20,7 @@ services:
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
             - BASE_HOST=${BASE_HOST}
-        restart: always
+        restart: unless-stopped
 
     frontend:
         build: ./cinema-booking/frontend
@@ -37,6 +37,7 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         depends_on:
             - identity
+        restart: unless-stopped
 
     identity:
         build: 
@@ -62,6 +63,7 @@ services:
         depends_on:
             - database
             - databaseservice
+        restart: unless-stopped
 
     movie:
         build: 
@@ -80,6 +82,7 @@ services:
         depends_on:
             - database
             - databaseservice
+        restart: unless-stopped
     
     booking:
         build: 
@@ -99,6 +102,7 @@ services:
         depends_on:
             - database
             - databaseservice
+        restart: unless-stopped
 
     payment:
         build: 
@@ -118,6 +122,7 @@ services:
         depends_on:
             - database
             - databaseservice
+        restart: unless-stopped
 
     databaseservice:
         build: 
@@ -147,6 +152,7 @@ services:
                 max-file: "20"
         depends_on:
             - database
+        restart: unless-stopped
 
     database:
         build:
@@ -164,6 +170,7 @@ services:
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
             - postgres_container:/var/lib/postgresql/data
+        restart: unless-stopped
 
     ofelia-scheduler:
         image: mcuadros/ofelia:v0.3.7
