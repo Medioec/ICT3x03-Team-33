@@ -81,7 +81,7 @@ exports.postRegister = async (req, res) => {
 
         const data = await identityService.registerRequest(req.body);
         // Check if the data includes a status that indicates success
-        if (data.status === 201) {
+        if (data.status === 201 || data.status === 200) {
             return res.status(data.status).json({ message: 'Registration successful' });
         } else {
             // If data includes a message, send that, otherwise send a generic error message
