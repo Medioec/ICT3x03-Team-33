@@ -7,13 +7,15 @@ import re
 
 # Validate credit card number
 def validateCreditCardNumber(creditCardNumber):
+    # regex to check if the cc number contains only numbers
+    if not re.match(r'^\d+$', creditCardNumber):
+        return False
+
     # Check if the card number has a valid length
     if not (13 <= len(creditCardNumber) <= 19):
         return False
 
     return True
-
-
 
 # Validate credit card name
 def validateCreditCardName(creditCardName):
