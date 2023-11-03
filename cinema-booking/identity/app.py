@@ -369,97 +369,105 @@ def enhancedAuth():
         return jsonify({"message": "Error occurred"}), 500
 ############################## END OF AUTH #########################################
 
-############################## REGISTRATION #########################################
-@app.route("/register", methods=["POST"])
-def register():
-    # logs registration attempt
-    logger.info(f"Attempting registration...")
-    
-    # get data from registration form
-    data = request.get_json()
-    email = data['email']
-    username = data['username']
-    password = data['password']
-
-    # Sanitize email and username
-    email = html.escape(email)
-    username = html.escape(username)
-    
-    # logs sanitized user input
-    logger.info(f"Sanitized user input: Email: {email}, Username: {username}")
-
-    if not email or not username or not password:
-        return jsonify({"message": "Please fill in all form data"}), 400
-
-    # ensure username and password contain only allowed characters
-    if not user_utils.validateUsername(username):
-        return jsonify({"message": "Username does not meet the requirements"}), 400
-    
-    if not user_utils.validatePassword(password):
-        print("password not meet reqs")
-        return jsonify({"message": "Password does not meet the requirements"}), 400
-    
-    # check if username exists in db
+############################## STAFF REGISTRATION #########################################
+@app.route("/create_staff", methods=["POST"])
+@jwt_required() # can only be accessed by admins
+def create_staff():
     try:
-        if not user_utils.isUsernameAvailable(username):
-            # log registration failure due to username already taken
-            logger.warning(f"Username '{username}' is already taken.")
-            return jsonify({"message": "Username is already taken"}), 409
-    
-    except Exception as e:
-        logger.error(f"Error during username availability check: {str(e)}")
-        return jsonify({"message": {str(e)}}), 500
-    
-    # check if email address is valid
-    try:
-        validate_email(email, check_deliverability=True)
-
-    except EmailNotValidError:
-        return jsonify({"message": "Email is invalid"}), 400
-
-    # check if email address is still available 
-    try:
-        if not user_utils.isEmailAvailable(email):
-            return jsonify({"message": "Email is already in use"}), 409
-    except Exception as e:
-        return jsonify({"message": {str(e)}}), 500
-
-    ph = PasswordHasher()
-    hash = ph.hash(password)
-    
-    # logs that password has been hashed
-    logger.info(f"Password has been hashed.")
-
-    role = "member"
-    userId = user_utils.generateUUID()
-    
-    data = {
-        "userId": userId,
-        "email": email,
-        "username": username,
-        "passwordHash": hash,
-        "userRole": role
-    }
-
-    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
-    
-    if response.status_code == 201:
-        logger.info(f"User '{username}' registered successfully!")
-        return jsonify({"message": "Registration successful"}), 200
-    
-    # if insert unsuccessful, return error message from databaseservice
-    else:
-        try:
-            logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
-            response_json = response.json()
-            # get error message from response. if no message, use default "Error occurred"
-            error_message = response_json.get("message", "Error occurred")
-            return jsonify({"message": error_message}), response.status_code
-    
-        except json.JSONDecodeError as e:
-            return jsonify({"message": "Error occurred"}), 500
+        # logs registration attempt
+        logger.info("Attempting staff creation...")
         
-############################## END OF REGISTRATION #########################################
+        # get data from registration form
+        data = request.get_json()
+        email = data['email']
+        username = data['username']
+
+        # Sanitize email and username
+        email = html.escape(email)
+        username = html.escape(username)
+        
+        # logs sanitized user input
+        logger.info(f"Sanitized user input: Email: {email}, Username: {username}")
+
+        if not email or not username:
+            return jsonify({"message": "Please fill in all form data"}), 400
+
+        # ensure username and password contain only allowed characters
+        if not user_utils.validateUsername(username):
+            return jsonify({"message": "Username does not meet the requirements"}), 400
+        
+        # check if username exists in db
+        try:
+            if not user_utils.isUsernameAvailable(username):
+                # log registration failure due to username already taken
+                logger.warning(f"Username '{username}' is already taken.")
+                return jsonify({"message": "Username is already taken"}), 409
+        
+        except Exception as e:
+            logger.error(f"Error during username availability check: {str(e)}")
+            return jsonify({"message": {str(e)}}), 500
+        
+        # check if email address is valid
+        try:
+            validate_email(email, check_deliverability=True)
+        except EmailNotValidError:
+            return jsonify({"message": "Email is invalid"}), 400
+
+        # check if email address is still available 
+        try:
+            if not user_utils.isEmailAvailable(email):
+                return jsonify({"message": "Email is already in use"}), 409
+        except Exception as e:
+            return jsonify({"message": {str(e)}}), 500
+
+        try:
+            # create a unique activation link
+            # timestamp is embedded into token, will be checked when token is decoded
+            link_type = "activate-staff-account"
+            activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
+        except Exception as e:
+            print("error generating email link", e)
+
+        # store in db activation link in db -> will use this to verify when staff uses their activation link
+        userId = user_utils.generateUUID()
+        role = "staff"
+
+        # insert all info into db
+        data = {
+            "userId": userId,
+            "email": email,
+            "username": username,
+            "passwordHash": activation_link,
+            "userRole": role,
+            "activationLink": activation_link,
+        }
+        
+        response = requests.post("http://databaseservice:8085/databaseservice/user/add_staff", json=data)
+        if response.status_code != 201:
+            return jsonify({"message": "Database insert error"}), 500
+
+        # send email to user with activation link
+        requestData = {
+                    "email": email,
+                    "activation_link": activation_link,
+                    "username": username
+        }
+        response = requests.post("http://email:587/send_staff_activation_email", json=requestData) 
+
+        if response.status_code != 200:
+            # delete user from db
+            data = {"userId": userId}
+            delete_response = requests.delete("http://databaseservice:8085/databaseservice/user/delete_user", json=data)
+
+            print("delete_response", delete_response)
+
+            return jsonify({"message": "Error sending email"}), 500
+        
+        else:
+            return jsonify({"message": "Email sent"}), 200
+    except:
+        return jsonify({"message": "Error occurred"}), 500
+############################## END OF STAFF REGISTRATION #########################################
 
 ############################## VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
 # verifies if the link is valid  before loading form to set password
@@ -468,7 +476,7 @@ def activate_staff_account(token):
     try:
         # check if activation link is valid
         expiration_time_in_seconds = 86400 # 24 hour window
-        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        username = user_utils.validateEmailLinks(serializer, token, "activate-staff-account", expiration_time_in_seconds)
 
         # if activation link is invalid
         if username is None:
@@ -482,16 +490,15 @@ def activate_staff_account(token):
             return jsonify({"message": "Error occurred"}), 500
         
         # get info from db
-        db_tokenHash = response.json()['passwordHash']
+        db_activationLink = response.json()['activationLink']
+        isLinkUsed = response.json()['isLinkUsed']
 
-        # check if activation link matches link in db
-        try:
-            ph = PasswordHasher()
-            ph.verify(db_tokenHash, token)
+        # if activation link hasn't used and matches in db, link is valid
+        if (isLinkUsed == False and db_activationLink == token):
             return jsonify({"message": "Valid activation link"}), 200
-        
-        except:
-            return jsonify({"message": "Invalid activation link"}), 400
+
+        # else token is invalid
+        return jsonify({"message": "Invalid activation link"}), 400
 
     except:
         return jsonify({"message": "Error occurred"}), 500    
@@ -499,48 +506,70 @@ def activate_staff_account(token):
 
 ############################## STAFF SET PASSWORD #########################################
 # let staff set their password
-@app.route("/staff_set_password/<token>", methods=["POST"])
+@app.route("/staff_set_password/<token>", methods=["PUT"])
 def staff_set_password(token):
     try:
+        print("in staff set password api")
         # get username from token
         expiration_time_in_seconds = 86400 # 24 hour window
-        username = serializer.loads(token, salt="activate-staff-account", max_age=expiration_time_in_seconds)
+        username = user_utils.validateEmailLinks(serializer, token, "activate-staff-account", expiration_time_in_seconds)
         
         # if activation link is invalid
         if username is None:
             return jsonify({"message": "Invalid activation link"}), 400
         
-        # get password
-        data = request.get_json()
-        password = data['password']
+        # if activation link is valid, double check against user info in db
+        requestData = {"username": username}
+        response = requests.post("http://databaseservice:8085/databaseservice/user/get_user_details", json=requestData)
         
-        # if password is empty
-        if not password:
-            return jsonify({"message": "Please fill in all form data"}), 400
+        if response.status_code !=200:
+            return jsonify({"message": "Error occurred"}), 500
+        
+        # get info from db
+        db_activationLink = response.json()['activationLink']
+        isLinkUsed = response.json()['isLinkUsed']
 
-        # validate password
-        if not user_utils.validatePassword(password):
-            print("password not meet reqs")
-            return jsonify({"message": "Password does not meet the requirements"}), 400
-    
-        # hash password
-        ph = PasswordHasher()
-        hash = ph.hash(password)
+        # if activation link hasn't used and matches in db, link is valid
+        if (isLinkUsed == False and db_activationLink == token):
+            # get password
+            data = request.get_json()
+            password = data['password']
 
-        # replace activation link/token hash with password hash in db
-        data = {
-            "username": username,
-            "passwordHash": hash
-        }
+            print("received password" + password)
+            print("username", username)
+
+            # if password is empty
+            if not password:
+                return jsonify({"message": "Please fill in all form data"}), 400
+
+            # validate password
+            if not user_utils.validatePassword(password):
+                print("password not meet reqs")
+                return jsonify({"message": "Password does not meet the requirements"}), 400
         
-        response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_by_username", json=data)
-        # if database error
-        if response.status_code != 200:
-            return jsonify({"message": "Database update error"}), 500
-        
-        else:
-            return jsonify({"message": "Password set successfully"}), 200
-        
+            # hash password
+            ph = PasswordHasher()
+            hash = ph.hash(password)
+
+            # replace activation link/token hash with password hash in db
+            data = {
+                "username": username,
+                "passwordHash": hash,
+                "isLinkUsed": True
+            }
+            response = requests.put("http://databaseservice:8085/databaseservice/user/update_password_linkUsed_by_username", json=data)
+            print("set password response", response.status_code)
+
+            # if database error
+            if response.status_code != 200:
+                return jsonify({"message": "Database update error"}), 500
+            
+            else:
+                return jsonify({"message": "Password set successfully"}), 200
+            
+        # else token is invalid
+        return jsonify({"message": "Invalid activation link"}), 400
+            
     except:
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF STAFF SET PASSWORD #########################################

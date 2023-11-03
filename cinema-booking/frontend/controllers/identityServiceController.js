@@ -78,20 +78,10 @@ exports.postRegister = async (req, res) => {
         }
 
         const data = await identityService.registerRequest(req.body);
-
-        if (data.status === 200) {
-            return res.status(data.status).json({'message': 'Registration successful'});
-        }
-        else {
-            const jresponse = await data.json()
-            return res.status(data.status).json(jresponse);
-        }
-        
-        
+        return res.status(200).json({'message': 'Registration successful'});        
     } catch (error) {
         return res.status(500).json({ 'message': 'Internal Server Error' });
     }
-    return res.status(500).json({'message': 'Internal Server Error'});
 };
 
 exports.logout = async (req, res) => {
@@ -115,7 +105,7 @@ exports.logout = async (req, res) => {
         }
         
     } catch (error) {
-        res.status(500).json({ 'message': 'Internal Server Error' });
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
 

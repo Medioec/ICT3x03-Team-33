@@ -246,6 +246,10 @@ networks:
     driver: bridge
   identity-to-payment:
     driver: bridge
+  identity-to-email:
+    driver: bridge
+  booking-to-email:
+    driver: bridge
   identity-to-databaseservice:
     driver: bridge
   movie-to-databaseservice:
@@ -259,10 +263,6 @@ networks:
   scheduler-to-sessioncleaning:
     driver: bridge
   sessioncleaning-to-database:
-    driver: bridge
-  identity-to-email:
-    driver: bridge
-  booking-to-email:
     driver: bridge
 
 volumes:
