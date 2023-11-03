@@ -574,5 +574,40 @@ def staff_set_password(token):
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF STAFF SET PASSWORD #########################################
 
+############################## VERIFY MEMBER ACCOUNT ACTIVATION LINK #########################################
+# verifies if the link is valid  before loading form to set password
+@app.route("/activate_member_account/<token>", methods=["GET"])
+def activate_member_account(token):
+    try:
+        # check if activation link is valid
+        expiration_time_in_seconds = 86400 # 24 hour window
+        username = user_utils.validateEmailLinks(serializer, token, "activate-member-account", expiration_time_in_seconds)
+
+        # if activation link is invalid
+        if username is None:
+            return jsonify({"message": "Invalid activation link"}), 400
+
+        # if activation link is valid, double check against user info in db
+        requestData = {"username": username}
+        response = requests.post("http://databaseservice:8085/databaseservice/user/get_user_details", json=requestData)
+        
+        if response.status_code !=200:
+            return jsonify({"message": "Error occurred"}), 500
+        
+        # get info from db
+        db_activationLink = response.json()['activationLink']
+        isLinkUsed = response.json()['isLinkUsed']
+
+        # if activation link hasn't used and matches in db, link is valid
+        if (isLinkUsed == False and db_activationLink == token):
+            return jsonify({"message": "Valid activation link"}), 200
+
+        # else token is invalid
+        return jsonify({"message": "Invalid activation link"}), 400
+
+    except:
+        return jsonify({"message": "Error occurred"}), 500    
+############################## END OF VERIFY MEMBER ACCOUNT ACTIVATION LINK #########################################
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)
