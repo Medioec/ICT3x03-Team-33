@@ -190,7 +190,7 @@ def update_credit_card():
         else:
             # If the user does not own the credit card, reject the request with a 403 Forbidden response
             # Log the error
-            logger.error(f"Access denied: No permissions. userId: {userId}")
+            logger.error(f"Access denied: No permissions. userId: {newUserId}")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         # Log the error

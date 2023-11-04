@@ -423,6 +423,7 @@ def deleteCreditCard():
     # Retrieve credit card id from request
     data = request.get_json()
     creditCardId = data['creditCardId']
+    validateCCInt  = int(creditCardId)
     
     # get sessionId from jwt
     sessionId = get_jwt_identity()
@@ -439,7 +440,7 @@ def deleteCreditCard():
     userId = response.json()["userId"]
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
-    url = f"http://databaseservice:8085/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{creditCardId}"
+    url = f"http://databaseservice:8085/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{validateCCInt}"
     response = requests.delete(url)
     
     if response.status_code == 200:
