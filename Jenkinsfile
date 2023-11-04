@@ -7,6 +7,18 @@ pipeline {
                 dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
+        stage('Sonarqube') {
+            agent { label 'builtin' }
+            steps {
+                script {
+                    def scannerHome = tool 'sonarqube';
+                    withSonarQubeEnv('sonarqube') {
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=3x03 -Dsonar.sources=."
+                    }
+                }
+
+            }
+        }
         stage('Build Test') {
             agent { label 'builtin' }
             steps {
