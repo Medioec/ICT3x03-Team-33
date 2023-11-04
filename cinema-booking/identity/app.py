@@ -172,6 +172,8 @@ def login():
     username = data['username']
     password = data['password']
 
+    username = html.escape(username)
+
     if not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
     
@@ -260,6 +262,11 @@ def verify_otp():
     username = data['username']
     user_input_otp = data['otp']
     current_time = int(time.time())
+
+    # validate and sanitize user input
+    username = html.escape(username)
+    user_input_otp = html.escape(user_input_otp)
+    user_input_otp = user_utils.validateOTP(user_input_otp)
 
     # get otp and expiry timestamp from db
     requestData = {"username": username}

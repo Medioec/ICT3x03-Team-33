@@ -94,13 +94,17 @@ def validateEmailLinks(serializer, token, link_type, expiration_time_in_seconds)
         return None
 
 def generateOTPWithTimestamp(len, expires_in_seconds):
-    characters = string.ascii_letters + string.digits
+    characters = string.ascii_uppercase + string.digits
     otp = ''.join(secrets.choice(characters) for _ in range(len))
 
     current_time = int(time.time())
     expiry_timestamp = current_time + expires_in_seconds
 
     return otp, expiry_timestamp
+
+# verify that only alphanumeric characters are used
+def validateOTP(otp):
+    return otp.isalnum()
 
 # def generateOTPWithTimestamp(totp, expires_in_seconds):
 #     current_totp = totp.now()
