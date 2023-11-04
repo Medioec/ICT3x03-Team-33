@@ -43,19 +43,19 @@ def generateBooking():
     seatId = data['seatId']
     ticketPriceId = data['ticketPriceId']
     
-    token = get_jwt() 
-
+    # get JWT token from header
+    jwt_token = request.headers.get('Authorization')
     headers = {
-        "Accept": "application/json",
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}" 
+        "Accept": "application/json",
+        "Authorization": jwt_token
     }
 
     data = {
         "userId": userId,
         "creditCardId": creditCardId
     }
-    
+
     url = f"http://payment:8084/makePayment"
     response = requests.post(url, headers=headers, json=data)
     if response.status_code != 200:
