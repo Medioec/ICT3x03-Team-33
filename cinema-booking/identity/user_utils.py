@@ -84,10 +84,10 @@ def validatePassword(password):
     if check_pwned_api(password):
         return False, "Password has been breached before according to Have I Been Pwned."
 
-    # Check password strength
-    strength_score = password_strength(password)
-    if strength_score < 3:  # You can set the threshold as you see fit
-        return False, f"Password is too weak (score: {strength_score})."
+    # Check password strength just for user to gauge their password strength
+    # strength_score = password_strength(password)
+    # if strength_score < 2:  # You can set the threshold as you see fit
+    #     return False, f"Password is too weak (score: {strength_score})."
 
     # Regular expression pattern check
     # ensure that password is 12 - 32 characters 
