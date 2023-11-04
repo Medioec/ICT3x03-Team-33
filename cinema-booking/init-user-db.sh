@@ -69,7 +69,7 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 		showtimeId INT NOT NULL,
 		userId UUID NOT NULL UNIQUE,
 		transactionId UUID NOT NULL,
-		ticketId INT UNIQUE NOT NULL,
+		ticketId SERIAL UNIQUE NOT NULL,
 		ticketPriceId INT NOT NULL,
 		PRIMARY KEY(seatId, showtimeId)
 	);
