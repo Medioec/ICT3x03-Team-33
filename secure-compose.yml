@@ -1,25 +1,28 @@
-version: '3.3'
+version: "3.3"
 services:
     nginx-waf:
-        build: ./nginx-waf/
+        image: owasp/modsecurity-crs:nginx
         networks:
             - internet-access
             - waf-to-frontend
         ports:
-            - '${HTTP_PORT}:80'
-            - '${HTTPS_PORT}:443'
+            - "${HTTP_PORT}:80"
+            - "${HTTPS_PORT}:443"
         volumes:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
-            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem:ro
+            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
+            - ./cert/certificates/nginx-waf-cert.pem:/etc/nginx/ssl/fullchain.pem:ro
+            - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
         environment:
+            - HTTP_PORT=${HTTP_PORT}
+            - HTTPS_PORT=${HTTPS_PORT}
             - PROXY=1
-            - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
-            - HEALTH=${HEALTH}
-        restart: always
-        privileged: true
+            - BASE_HOST=${BASE_HOST}
+        restart: unless-stopped
 
     frontend:
         build: ./cinema-booking/frontend
@@ -28,30 +31,64 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
+        environment:
+            - CAPTCHA_KEY=${CAPTCHA_KEY}
+        volumes:
+            - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - identity
+        restart: unless-stopped
 
     identity:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./identity/Dockerfile
         networks:
+            - internet-access
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+        volumes:
+            - ./cinema-booking/identity/logs:/logs
+            - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
+            - databaseservice
+        restart: unless-stopped
 
     movie:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./movie/Dockerfile
         networks:
             - frontend-to-movie
             - movie-to-databaseservice
+        volumes:
+            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/movie-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
-    
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+        depends_on:
+            - database
+            - databaseservice
+        restart: unless-stopped
+
     booking:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./booking/Dockerfile
         networks:
@@ -60,20 +97,38 @@ services:
             - booking-to-databaseservice
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+        volumes:
+            - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - database
+            - databaseservice
+        restart: unless-stopped
 
     payment:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
+        volumes:
+            - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         environment:
             - PYTHONUNBUFFERED=1
+            - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+        depends_on:
+            - database
+            - databaseservice
+        restart: unless-stopped
 
     databaseservice:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./databaseservice/Dockerfile
         networks:
@@ -88,12 +143,26 @@ services:
             DB_NAME: ${DBSVC_NAME}
             DB_NORMALUSER: ${DBSVC_NORMALUSER}
             DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
+        volumes:
+            - ./cinema-booking/databaseservice/logs:/logs
+            - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "20"
+        depends_on:
+            - database
+        restart: unless-stopped
 
     database:
         build:
             context: ./cinema-booking/database
         networks:
-          - databaseservice-to-database
+            - databaseservice-to-database
+            - sessioncleaning-to-database
         environment:
             POSTGRES_DB: ${SUPERUSER_DB_NAME}
             POSTGRES_USER: ${POSTGRES_SUPERUSER}
@@ -103,45 +172,119 @@ services:
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-            # - ./cinema-booking/init.sql:/docker-entrypoint-initdb.d/init.sql
             - postgres_container:/var/lib/postgresql/data
+        restart: unless-stopped
+
+    email:
+        build:
+            context: ./cinema-booking
+            dockerfile: ./email/Dockerfile
+        networks:
+            - internet-access
+            - identity-to-email
+            - booking-to-email
+        environment:
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            EMAIL_NAME: ${EMAIL_NAME}
+            EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+            BASE_HOST: ${BASE_HOST}
+        volumes:
+            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - identity
+            - booking
+        restart: unless-stopped
+
+    ofelia-scheduler:
+        image: mcuadros/ofelia:v0.3.7
+        networks:
+            - scheduler-to-sessioncleaning
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: daemon --docker
+        labels:
+            - ofelia.enabled=true
+        depends_on:
+            - sessioncleaning
+
+    sessioncleaning:
+        build:
+            context: ./cinema-booking
+            dockerfile: ./sessioncleaning/Dockerfile
+        networks:
+            - scheduler-to-sessioncleaning
+            - sessioncleaning-to-database
+        entrypoint: tail -f /dev/null
+        environment:
+            PYTHONUNBUFFERED: 1
+            DB_HOST: database
+            DB_NAME: ${DBSVC_NAME}
+            DB_NORMALUSER: ${DBSVC_NORMALUSER}
+            DB_NORMALPASSWORD: ${DBSVC_NORMALPASSWORD}
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "1m"
+                max-file: "5"
+        labels:
+            - ofelia.enabled=true
+            - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
+            - ofelia.job-exec.sessioncleaning.no-overlap=true
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
+        depends_on:
+            - database
 
 networks:
-  internet-access:
-    driver: bridge
-  waf-to-frontend:
-    driver: bridge
-    internal: true
-  frontend-to-identity:
-    driver: bridge
-    internal: true
-  frontend-to-booking:
-    driver: bridge
-    internal: true
-  frontend-to-movie:
-    driver: bridge
-    internal: true
-  booking-to-payment:
-    driver: bridge
-    internal: true
-  identity-to-payment:
-    driver: bridge
-    internal: true
-  identity-to-databaseservice:
-    driver: bridge
-    internal: true
-  movie-to-databaseservice:
-    driver: bridge
-    internal: true
-  payment-to-databaseservice:
-    driver: bridge
-    internal: true
-  booking-to-databaseservice:
-    driver: bridge
-    internal: true
-  databaseservice-to-database:
-    driver: bridge
-    internal: true
+    internet-access:
+        driver: bridge
+    waf-to-frontend:
+        driver: bridge
+        internal: true
+    frontend-to-identity:
+        driver: bridge
+        internal: true
+    frontend-to-booking:
+        driver: bridge
+        internal: true
+    frontend-to-movie:
+        driver: bridge
+        internal: true
+    booking-to-payment:
+        driver: bridge
+        internal: true
+    identity-to-payment:
+        driver: bridge
+        internal: true
+    identity-to-email:
+        driver: bridge
+        internal: true
+    booking-to-email:
+        driver: bridge
+        internal: true
+    identity-to-databaseservice:
+        driver: bridge
+        internal: true
+    movie-to-databaseservice:
+        driver: bridge
+        internal: true
+    payment-to-databaseservice:
+        driver: bridge
+        internal: true
+    booking-to-databaseservice:
+        driver: bridge
+        internal: true
+    databaseservice-to-database:
+        driver: bridge
+        internal: true
+    scheduler-to-sessioncleaning:
+        driver: bridge
+        internal: true
+    sessioncleaning-to-database:
+        driver: bridge
+        internal: true
 
 volumes:
-  postgres_container:
+    postgres_container:

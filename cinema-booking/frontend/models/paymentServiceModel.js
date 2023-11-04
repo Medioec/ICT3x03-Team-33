@@ -1,5 +1,5 @@
 async function makePayment(sessionId, paymentData) {
-    const response = await fetch("http://paymentservice:8084/makePayment", {
+    const response = await fetch("http://payment:8084/makePayment", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -14,7 +14,7 @@ async function makePayment(sessionId, paymentData) {
 }
 
 async function addCreditCard(token, creditCardData) {
-    const response = await fetch("http://paymentservice:8084/addCreditCard", {
+    const response = await fetch("http://payment:8084/addCreditCard", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -24,12 +24,18 @@ async function addCreditCard(token, creditCardData) {
         body: JSON.stringify(creditCardData),
     });
 
-    return response;
+    if (response.status === 200) {
+        return response;
+    } else if (response.status === 400) {
+        throw new Error('Bad Request - Invalid credit card data');
+    } else {
+        throw new Error('Internal Server Error');
+    }
 }
 
-async function getOneCreditCard(sessionId, userId, creditCardId) {
+
+async function getOneCreditCard(sessionId, creditCardId) {
     const requestData = {
-        userId: userId,
         creditCardId: creditCardId
     };
     
@@ -47,23 +53,22 @@ async function getOneCreditCard(sessionId, userId, creditCardId) {
     return responseData;
 }
 
-async function getAllCreditCards(token, userId) {
-    const requestData = {
-        userId: userId
-    };
-    
-    const response = await fetch("http://payment:8084/getAllCreditCards", {
-        method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(requestData),
-    });
-
-    const responseData = await response.json();
-    return responseData;
+async function getAllCreditCards(token) {
+    try {
+        const response = await fetch("http://payment:8084/getAllCreditCards", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        });
+        const responseData = await response.json();
+        return responseData;
+    } catch (error) {
+        console.error("Error in getAllCreditCards:", error); 
+        throw error; 
+    }
 }
 
 async function updateOneCreditCard(sessionId, creditCardData) {
@@ -81,9 +86,8 @@ async function updateOneCreditCard(sessionId, creditCardData) {
     return responseData;
 }
 
-async function deleteCreditCard(sessionId, userId, creditCardId) {
+async function deleteCreditCard(sessionId, creditCardId) {
     const requestData = {
-        userId: userId,
         creditCardId: creditCardId
     };
 

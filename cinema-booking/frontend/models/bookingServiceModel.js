@@ -1,4 +1,4 @@
-async function generateBooking(bookingData) {
+async function generateBooking(token, bookingData) {
     const response = await fetch("http://booking:8083/generateBooking", {
         method: "POST",
         headers: {

@@ -1,3 +1,15 @@
+// Define the onSuccess function to handle the captcha callback
+function onSuccess() {
+    if (grecaptcha.getResponse()) {
+        captchaState = true;
+        console.log(captchaState);
+        captchaFeedback.textContent = '';
+    }
+}
+
+let captchaState = false;
+const captchaFeedback = document.getElementById('captchaError');
+
 (() => {
     'use strict';
   
@@ -28,6 +40,15 @@
     cvvFeedback.className = 'invalid-feedback';
     cvvFeedback.textContent = 'Invalid CVV';
     cvvInput.parentNode.appendChild(cvvFeedback);
+
+    // Delete Credit Card Modal
+    const deleteCardModal = document.getElementById('deleteCardModal');
+    const confirmDeleteCardButton = document.getElementById('confirmDeleteCard');
+    const deleteCardId = document.getElementById('deleteCardId');
+
+    // Modify Credit Card Modal
+    const modifyCardModal = document.getElementById('modifyCardModal');
+    const confirmModifyCardButton = document.getElementById('confirmModifyCard');
   
     //////////////////////////////////////////////////////////////////////////
 
@@ -38,10 +59,39 @@
         const sanitizedCreditCardExpiry = DOMPurify.sanitize(creditCardExpiryInput.value);
         const sanitizedCvv = DOMPurify.sanitize(cvvInput.value);
         
-        if (!form.checkValidity()) {
+        const formData = {
+            creditCardNumber: sanitizedCreditCardNumber,
+            creditCardName: sanitizedCreditCardName,
+            creditCardExpiry: sanitizedCreditCardExpiry,
+            cvv: sanitizedCvv,
+          };
+        
+          const creditCardData = JSON.stringify(formData);
+        if (!form.checkValidity() || captchaState === false) {
             event.preventDefault();
             event.stopPropagation();
+            captchaFeedback.textContent = 'Please complete the captcha!';
         }
+        else{       
+            fetch("/addcreditcard", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: creditCardData,
+        })
+    
+        .then(response => {
+            if (response.ok) {
+                console.log('Credit card added successfully');
+                window.location.href = '/memberprofile';
+            }
+        })
+    
+        .catch(error => {
+            console.error('Error occurred', error);
+        });}
 
       form.classList.add('was-validated');
     }, false);
@@ -66,28 +116,28 @@
   
     function validateCreditCardExpiry(creditCardExpiry) {
         try {
-          if (creditCardExpiry.length !== 5 || creditCardExpiry.charAt(2) !== '/') {
-            return false;
-          }
-      
-          const month = parseInt(creditCardExpiry.substring(0, 2), 10) - 1;
-          const year = parseInt(`20${creditCardExpiry.substring(3, 5)}`, 10);
-      
-          const expiryDate = new Date(year, month, 1);
-          const currentDate = new Date();
-      
-          return expiryDate > currentDate;
+            if (creditCardExpiry.length !== 5 || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(creditCardExpiry)) {
+                return false;
+            }
+    
+            const month = parseInt(creditCardExpiry.substring(0, 2), 10) - 1;
+            const year = parseInt(`20${creditCardExpiry.substring(3, 5)}`, 10);
+    
+            const expiryDate = new Date(year, month, 1);
+            const currentDate = new Date();
+    
+            return expiryDate > currentDate;
         } catch (error) {
-          return false;
+            return false;
         }
-    }  
+    }    
   
     function validateCvv(cvv) {
       return /^\d{3,4}$/.test(cvv);
     }
   
     //////////////////////////////////////////////////////////////////////////
-
+    
     //////////////////////////////////////////////////////////////////////////
 
     creditCardNumberInput.addEventListener('input', () => {

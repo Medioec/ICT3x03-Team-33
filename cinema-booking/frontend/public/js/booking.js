@@ -11,10 +11,11 @@ const modalCancelButton = document.getElementById('cancelButton');
 const loggedIn = checkoutButton.getAttribute('data-loggedin');
 
 // uncomment the following line to populate the UI with the cached selected seat ID
-// populateUI();
+populateUI();
 
 let ticketPrice = 10.50; // Assuming a default price per ticket
 let selectedSeatsCount = 0;
+let selectedSeatId = null; 
 
 function updateSelectedCount() {
     const selectedSeat = document.querySelector('.row .seat.selected');
@@ -58,8 +59,12 @@ container.addEventListener('click', (e) => {
         // Toggle the clicked seat
         e.target.classList.toggle('selected');
         updateSelectedCount();
+        
+        // Update the selectedSeatId variable
+        selectedSeatId = e.target.classList.contains('selected') ? e.target.id : null;
     }
 });
+
 
 // Add an event listener to the reset button
 const resetButton = document.getElementById('resetButton');
@@ -68,21 +73,19 @@ resetButton.addEventListener('click', () => {
     if (selectedSeat) {
         selectedSeat.classList.remove('selected');
     }
-    localStorage.removeItem('selectedSeat');
     updateSelectedCount();
 });
 
 checkoutButton.addEventListener('click', () => {
     if (loggedIn === 'true') {
         // User is logged in, continue with checkout logic
-        const selectedSeat = JSON.parse(localStorage.getItem('selectedSeat'));
-
-        // Check if a seat is selected
-        if (selectedSeat) {
+        
+        // Check if a seat is selected using the selectedSeatId variable
+        if (selectedSeatId) {
             const showtimeDetailsId = showtimeDetails.showtimeId; // Get the showtime ID from showtimeDetails
 
             // Construct the URL with selected seat ID and showtime ID as query parameters
-            const paymentURL = `/payment?seat=${encodeURIComponent(selectedSeat)}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
+            const paymentURL = `/payment?seat=${encodeURIComponent(selectedSeatId)}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
             
             // Navigate to the payment page with selected seat ID and showtime ID as query parameters
             window.location.href = paymentURL;
@@ -96,6 +99,7 @@ checkoutButton.addEventListener('click', () => {
         modalOverlay.style.display = 'block';
     }
 });
+
 
 modalCloseBtn.addEventListener('click', () => {
     loginModal.style.display = 'none';

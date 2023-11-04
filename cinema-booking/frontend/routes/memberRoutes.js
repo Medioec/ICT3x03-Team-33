@@ -23,6 +23,11 @@ router.get('/payment', isOTPVerified, checkUserRole(member_role), memberControll
 // verify account activation link
 router.get('/verify', memberController.verifyAccount);
 
-// Add other routes as needed
+// add credit card
+router.post('/addcreditcard', isOTPVerified, checkUserRole(member_role), memberController.postCreditCard);
 
+// process booking 
+router.post('/processbooking', isOTPVerified, checkUserRole(member_role), memberController.postGenerateBooking);
+
+// Add other routes as needed
 module.exports = router;

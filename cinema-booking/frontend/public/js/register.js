@@ -68,26 +68,30 @@ document.addEventListener("DOMContentLoaded", function () {
         password: password
       };
 
-      if (grecaptcha.getResponse()) { // Check if reCAPTCHA is completed
-        await fetch("/registerRequest", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(data),
-        })
-        .then(response => 
-        {
-          // redirect to login if registration successful
+      if (grecaptcha.getResponse()) {
+        try {
+          const response = await fetch("/registerRequest", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify(data),
+          });
+  
           if (response.ok) {
             window.location.href = "/login";
+          } else {
+            // Handle non-200 responses
+            const errorData = await response.json();
+            document.getElementById("error-message").textContent = errorData.message;
           }
           return response.json();
-        })
-        .then(data => {
-          document.getElementById("error-message").textContent = data.message;
-        });
+        }
+        catch (error) {
+          // Handle network errors or issues parsing the response
+          document.getElementById("error-message").textContent = "An error occurred. Please try again.";
+        }
       } else {
         document.getElementById("error-message").textContent = "Please complete the reCAPTCHA.";
       }
