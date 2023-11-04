@@ -40,6 +40,15 @@ const captchaFeedback = document.getElementById('captchaError');
     cvvFeedback.className = 'invalid-feedback';
     cvvFeedback.textContent = 'Invalid CVV';
     cvvInput.parentNode.appendChild(cvvFeedback);
+
+    // Delete Credit Card Modal
+    const deleteCardModal = document.getElementById('deleteCardModal');
+    const confirmDeleteCardButton = document.getElementById('confirmDeleteCard');
+    const deleteCardId = document.getElementById('deleteCardId');
+
+    // Modify Credit Card Modal
+    const modifyCardModal = document.getElementById('modifyCardModal');
+    const confirmModifyCardButton = document.getElementById('confirmModifyCard');
   
     //////////////////////////////////////////////////////////////////////////
 

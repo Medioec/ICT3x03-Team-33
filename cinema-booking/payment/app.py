@@ -23,6 +23,7 @@ def unauthorized_callback(callback):
 @app.route('/makePayment', methods=["POST"])
 @jwt_required()
 def makePayment():
+
     # get sessionId from jwt
     sessionId = get_jwt_identity()
     if not sessionId:

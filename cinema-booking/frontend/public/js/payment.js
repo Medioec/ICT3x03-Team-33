@@ -138,7 +138,7 @@ const captchaFeedback = document.getElementById('captchaError');
               const bookingData = JSON.stringify(paymentData);
               console.log(bookingData);
 
-                if(bookingData.length > 0){
+                if(bookingData){
                   fetch("/processbooking", {
                     method: "POST",
                     headers: {
@@ -166,7 +166,7 @@ const captchaFeedback = document.getElementById('captchaError');
                 }
 
             } else {
-                console.log('Credit card not found in cardData');
+                console.log('Credit card not found.');
             }
         } else {
             makePaymentWarning.textContent = 'Please select an option first!';

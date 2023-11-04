@@ -53,7 +53,7 @@ def generateBooking():
 
     data = {
         "userId": userId,
-        "creditCardId": creditCardId,
+        "creditCardId": creditCardId
     }
     
     url = f"http://payment:8084/makePayment"
