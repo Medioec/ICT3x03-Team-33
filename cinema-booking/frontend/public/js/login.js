@@ -60,17 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("error-message").textContent = data.message;
             throw new Error(data.message);
           }
-      
-          switch (data.userRole) {
-            case "member":
-              window.location.href = "/member";
-              break;
-      
-            case "staff":
-              window.location.href = "/staff";
-              break;
 
-            // TODO ADD A CASE FOR ADMIN
+          else if (data.status === 'success') {
+            window.location.href = "/otp";
           }
         })
         .catch(error => {

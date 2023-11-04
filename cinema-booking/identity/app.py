@@ -165,14 +165,12 @@ def register():
 @app.route("/login", methods=["POST"])
 def login():
     # logs login attempt
-    logger.info(f"Attempting login...")
+    logger.warning(f"Attempting login...")
     
     # get data from login form
     data = request.get_json()
     username = data['username']
     password = data['password']
-
-    username = html.escape(username)
 
     if not username or not password:
         return jsonify({"message": "Please fill in all form data"}), 400
@@ -188,7 +186,9 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_details", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/user/get_user_details", json=requestData)
+
+    print("getting password hash", response.status_code)
 
     if response.status_code != 200:
         # get error message from response. if no message, use default "Error occurred"
@@ -210,13 +210,16 @@ def login():
 
     # if account activated, get password hash and email from DB
     dbHash = response.json()["passwordHash"]
-    email =response.json()["email"]
+    email = response.json()["email"]
     
+    print("password hash", dbHash)
+
     # verify password
     try:
         ph = PasswordHasher()
         ph.verify(dbHash, password)
-    
+        print("password hashes match")
+
     # if password hashes do not match, throw error
     except Exception as e:
         # log login failure
@@ -224,13 +227,13 @@ def login():
         return jsonify({"message": "Username or password was incorrect"}), 404
     
     # if username and password are valid, generate otp, insert into db and send to user's email
-    otp, expiryTimestamp = user_utils.generateOTPWithTimestamp(len=6, expires_in_seconds=60)
+    otp, otpExpiryTimestamp = user_utils.generateOTPWithTimestamp(len=6, expires_in_seconds=60)
     
     # insert otp into db
     requestData = {"username": username,
                    "otp": otp,
-                   "expiryTimestamp": expiryTimestamp}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/set_otp_by_username", json=requestData)
+                   "otpExpiryTimestamp": otpExpiryTimestamp}
+    response = requests.put("http://databaseservice:8085/databaseservice/user/set_otp_by_username", json=requestData)
     if response.status_code != 200:
         # log otp insertion failure
         logger.error(f"OTP insertion for {username} failed. Error: {response.json()['message']}")
@@ -243,8 +246,8 @@ def login():
                 "username": username
     }
     response = requests.post("http://email:587/send_otp", json=requestData)
+    
     if response.status_code != 200:
-
         # log otp email failure
         logger.error(f"Email sending of OTP to {username} failed. Error: {response.json()['message']}")
         return jsonify({"message": "Error occurred"}), response.status_code
@@ -277,7 +280,7 @@ def verify_otp():
         return jsonify({"message": "Error occurred"}), response.status_code
     
     db_otp = response.json()["otp"]
-    db_timestamp = response.json()["expiryTimestamp"]
+    db_timestamp = response.json()["otpExpiryTimestamp"]
     password = response.json()["passwordHash"]
     
     # check if OTP has expired

@@ -15,6 +15,19 @@ async function loginRequest(body) {
     return response;
 }
 
+async function verifyOTP(body) {
+    const response = await fetch("http://identity:8081/verify_otp", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+    });
+
+    return response;
+}
+
 async function registerRequest(body) {
     const response = await fetch("http://identity:8081/register", {
         method: "POST",
@@ -80,6 +93,7 @@ async function verifyMemberActivationToken(token) {
 
 module.exports = {
     loginRequest,
+    verifyOTP,
     registerRequest,
     logoutRequest,
     verifyStaffActivationToken,

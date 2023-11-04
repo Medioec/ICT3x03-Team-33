@@ -105,7 +105,6 @@ def get_user_details():
         # Get data from the request
         data = request.get_json()
         username = data['username']
-
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -114,7 +113,7 @@ def get_user_details():
         select_query = "SELECT * FROM cinemauser WHERE username = %s"
         cursor.execute(select_query, (username,))
         user = cursor.fetchone()
-        
+
         cursor.close()
         conn.close()
 
@@ -130,7 +129,7 @@ def get_user_details():
                 "activationLink": user[6],
                 "isLinkUsed": user[7],
                 "otp": user[8],
-                "expiryTimestamp": user[9],
+                "otpExpiryTimestamp": user[9]
             }
             
             # Log the successful retrieval of a user
@@ -467,6 +466,6 @@ def get_otp_details():
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
-        logger.error(f"Error in get_user_details: {str(e)}")
+        logger.error(f"Error in get_otp_passwordHash: {str(e)}")
         return jsonify({"error": str(e)}), 500 
 #####   End of get OTP information     #####    

@@ -7,9 +7,7 @@ import requests
 import re
 import secrets 
 import uuid
-from itsdangerous import URLSafeTimedSerializer
 import string
-import pyotp
 import time
 
 # check if username is available/does not exist in db

@@ -11,6 +11,8 @@ const checkLoggedIn = require('../middleware/checkLoggedIn');
 // login
 router.get('/login', checkLoggedIn, identityServiceController.getLogin);
 router.post('/loginRequest', checkLoggedIn, checkHeaders, identityServiceController.postLogin);
+router.get('/otp', checkLoggedIn, identityServiceController.getOTP);
+router.post('/otpRequest', checkLoggedIn, checkHeaders, identityServiceController.postOTP);
 
 // register
 router.get('/register', checkLoggedIn, identityServiceController.getRegister);
