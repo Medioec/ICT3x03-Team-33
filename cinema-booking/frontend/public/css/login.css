@@ -289,3 +289,10 @@ span.validate-tooltip {
 #placeholderFix{
   margin: -4px;
 }
+
+#password-strength-bar {
+  height: 10px;
+  width: 2%; /* Minimum width to make it visible even when score is 0 */
+  background-color: red;
+  transition: width 0.5s ease; /* Optional: adds a transition effect */
+}

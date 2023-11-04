@@ -7,6 +7,8 @@ const https = require('https');
 const fs = require('fs');
 
 const app = express();
+// Serve static files(password str meter) from the 'dist' directory
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // middleware
 app.use(cors());
@@ -15,6 +17,10 @@ app.use(bodyParser.json());
 
 // set up static files (css, js, images) and views
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve the zxcvbn-ts core package as a static asset
+app.use('/zxcvbn-core', express.static(path.join(__dirname, 'node_modules/@zxcvbn-ts/core/dist')));
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
