@@ -49,8 +49,21 @@ otpForm.on('submit', function (e) {
     })
     .then(data => {
         if (data.status === 'fail') {
-          document.getElementById("error-message").textContent = data.message;
-          throw new Error(data.message);
+            document.getElementById("error-message").textContent = data.message;
+
+            // Clear all inputs and OTP values
+            $('.otp-input').val('');
+
+            // Disable all fields except for the first field
+            $('.otp-input:not(:first)').prop('disabled', true);
+
+            // Remove the 'required' attribute from all fields except for the first field
+            $('.otp-input:not(:first)').removeAttr('required');
+            
+            // Focus on the first input
+            $('input').eq(0).focus();
+
+            throw new Error(data.message);
         }
 
         switch (data.userRole) {
