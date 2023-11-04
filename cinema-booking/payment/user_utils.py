@@ -22,22 +22,15 @@ def validateCreditCardName(creditCardName):
     # Allow only letters and spaces, and ensure it's not empty
     return bool(re.match(r'^[A-Za-z\s]+$', creditCardName)) and len(creditCardName) > 0
 
+# Validate credit card expiry date
 def validateCreditCardExpiry(creditCardExpiry):
     try:
         # Convert the expiration date string to a datetime object
         expiry_date = datetime.strptime(creditCardExpiry, '%m/%y')
-
-        # Replace day with the last day of the expiry month
-        # This considers the card valid through the end of the expiration month
-        last_day_of_month = datetime(expiry_date.year, expiry_date.month + 1, 1) - timedelta(days=1)
-        expiry_date = expiry_date.replace(day=last_day_of_month.day)
-
         # Check if the expiration date is in the future
-        # Using datetime.utcnow() to get the current UTC date
-        return expiry_date >= datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        return expiry_date >  datetime.utcnow()
     except ValueError:
-        # Failed to parse the date
-        return False
+        return False  # Failed to parse the date
     
 # Validate CVV
 def validateCvv(cvv):
