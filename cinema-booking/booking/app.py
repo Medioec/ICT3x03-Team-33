@@ -175,6 +175,27 @@ def retrieveAllBookings():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+###################################################################################################################################
+
+@app.route('/retrieveAllBookedSeats/<int:showtimeId>', methods=["GET"])
+@jwt_required()
+def retrieveAllBookedSeats(showtimeId):
+    try:
+        showtimeIdInt = int(showtimeId)
+        
+        url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_all_booked_seats_by_showtimeId/{showtimeIdInt}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            return response.json(), 200
+        elif response.status_code == 404:
+            return jsonify({"message": f"No booked seats found for showtimeId given. showtimeId: {showtimeId}"}), 404
+        else:
+            return jsonify({"message": "Error retrieving the booked seats"}), 500
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 #NOTE: No need do cancellation or updating booking, cause we not allowing both.    
     
 if __name__ == "__main__":

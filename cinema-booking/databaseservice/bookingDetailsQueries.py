@@ -83,12 +83,12 @@ def get_booking_details_by_id(user_id, ticket_id):
 
             if booking_details:
                 bookingDetails = {
-                    "ticketId": booking_details[0],
-                    "showtimeId": booking_details[1],
-                    "seatId": booking_details[2],
-                    "transactionId": booking_details[3],
-                    "userId": booking_details[4],
-                    "ticketPriceId": booking_details[5]
+                    "seatId": booking_details[0],            
+                    "showtimeId": booking_details[1],        
+                    "userId": booking_details[2],            
+                    "transactionId": booking_details[3],     
+                    "ticketId": booking_details[4],          
+                    "ticketPriceId": booking_details[5] 
                 }
                 return jsonify(bookingDetails), 200
             else:
@@ -143,6 +143,43 @@ def get_all_bookings_by_userId(userId):
         logger.error(f"Error in get_all_bookings_by_userId: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####     End of retrieve all booking by userId    #####
+
+#####     Retrieve all booked seats by showtimeId     #####
+@booking_details_bp.route('/get_all_booked_seats_by_showtimeId/<int:showtimeId>', methods=['GET'])
+def get_all_booked_seats_by_showtimeId(showtimeId):
+    # Log the retrieval of all booked seats by showtimeId
+    logger.info(f"Retrieving all booked seats for showtimeId: {showtimeId}.")
+    try:
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        select_query = "SELECT seatId FROM BookingDetails WHERE showtimeId = %s"
+        cursor.execute(select_query, (showtimeId,))
+        booked_seats = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        if booked_seats:
+            booked_seats_list = []
+            for bookedseats in booked_seats:
+                one_booked_seat = {
+                    "showtimeId": showtimeId,
+                    "seatId": bookedseats[0],
+                }
+                booked_seats_list.append(one_booked_seat)
+
+            # Log the successful retrieval of all booked seats by showtimeId
+            logger.info(f"Booked seats by showtimeId retrieved successfully.")
+            return jsonify(booked_seats_list), 200
+        else:
+            logger.warning(f"No booked seats found.")
+            return jsonify({"message": "No booked seats found"}), 404
+
+    except Exception as e:
+        logger.error(f"Error in get_all_booked_seats_by_showtimeId: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####     End of retrieve all booked seats by showtimeId    #####
 
 '''
 NOTE: 
