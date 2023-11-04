@@ -383,7 +383,7 @@ def set_otp():
         data = request.get_json()
         username = data['username']
         otp = data['otp']
-        expiryTimestamp = data['expiryTimestamp']
+        otpExpiryTimestamp = data['otpExpiryTimestamp']
         
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -402,8 +402,8 @@ def set_otp():
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()
 
-            update_query = "UPDATE cinemauser SET otp = %s, expiryTimestamp = %s WHERE username = %s"
-            cursor.execute(update_query, (otp, expiryTimestamp, username,))
+            update_query = "UPDATE cinemauser SET otp = %s, otpExpiryTimestamp = %s WHERE username = %s"
+            cursor.execute(update_query, (otp, otpExpiryTimestamp, username,))
             conn.commit()
 
             cursor.close()
@@ -439,7 +439,7 @@ def get_otp_details():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        select_data_query = "SELECT passwordHash, otp, expiryTimestamp FROM CinemaUser WHERE username = %s "
+        select_data_query = "SELECT passwordHash, otp, otpExpiryTimestamp FROM CinemaUser WHERE username = %s "
         cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 
@@ -449,11 +449,11 @@ def get_otp_details():
         # Separate the data into two attributes in a JSON response
         if data_result:
             # Assuming there's one result
-            passwordHash, otp, expiryTimestamp = data_result[0]
+            passwordHash, otp, otpExpiryTimestamp = data_result[0]
             response_data = {
                 "passwordHash": passwordHash,
                 "otp": otp,
-                "expiryTimestamp": expiryTimestamp
+                "otpExpiryTimestamp": otpExpiryTimestamp
             }
 
             # Log the successful retrieval of a user
