@@ -32,8 +32,8 @@ pipeline {
                 script {
                     sh '''
                     . venv/bin/activate
-                    python -m unittest tests/test_app.py
-                    python -m unittest tests/test_booking_utils.py
+                    python -m unittest test_app.py
+                    python -m unittest test_booking_utils.py
                     '''
                 }
             }
