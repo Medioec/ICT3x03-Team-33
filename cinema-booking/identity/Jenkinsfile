@@ -26,7 +26,7 @@ pipeline {
                 script {
                     // Run your unit tests
                     sh '. venv/bin/activate'
-                    sh 'python -m unittest discover tests'
+                    sh 'python -m unittest discover'
                 }
             }
         }
