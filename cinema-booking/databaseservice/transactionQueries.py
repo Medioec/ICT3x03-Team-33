@@ -39,14 +39,14 @@ def create_transaction():
         
         try:
             cursor.execute(insert_query, (transactionId, creditCardId, transactionDateTime))
-            transaction_id = cursor.fetchone()[0]
             conn.commit()
             cursor.close()
             conn.close()
 
             # Log the successful creation of a new transaction entry
-            logger.info(f"Transaction added successfully with new transactionId: {transaction_id}.")
-            return jsonify({"message": "Transaction added successfully", "transactionId": transaction_id}), 201
+            logger.info(f"Transaction added successfully with transactionId: {transactionId}.")
+            return jsonify({"message": "Transaction added successfully", "transactionId": transactionId}), 201
+
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
             conn.rollback()  # Rollback the transaction

@@ -52,13 +52,23 @@ exports.getMemberBookingPage = async (req, res) => {
         const token = req.cookies.token;
 
         const bookingHistory = await bookingService.retrieveAllBookings(token);
-        console.log(bookingHistory);
+        const bookingShowtime = bookingHistory.map((booking) => booking.showtimeId);
+        const showtimeArray = [];
 
-        return res.render('pages/memberbooking.ejs', { bookingHistory, loggedIn });
+        for (const showtimeId of bookingShowtime) {
+            const showtime = await movieService.getShowtimeById(showtimeId);
+            showtimeArray.push(showtime);
+        }
+
+        console.log(bookingHistory);
+        console.log(showtimeArray);
+
+        return res.render('pages/memberbooking.ejs', { showtimeArray, bookingHistory, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 exports.getMemberProfilePage = async (req, res) => {
     try {
@@ -70,7 +80,7 @@ exports.getMemberProfilePage = async (req, res) => {
 
         return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
     } catch (error) {
-        console.error("Error in getMemberProfilePage:", error); // Log the error
+        console.error("Error in getMemberProfilePage:", error); 
         res.status(500).send('Internal Server Error');
     }
 };
@@ -167,8 +177,8 @@ exports.postGenerateBooking = async (req, res) => {
 
         const booking = await bookingService.generateBooking(token, bookingDetails);
 
-        if (booking.status === 200) {
-            return res.status(200).json({ message: 'Booking generated successfully' });
+        if (booking.status === 201) {
+            return res.status(201).json({ message: 'Booking generated successfully' });
         } else if (booking.status === 400) {
             // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Bad Request - Invalid booking data' });

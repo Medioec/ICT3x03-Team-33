@@ -41,7 +41,7 @@ def generate_booking_details():
         
         try:
             cursor.execute(insert_query, (showtimeId, seatId, transaction_id, userId, ticketPriceId))
-            ticket_id = cursor.fetchone()[0]
+            ticket_id = cursor.lastrowid
             conn.commit()
             cursor.close()
             conn.close()
@@ -114,7 +114,7 @@ def get_all_bookings_by_userId(userId):
 
         select_query = "SELECT * FROM BookingDetails WHERE userId = %s"
         cursor.execute(select_query, (userId,))
-        booking_details = cursor.fetchone()
+        booking_details = cursor.fetchall()
 
         cursor.close()
         conn.close()

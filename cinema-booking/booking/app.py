@@ -26,14 +26,13 @@ def generateBooking():
     # get sessionId from jwt
     sessionId = get_jwt_identity()
     if not sessionId:
-        print("Error: No token sent")
-        return jsonify({"message": "Error retrieving the bookings"}), 500    
+        return jsonify({"message": "Error retrieving the bookings", "status": 500}), 500    
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
     response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
-        return jsonify({"message": "Database error"}), 500
+        return jsonify({"message": "Database error", "status": 500}), 500
     userId = response.json()["userId"]
 
     # Retrieve booking details from request
@@ -58,19 +57,19 @@ def generateBooking():
 
     url = f"http://payment:8084/makePayment"
     response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 200:
+    if response.status_code != 201:
         if response.status_code == 400:
-            return jsonify({"message": "Bad request: Invalid credit card"}), 400
+            return jsonify({"message": "Bad request: Invalid credit card", "status": 409}), 400
         elif response.status_code == 403:
-            return jsonify({"message": "Access denied: No permissions"}), 403    
+            return jsonify({"message": "Access denied: No permissions", "status": 403}), 403    
         elif response.status_code == 404:
-            return jsonify({"message": "Credit card not found"}), 404    
+            return jsonify({"message": "Credit card not found", "status": 404}), 404    
         elif response.status_code == 409:
-            return jsonify({"message": "Duplicate entry: This transaction already exists"}), 409    
+            return jsonify({"message": "Duplicate entry: This transaction already exists", "status": 409}), 409    
         else:
-            return jsonify({"message": "Error generating the booking"}), 500    
-
-    if response.status_code == 200:
+            return jsonify({"message": "Error generating the booking", "status": 500}), 500    
+    
+    if response.status_code == 201:
         data = {
             "userId": userId,
             "showtimeId": showtimeId,
@@ -83,17 +82,14 @@ def generateBooking():
         url = f"http://databaseservice:8085/databaseservice/bookingdetails/generate_booking_details"
         response = requests.post(url, json=data)
         if response.status_code == 201:
-            return jsonify({"message": "Booking created successfully"}), 201    
-
+            return jsonify({"message": "Booking created successfully", "status": 201}), 201    
         elif response.status_code == 409:
-            return jsonify({"message": "Duplicate entry: This booking already exists"}), 409    
-
-            
+            return jsonify({"message": "Duplicate entry: This booking already exists", "status": 409}), 409    
         else:
-            return jsonify({"message": "Error generating the booking"}), 500    
+            return jsonify({"message": "Error generating the booking", "status": 500}), 500    
 
     # Add a final return statement in case none of the conditions are met
-    return jsonify({"message": "Error generating the booking"}), 500    
+    return jsonify({"message": "Error generating the booking", "status": 500}), 500    
 
 
 ###################################################################################################################################
@@ -160,6 +156,7 @@ def retrieveAllBookings():
         response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
+        
         userId = response.json()["userId"]
         
         url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"

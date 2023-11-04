@@ -157,7 +157,7 @@ const captchaFeedback = document.getElementById('captchaError');
                   .then(data => {
                       console.log('Payment Successful');
                       alert("Payment Successful!");
-                      window.location.href = '/memberhome';
+                      window.location.href = '/viewbooking';
                   })
                   .catch(error => {
                       console.error('Error occurred', error);

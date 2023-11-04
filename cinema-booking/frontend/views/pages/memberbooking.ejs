@@ -4,51 +4,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Bookings</title>
+  <title>All bookings</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <link rel="stylesheet" href="/css/nav.css" />
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body>
+  <!-- Navbar -->
+  <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
-    <!-- Navbar -->
-    <% include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
-    <!-- Container for booking history -->
+  <!-- Container for booking history -->
     <div class="container mt-5">
       <h2>Booking History</h2>
       <div class="row mt-3">
-        <div class="col">Transaction ID</div>
-        <div class="col">Seat ID</div>
-        <div class="col">Showtime ID</div>
-        <div class="col">Ticket ID</div>
-        <div class="col">Ticket Price ID</div>
-      </div>
-      <div class="row" id="ccRow">
-        <a>Use an existing credit card?</a>
         <% if (bookingHistory && bookingHistory.length > 0) { %>
-          <form class="btn-group-toggle" data-toggle="buttons">
+          <div class="card-deck">
             <% bookingHistory.forEach(function(booking) { %>
-              <div class="row mt-3">
-                <div class="col">Transaction Id: <%= booking.transactionId %></div>
-                <div class="col">Seat: <%= booking.seatId %></div>
-                <div class="col">Showtime: <%= booking.showtimeId %></div>
-                <div class="col">Ticket Id: <%= booking.ticketId %></div>
-                <div class="col">Ticket Price: <%= booking.ticketPriceId %></div>
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Transaction ID: <%= booking.transactionId %></h5>
+                  <div class="col-md-6">
+                    <p class="card-text">Seat ID: <%= booking.seatId %></p>
+                    <p class="card-text">Showtime ID: <%= booking.showtimeId %></p>
+                    <p class="card-text">Ticket Price ID: <%= booking.ticketPriceId %></p>
+                  </div>
+                  <!-- Extracted data from showtimeArray -->
+                  <div class="col-md-6">
+                  <% showtimeArray.forEach(function(showtime) { %>
+                    <% if (showtime.showtimeId === booking.showtimeId) { %>
+                      <p class="card-text">Cinema Name: <%= showtime.cinemaName %></p>
+                      <p class="card-text">Movie Title: <%= showtime.movieTitle %></p>
+                      <p class="card-text">Show Date: <%= showtime.showDate %></p>
+                      <p class="card-text">Show Time: <%= showtime.showTime %></p>
+                      <p class="card-text">Theater Number: <%= showtime.theaterNumber %></p>
+                    <% } %>
+                  <% }); %>
+                  </div>
+                </div>
               </div>
             <% }); %>
-          </form>
+          </div>
         <% } else { %>
-          <!-- if there are no existing credit cards -->
+          <!-- if booking history is empty -->
           <div class="row mt-3">
             <div class="col">
               No booking history available.
@@ -58,13 +64,17 @@
       </div>
     </div>
 
+  </main>
     <!-- footer -->
-    <% include('../partial/footer'); %>
+    <%- include('../partial/footer'); %>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-  </main>
 
 </body>
 
 </html>
+
+
+
+
