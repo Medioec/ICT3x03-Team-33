@@ -178,7 +178,6 @@ def retrieveAllBookings():
 ###################################################################################################################################
 
 @app.route('/retrieveAllBookedSeats/<int:showtimeId>', methods=["GET"])
-@jwt_required()
 def retrieveAllBookedSeats(showtimeId):
     try:
         showtimeIdInt = int(showtimeId)
