@@ -33,16 +33,29 @@
         <div class="col">Ticket ID</div>
         <div class="col">Ticket Price ID</div>
       </div>
-      <% bookingHistory.forEach(function(booking) { %>
-        <div class="row mt-3">
-          <div class="col">Transaction Id: <%= booking.transactionId %></div>
-          <div class="col">Seat: <%= booking.seatId %></div>
-          <div class="col">Showtime: <%= booking.showtimeId %></div>
-          <!-- join with showtimeDetails to get showtime information, for now leave it -->
-          <div class="col">Ticket Id: <%= booking.ticketId %></div>
-          <div class="col">Ticket Price: <%= booking.ticketPriceId %></div>
-        </div>
-      <% }); %>
+      <div class="row" id="ccRow">
+        <a>Use an existing credit card?</a>
+        <% if (bookingHistory && bookingHistory.length > 0) { %>
+          <form class="btn-group-toggle" data-toggle="buttons">
+            <% bookingHistory.forEach(function(booking) { %>
+              <div class="row mt-3">
+                <div class="col">Transaction Id: <%= booking.transactionId %></div>
+                <div class="col">Seat: <%= booking.seatId %></div>
+                <div class="col">Showtime: <%= booking.showtimeId %></div>
+                <div class="col">Ticket Id: <%= booking.ticketId %></div>
+                <div class="col">Ticket Price: <%= booking.ticketPriceId %></div>
+              </div>
+            <% }); %>
+          </form>
+        <% } else { %>
+          <!-- if there are no existing credit cards -->
+          <div class="row mt-3">
+            <div class="col">
+              No booking history available.
+            </div>
+          </div>
+        <% } %>
+      </div>
     </div>
 
     <!-- footer -->

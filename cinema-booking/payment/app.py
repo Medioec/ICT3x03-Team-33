@@ -439,7 +439,7 @@ def deleteCreditCard():
     userId = response.json()["userId"]
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
-    url = f"http://databaseservice:8085/databaseservice/creditcard/delete_credit_card/{userId}/{creditCardId}"
+    url = f"http://databaseservice:8085/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{creditCardId}"
     response = requests.delete(url)
     
     if response.status_code == 200:

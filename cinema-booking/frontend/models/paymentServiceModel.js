@@ -1,10 +1,10 @@
-async function makePayment(sessionId, paymentData) {
+async function makePayment(token, paymentData) {
     const response = await fetch("http://payment:8084/makePayment", {
         method: "POST",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(paymentData),
     });
@@ -34,7 +34,7 @@ async function addCreditCard(token, creditCardData) {
 }
 
 
-async function getOneCreditCard(sessionId, creditCardId) {
+async function getOneCreditCard(token, creditCardId) {
     const requestData = {
         creditCardId: creditCardId
     };
@@ -44,7 +44,7 @@ async function getOneCreditCard(sessionId, creditCardId) {
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(requestData),
     });
@@ -71,13 +71,13 @@ async function getAllCreditCards(token) {
     }
 }
 
-async function updateOneCreditCard(sessionId, creditCardData) {
+async function updateOneCreditCard(token, creditCardData) {
     const response = await fetch("http://payment:8084/updateOneCreditCard", {
         method: "PUT",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(creditCardData),
     });
@@ -86,7 +86,7 @@ async function updateOneCreditCard(sessionId, creditCardData) {
     return responseData;
 }
 
-async function deleteCreditCard(sessionId, creditCardId) {
+async function deleteCreditCard(token, creditCardId) {
     const requestData = {
         creditCardId: creditCardId
     };
@@ -96,7 +96,7 @@ async function deleteCreditCard(sessionId, creditCardId) {
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${sessionId}`
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(requestData),
     });

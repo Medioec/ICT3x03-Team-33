@@ -121,6 +121,39 @@ exports.postCreditCard = async (req, res) => {
     }
 };
 
+
+exports.deleteCreditCard = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        const creditCardDetails = req.body; 
+
+        console.log(creditCardDetails);
+
+        // Ensure that the creditCardDetails object contains the necessary properties
+        if (!creditCardDetails) {
+            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
+        }
+
+        // Delete the credit card
+        const creditCard = await paymentService.deleteCreditCard(token, creditCardDetails);
+
+        // handle response
+        if (creditCard.status === 200) {
+            return res.status(200).json({ message: 'Credit Card deleted successfully' });
+        } else if (creditCard.status === 400) {
+            // Handle a 400 Bad Request response
+            return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
+        } else {
+            // Handle other response status codes as needed
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
 exports.postGenerateBooking = async (req, res) => {
     try{
 
