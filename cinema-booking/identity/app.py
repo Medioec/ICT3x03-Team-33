@@ -474,9 +474,12 @@ def basicAuth():
     token = get_jwt()
     currStatus = token["currStatus"]
 
+    print(sessionId)
+    print(currStatus)
+
     # get currStatus from db
     requestData = {"sessionId": sessionId}
-    response = requests.get("http://databaseservice:8085/databaseservice/usersessions/get_session_status_by_id", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
     if response.status_code != 200:
         logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
         return jsonify({"message": "Invalid session"}), 403
@@ -487,13 +490,12 @@ def basicAuth():
     if currStatus == 'active' and currStatus == db_currStatus:
         # logs login success
         logger.info(f"Login successful")
-        
         return jsonify({"message": "Authenticated"}), 200
 
     else:
         # log authentication failure
         logger.error(f"Authentication failed due to session not active")
-        return jsonify({"message": "Invalid session"}), 403
+        return jsonify({"message": "Invalid session"}), 401
 
 # check if user is logged in with valid token and verify their role
 @app.route("/enhancedAuth", methods=["POST"])

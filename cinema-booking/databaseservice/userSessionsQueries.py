@@ -54,7 +54,7 @@ def create_user_session():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in create_user_session: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of create session     #####
 
 
@@ -103,7 +103,7 @@ def get_user_session():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_user_session: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of create session     #####
 
 ##### Retrieves userId, password hash, user role and link status from database #####
@@ -152,7 +152,7 @@ def get_userId_hash_role():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_userId_hash_role_linkStatus: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of pw hash retrieval   #####
 
 ##### Updates private key and expiry timestamp into database #####
@@ -167,7 +167,7 @@ def update_timestamp():
         newExpiryTimestamp = data['expiryTimestamp']
         
         if sessionId is None or newExpiryTimestamp is None:
-            return jsonify({"error": "Missing data in the request"}), 400
+            return jsonify({"message": "Missing data in the request"}), 400
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
@@ -186,14 +186,14 @@ def update_timestamp():
             # Session does not exist
             # log the error
             logger.error(f"Session not found. sessionId: {sessionId}")
-            return jsonify({"error": "Session not found"}), 404
+            return jsonify({"message": "Session not found"}), 404
         else:
             conn.close()
             # log the successful update of timestamp
             logger.info(f"Timestamp updated successfully. sessionId: {sessionId}")
             return jsonify({"message": "Session updated successfully"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of updating keys and expiry   #####
 
 ##### Store encryption key associated with SessionID, for testing purpose, almost duplicate of user session #####
@@ -234,7 +234,7 @@ def store_key_in_database():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in store_key_in_database: {str(e)}")
-        return jsonify({"error": str(e),
+        return jsonify({"message": str(e),
                         "message":"Database Error"}), 500
 ##### End of Store encryption key associated with SessionID #####    
 
@@ -284,7 +284,7 @@ def delete_session_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in delete_session_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of delete user session by ID     #####
 
 #####     Update a user session status by its ID     #####
@@ -335,7 +335,7 @@ def update_session_status_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in update_session_status_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of update user session status by ID     #####
 
 ##### Retrieves user role based on user ID #####
@@ -382,12 +382,12 @@ def get_role_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_role_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of user role by user ID retrieval   #####
 
 ##### Retrieves currStatus based on session ID #####
 @user_sessions_bp.route('/get_userId_status_by_sessionId', methods=['POST'])
-def get_status_by_sessionId():
+def get_userId_status_by_sessionId():
     # Log the getting current status
     logger.info(f"Getting current status started.")
     try:
@@ -410,6 +410,7 @@ def get_status_by_sessionId():
 
         # Separate the data into two attributes in a JSON response
         if data_result:
+            print(data_result)
             # Assuming there's one result
             userId, currStatus = data_result[0]
 
@@ -432,5 +433,5 @@ def get_status_by_sessionId():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_userId_status_by_sessionId: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of currStatus based on session ID retrieval  #####

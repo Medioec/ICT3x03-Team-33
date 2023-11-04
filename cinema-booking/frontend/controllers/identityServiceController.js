@@ -74,35 +74,43 @@ exports.postOTP = async (req, res) => {
         // get partial token
         const token = req.cookies.token;
 
-        const data = await identityService.verifyOTP(token, req.body);
+        if (token) {
+            const data = await identityService.verifyOTP(token, req.body);
         
-        if (data.status === 200) {
-            res.clearCookie('token');
+            if (data.status === 200) {
+                res.clearCookie('token');
 
-            json_response = await data.json();
-            const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
-            const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
+                json_response = await data.json();
+                const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
+                const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
 
-            // get user role
-            const userRole = decodedToken.userRole;
+                // get user role
+                const userRole = decodedToken.userRole;
 
-            res.cookie('token', json_response.sessionToken, {
-                path: '/',
-                maxAge: expiryDelta,
-                httpOnly: true
-                // TODO: add more cookie options (samesite, secure, etc.)
-            });
+                res.cookie('token', json_response.sessionToken, {
+                    path: '/',
+                    maxAge: expiryDelta,
+                    httpOnly: true
+                    // TODO: add more cookie options (samesite, secure, etc.)
+                });
 
-            // set loggedIn status
-            req.loggedIn = true;
-            logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
-            return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
-        }   
+                // set loggedIn status
+                req.loggedIn = true;
+                logger('info', 'Successful login for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+                return res.status(200).json({'status': 'success', 'message': 'Login successful', 'userRole': userRole});
+                }   
+
+            else {
+                logger('info', 'Invalid OTP for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
+                return res.status(401).json({'status': 'fail', 'message': 'Invalid OTP' });
+            }
+        }
 
         else {
-            logger('info', 'Invalid OTP for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
-            return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
+            logger('info', 'OTP expired for user' + req.body.username + ' from ' + req.socket.remoteAddress);
+            return res.status(401).json({'status': 'fail', 'message': 'OTP expired' });
         }
+        
     } catch (error) {
         logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.socket.remoteAddress + ': ' + error.message);
         return res.status(500).json({'status': 'fail', 'message': 'Internal Server Error' });

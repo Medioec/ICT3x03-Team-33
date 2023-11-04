@@ -2,8 +2,8 @@
 const checkLoggedIn = (req, res, next) => {
     try {
         const token = req.cookies.token;
-
-        if (token) {
+    
+        if (token) {    
             fetch("http://identity:8081/basicAuth", { 
                 method: "POST",
                 headers: {
@@ -12,17 +12,16 @@ const checkLoggedIn = (req, res, next) => {
                     "Authorization": `Bearer ${token}`
                 }
             })
-            .then(response => {
+            .then(response => {                
                 if (response.status === 200) {
                     req.loggedIn = true;
-                } else {
+                } 
+                
+                else {
                     req.loggedIn = false;
                 }
                 next();
             })
-            .catch(error => {
-                res.status(500).send('Internal Server Error');
-            });
         } else {
             req.loggedIn = false;
             next();
