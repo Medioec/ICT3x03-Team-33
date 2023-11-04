@@ -1,28 +1,37 @@
 pipeline {
     agent none
     stages {
-        stage('Build Test') {
-            agent { label 'builtin' }
-            steps {
-                sh 'chmod 700 -R scripts/'
-                sh './scripts/docker-build.sh test'
-            }
-        }
         stage('OWASP DependencyCheck') {
             agent { label 'builtin' }
             steps {
                 dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
+        stage('Build Test') {
+            agent { label 'builtin' }
+            steps {
+                withCredentials([file(credentialsId: 'test_secrets', variable: 'secrets_file')]) {
+                    sh '''
+                        chmod 700 -R scripts/
+                        . ./scripts/set-env.sh env/test/.env
+                        ./scripts/docker-build.sh test
+                    '''
+                }
+            }
+        }
         stage('Test') {
             agent { label 'builtin' }
             steps {
-                sh 'chmod 700 -R scripts/'
-                sh './scripts/cert-gen.sh'
-                sh './scripts/docker-deploy.sh test'
-                sh 'docker ps'
-                sh './scripts/test.sh test'
-                sh './scripts/docker-kill-volumes.sh test'
+                withCredentials([file(credentialsId: 'test_secrets', variable: 'secrets_file')]) {
+                    sh '''
+                        chmod 700 -R scripts/
+                        . ./scripts/set-env.sh env/test/.env
+                        ./scripts/cert-gen.sh
+                        ./scripts/docker-deploy.sh test
+                        ./scripts/test.sh test
+                        ./scripts/docker-kill-volumes.sh test
+                    '''
+                }
             }
         }
         stage('Build Stg') {

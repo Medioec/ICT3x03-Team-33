@@ -1,13 +1,21 @@
 #!/bin/bash
 # sets environment variables from a file
-set -o allexport
 readsecrets() {
-    set +x
-    . $secrets_file
-    export JWT_SECRET_KEY=$(openssl rand -hex 32)
-    set -x
+    if [ -z $1 ]
+    then
+        set +x
+        set -o allexport
+        . $secrets_file
+        export JWT_SECRET_KEY=$(openssl rand -hex 32)
+        set +o allexport
+        set -x
+    else
+        set +x
+        set -o allexport
+        . $1
+        export JWT_SECRET_KEY=$(openssl rand -hex 32)
+        set +o allexport
+        set -x
+    fi
 }
-readsecrets
-set +o allexport
-# sets non-persistent secrets
-
+readsecrets $1
