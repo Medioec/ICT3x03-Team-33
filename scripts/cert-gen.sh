@@ -26,6 +26,7 @@ domains=(
     "payment"
     "databaseservice"
     "nginx-waf"
+    "email"
     )
 
 for domain in "${domains[@]}"; do

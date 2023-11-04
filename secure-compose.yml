@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
     nginx-waf:
         image: owasp/modsecurity-crs:nginx
@@ -6,8 +6,8 @@ services:
             - internet-access
             - waf-to-frontend
         ports:
-            - '${HTTP_PORT}:80'
-            - '${HTTPS_PORT}:443'
+            - "${HTTP_PORT}:80"
+            - "${HTTPS_PORT}:443"
         volumes:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
             - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
@@ -42,7 +42,7 @@ services:
         restart: unless-stopped
 
     identity:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./identity/Dockerfile
         networks:
@@ -69,7 +69,7 @@ services:
         restart: unless-stopped
 
     movie:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./movie/Dockerfile
         networks:
@@ -86,9 +86,9 @@ services:
             - database
             - databaseservice
         restart: unless-stopped
-    
+
     booking:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./booking/Dockerfile
         networks:
@@ -108,7 +108,7 @@ services:
         restart: unless-stopped
 
     payment:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
@@ -128,7 +128,7 @@ services:
         restart: unless-stopped
 
     databaseservice:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./databaseservice/Dockerfile
         networks:
@@ -161,8 +161,8 @@ services:
         build:
             context: ./cinema-booking/database
         networks:
-          - databaseservice-to-database
-          - sessioncleaning-to-database
+            - databaseservice-to-database
+            - sessioncleaning-to-database
         environment:
             POSTGRES_DB: ${SUPERUSER_DB_NAME}
             POSTGRES_USER: ${POSTGRES_SUPERUSER}
@@ -173,6 +173,29 @@ services:
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
             - postgres_container:/var/lib/postgresql/data
+        restart: unless-stopped
+
+    email:
+        build:
+            context: ./cinema-booking
+            dockerfile: ./email/Dockerfile
+        networks:
+            - internet-access
+            - identity-to-email
+            - booking-to-email
+        environment:
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            EMAIL_NAME: ${EMAIL_NAME}
+            EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+            BASE_HOST: ${BASE_HOST}
+        volumes:
+            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
+        depends_on:
+            - identity
+            - booking
         restart: unless-stopped
 
     ofelia-scheduler:
@@ -186,9 +209,9 @@ services:
             - ofelia.enabled=true
         depends_on:
             - sessioncleaning
-           
+
     sessioncleaning:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./sessioncleaning/Dockerfile
         networks:
@@ -210,53 +233,58 @@ services:
             - ofelia.enabled=true
             - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
-            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function        
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
         depends_on:
             - database
 
-
 networks:
-  internet-access:
-    driver: bridge
-  waf-to-frontend:
-    driver: bridge
-    internal: true
-  frontend-to-identity:
-    driver: bridge
-    internal: true
-  frontend-to-booking:
-    driver: bridge
-    internal: true
-  frontend-to-movie:
-    driver: bridge
-    internal: true
-  booking-to-payment:
-    driver: bridge
-    internal: true
-  identity-to-payment:
-    driver: bridge
-    internal: true
-  identity-to-databaseservice:
-    driver: bridge
-    internal: true
-  movie-to-databaseservice:
-    driver: bridge
-    internal: true
-  payment-to-databaseservice:
-    driver: bridge
-    internal: true
-  booking-to-databaseservice:
-    driver: bridge
-    internal: true
-  databaseservice-to-database:
-    driver: bridge
-    internal: true
-  scheduler-to-sessioncleaning:
-    driver: bridge
-    internal: true
-  sessioncleaning-to-database:
-    driver: bridge
-    internal: true
+    internet-access:
+        driver: bridge
+    waf-to-frontend:
+        driver: bridge
+        internal: true
+    frontend-to-identity:
+        driver: bridge
+        internal: true
+    frontend-to-booking:
+        driver: bridge
+        internal: true
+    frontend-to-movie:
+        driver: bridge
+        internal: true
+    booking-to-payment:
+        driver: bridge
+        internal: true
+    identity-to-payment:
+        driver: bridge
+        internal: true
+    identity-to-email:
+        driver: bridge
+        internal: true
+    booking-to-email:
+        driver: bridge
+        internal: true
+    identity-to-databaseservice:
+        driver: bridge
+        internal: true
+    movie-to-databaseservice:
+        driver: bridge
+        internal: true
+    payment-to-databaseservice:
+        driver: bridge
+        internal: true
+    booking-to-databaseservice:
+        driver: bridge
+        internal: true
+    databaseservice-to-database:
+        driver: bridge
+        internal: true
+    scheduler-to-sessioncleaning:
+        driver: bridge
+        internal: true
+    sessioncleaning-to-database:
+        driver: bridge
+        internal: true
 
 volumes:
-  postgres_container:
+    postgres_container:

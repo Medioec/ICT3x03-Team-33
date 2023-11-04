@@ -44,7 +44,7 @@ services:
         restart: unless-stopped
 
     identity:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./identity/Dockerfile
         networks:
@@ -74,7 +74,7 @@ services:
         restart: unless-stopped
 
     email:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./email/Dockerfile
         networks:
@@ -85,14 +85,20 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
             EMAIL_NAME: ${EMAIL_NAME}
             EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+            BASE_HOST: ${BASE_HOST}
+        volumes:
+            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${EMAIL_PORT}"
         depends_on:
             - identity
             - booking
+        restart: unless-stopped
 
     movie:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./movie/Dockerfile
         networks:
@@ -111,9 +117,9 @@ services:
             - database
             - databaseservice
         restart: unless-stopped
-    
+
     booking:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./booking/Dockerfile
         networks:
@@ -136,7 +142,7 @@ services:
         restart: unless-stopped
 
     payment:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
@@ -159,7 +165,7 @@ services:
         restart: unless-stopped
 
     databaseservice:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./databaseservice/Dockerfile
         networks:
@@ -223,7 +229,7 @@ services:
         ports:
             - "${DB_PORT}"
         restart: unless-stopped
-    
+
     ofelia-scheduler:
         image: mcuadros/ofelia:v0.3.7
         networks:
@@ -235,9 +241,9 @@ services:
             - ofelia.enabled=true
         depends_on:
             - sessioncleaning
-           
+
     sessioncleaning:
-        build: 
+        build:
             context: ./cinema-booking
             dockerfile: ./sessioncleaning/Dockerfile
         networks:
@@ -259,46 +265,46 @@ services:
             - ofelia.enabled=true
             - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
-            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function        
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
         depends_on:
             - database
 
 networks:
-  default:
-    external:
-      name: non-existent-network
-  waf-to-frontend:
-    driver: bridge
-  frontend-to-identity:
-    driver: bridge
-  frontend-to-booking:
-    driver: bridge
-  frontend-to-movie:
-    driver: bridge
-  frontend-to-payment:
-    driver: bridge
-  booking-to-payment:
-    driver: bridge
-  identity-to-payment:
-    driver: bridge
-  identity-to-email:
-    driver: bridge
-  booking-to-email:
-    driver: bridge
-  identity-to-databaseservice:
-    driver: bridge
-  movie-to-databaseservice:
-    driver: bridge
-  payment-to-databaseservice:
-    driver: bridge
-  booking-to-databaseservice:
-    driver: bridge
-  databaseservice-to-database:
-    driver: bridge
-  scheduler-to-sessioncleaning:
-    driver: bridge
-  sessioncleaning-to-database:
-    driver: bridge
+    default:
+        external:
+            name: non-existent-network
+    waf-to-frontend:
+        driver: bridge
+    frontend-to-identity:
+        driver: bridge
+    frontend-to-booking:
+        driver: bridge
+    frontend-to-movie:
+        driver: bridge
+    frontend-to-payment:
+        driver: bridge
+    booking-to-payment:
+        driver: bridge
+    identity-to-payment:
+        driver: bridge
+    identity-to-email:
+        driver: bridge
+    booking-to-email:
+        driver: bridge
+    identity-to-databaseservice:
+        driver: bridge
+    movie-to-databaseservice:
+        driver: bridge
+    payment-to-databaseservice:
+        driver: bridge
+    booking-to-databaseservice:
+        driver: bridge
+    databaseservice-to-database:
+        driver: bridge
+    scheduler-to-sessioncleaning:
+        driver: bridge
+    sessioncleaning-to-database:
+        driver: bridge
 
 volumes:
-  postgres_container:
+    postgres_container:

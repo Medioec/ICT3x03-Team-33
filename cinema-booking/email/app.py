@@ -12,6 +12,7 @@ CORS(app)
 # gmail credentials
 sender_email = os.getenv("EMAIL_NAME")
 sender_password = os.getenv("EMAIL_PASSWORD")
+base_host = os.getenv("BASE_HOST")
 
 ############################## CREATE ACTIVATION LINK #########################################
 @app.route("/send_staff_activation_email", methods=["POST"])
@@ -23,8 +24,8 @@ def send_staff_activation_email():
     username = data["username"]
     activation_link = data["activation_link"]
 
-    # TODO: replace with actual url in production
-    activation_link = f'http://localhost:8080/activate?token={activation_link}'
+    # Create activation link
+    activation_link = f'https://{base_host}/activate?token={activation_link}'
     print("activation link: {}".format(activation_link))
 
     # create email
