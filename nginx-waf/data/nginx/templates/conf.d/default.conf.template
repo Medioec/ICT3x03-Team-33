@@ -7,6 +7,7 @@ map $http_upgrade $connection_upgrade {
 
 # Defining rate limiting zone 
 limit_req_zone $binary_remote_addr zone=one:10m rate=30r/m;
+limit_req_zone $binary_remote_addr zone=two:10m rate=100r/h;
 
 server {
     listen 80 default_server;
@@ -72,7 +73,8 @@ server {
         include includes/proxy_backend.conf;
 	index login.html login.htm;
 	root /usr/share/nginx/html;
-	limit_req zone=one;
+	limit_req zone=one burst=10;
+	limit_req zone=two burst=10;
     }
 
     # Apply rate limiting to /register.html
@@ -82,7 +84,8 @@ server {
         include includes/proxy_backend.conf;
 	index register.html register.htm;
 	root /usr/share/nginx/html;
-	limit_req zone=one;
+	limit_req zone=one burst=10;
+	limit_req zone=two burst=10;
 
     }
 
@@ -129,7 +132,8 @@ server {
         include includes/proxy_backend.conf;
 	index login.html login.htm;
 	root /usr/share/nginx/html;
-	limit_req zone=one;
+	limit_req zone=one burst=10;
+	limit_req zone=two burst=10;
     }
 
     # Apply rate limiting to /register.html
@@ -139,7 +143,8 @@ server {
         include includes/proxy_backend.conf;
 	index register.html register.htm;
 	root /usr/share/nginx/html;
-	limit_req zone=one;
+	limit_req zone=one burst=10;
+	limit_req zone=two burst=10;
 
     }
 
