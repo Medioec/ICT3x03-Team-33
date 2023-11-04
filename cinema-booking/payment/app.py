@@ -38,6 +38,8 @@ def makePayment():
     # Retrieve payment details from request
     data = request.get_json()
     creditCardId = data['creditCardId']
+
+    print (creditCardId)
     
     url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
     response = requests.get(url)
@@ -69,14 +71,23 @@ def makePayment():
     # decrypt card blob with encryption key and hash
     card = CreditCard.decrypt_from_b64_blob(blob, hash, encryption_key)
     
+    print (card.card_num)
+    print (card.name)
+    print (card.expiry)
+    print (card.cvv)
+
     # validate cc information
     if not user_utils.validateCreditCardNumber(card.card_num):
+        print("invalid cc num")
         return jsonify({"message": "Invalid credit card number"}), 400
     if not user_utils.validateCreditCardName(card.name):
+        print("invalid cc name")
         return jsonify({"message": "Invalid credit card name"}), 400
     if not user_utils.validateCreditCardExpiry(card.expiry):
+        print("invalid cc expiry")
         return jsonify({"message": "Invalid credit card expiry date"}), 400
     if not user_utils.validateCvv(card.cvv):
+        print("invalid cc cvv")
         return jsonify({"message": "Invalid CVV"}), 400
     
     max_retries = 3
@@ -420,23 +431,28 @@ def updateOneCreditCard():
 @app.route('/deleteCreditCard', methods=["DELETE"])
 @jwt_required()
 def deleteCreditCard():
-    # Retrieve credit card id from request
-    data = request.get_json()
-    creditCardId = data['creditCardId']
-    validateCCInt  = int(creditCardId)
+    # Retrieve credit card id from request body
+    creditCardId = request.data.decode('utf-8')
+    print(f"creditCardId: {creditCardId}")
     
-    # get sessionId from jwt
+    # Ensure creditCardId is an integer
+    try:
+        validateCCInt = int(creditCardId)
+    except ValueError:
+        return jsonify({"message": "Invalid creditCardId"}), 400
+    
+    # Get sessionId from JWT token
     sessionId = get_jwt_identity()
     if not sessionId:
         return jsonify({"message": "Error: No token sent"}), 500
     
-    # use sessionId to get userId from db
+    # Use sessionId to get userId from the database
     requestData = {"sessionId": sessionId}    
     response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
-    # set information retrieved via sessionId
+    # Set information retrieved via sessionId
     userId = response.json()["userId"]
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card

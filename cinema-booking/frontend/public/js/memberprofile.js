@@ -179,11 +179,13 @@ const captchaFeedback = document.getElementById("captchaError");
       deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardNumber}?`;
   
       // Create a creditCard object with the found creditCardId
-      const creditCard = { creditCardId: matchingCard.creditCardId };
+      const creditCardId = matchingCard.creditCardId;
   
-      console.log(creditCard);
+      console.log(creditCardId);
 
-      const creditCardNo = JSON.stringify(creditCard);
+      const creditCardNo = creditCardId.toString();
+
+      console.log(creditCardNo);
 
       // Add a confirm delete action
       confirmDeleteCardButton.addEventListener("click", async () => {
