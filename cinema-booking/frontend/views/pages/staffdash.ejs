@@ -18,11 +18,9 @@
 
 </head>
 
-<body>
-    <!-- will replace with staff navbar -->
-    <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
-
-    <!-- wip, need showtimes from movies -->
+    <body>
+        <!-- navbar -->
+        <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
         <!-- Delete Modal -->
         <div id="delete-modal" class="modal">
@@ -54,158 +52,113 @@
                 </div>
             </div>
         </div>
-
-        <div class="container">
-            <h1>Staff Dashboard</h1>
-
-            <div class="container" id="searchShowtime">
-                <div class="row">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Search for Showtime" id="searchInput">
-                    </div>
-                    <div class="col-md-3">
-                        <button id="searchButton" class="btn btn-primary">Search</button>
-                    </div>
-                    <div class="col-md-3">
-                        <button id="addButton" class="btn btn-primary"><i class="bi bi-plus"></i>Add New User</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab links -->
-            <div class="tab">
-                <button class="tablinks" onclick="openCity(event, 'Showtimes')">Showtimes</button>
-                <button class="tablinks" onclick="openCity(event, 'Movies')">Movies</button>
-            </div>
-
-            <!-- Tab content -->
-            <div id="Showtimes" class="tabcontent">
-                <h3>Showtimes</h3>
-                <div class="container" id="showtimeContainer">
-                    <div class="row" id="showtimeHeaderRow">
-                        <div class="col-md-2">
-                            <a class="showtimeHeader">showtimeId</a>
-                        </div>
-                        <div class="col-md-2">
-                            <a class="showtimeHeader">cinemaId</a>
-                        </div>
-                        <div class="col-md-1">
-                            <a class="showtimeHeader">theaterId</a>
-                        </div>
-                        <div class="col-md-1">
-                            <a class="showtimeHeader">movieId</a>
-                        </div>
-                        <div class="col-md-2">
-                            <a class="showtimeHeader">showDate</a>
-                        </div>
-                        <div class="col-md-2">
-                            <a class="showtimeHeader">showTime</a>
-                        </div>
-                        <div class="col-md-2">
-                            <a class="showtimeHeader">Manage</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- this whole part will render using Showtimes from movieService (not routed to test yet) -->
-                <!-- example: -->
-                <!-- <div class="container" id="showtimeContent">
-                    <% showtimes.forEach((showtime) => { %>
-                        <div class="row" id="showtimeContentRow">
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <a><%= showtime.showtimeId %></a>
+        
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-auto">
+                    <div id="Movies" class="tabcontent">
+                        <h3>Movies</h3>
+                        <div class="container" id="movieContent">
+                            <div class="row" id="movieContentRow">
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Movie ID</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <a><%= showtime.cinemaId %></a>
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Title</a>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-1">
-                            <div class="row">
-                                <a><%= showtime.theaterId %></a>
-                            </div>
-                            </div>
-                            <div class="col-md-1">
-                            <div class="row">
-                                <a><%= showtime.movieId %></a>
-                            </div>
-                        <div class="col-md-2">
-                            <div class="row">
-                                <a><%= showtime.showDate %></a>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="row">
-                                <a><%= showtime.showTime %></a>
-                            </div>
-                        </div>
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <button id="editShowtimes" class="btn btn-primary">Edit</button>
-                                    <button id="deleteShowtimes" class="btn btn-danger">Delete</button>
+                                <div class="col-md-2">
+                                    <div class="row">
+                                        <a>Synopsis</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Genre</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Content Rating</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Language</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="row">
+                                        <a>Subtitles</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="row">
+                                        <a>Manage</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <% movies.forEach((movie) => { %>
+                            <div class="container" id="movieContent">
+                                <div class="row" id="movieContentRow">
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.movieId %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.title %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="row">
+                                            <a><%= movie.synopsis %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.genre %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.contentRating %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.lang %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="row">
+                                            <a><%= movie.subtitles %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="row">
+                                            <button id="editMovie" class="btn btn-primary">Edit</button>
+                                            <button id="deleteMovie" class="btn btn-danger">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
                     </div>
-                    <% }); %>
-                </div> -->
-
-                <!-- <div class="container" id="showtimeContent">
-                    <div class="row" id="showtimeContentRow">
-                        <div class="col-md-2">
-                            <div class="row">
-                                <a>${Showtimes.showtimeId}</a>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="row">
-                                <a>${Showtimes.cinemaId}</a>
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="row">
-                                <a>${Showtimes.theaterId}</a>
-                            </div>
-                        </div>
-                        <div class="col-md-1">
-                            <div class="row">
-                                <a>${Showtimes.movieId}</a>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <a>${Showtimes.showDate}</a>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <a>${Showtimes.showTime}</a>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="row">
-                                    <button id="editShowtimes" class="btn btn-primary">Edit</button>
-                                    <button id="deleteShowtimes" class="btn btn-danger">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <div id="Movies" class="tabcontent">
-                    <h3>Movies</h3>
-                    <p>movie tab should be here</p>
-                    <!-- TODO: follow the same structure as above for dynamically rendering the movies -->
                 </div>
             </div>
         </div> 
 
-                <!-- footer -->
-                <%- include('./partial/footer'); %>
+        <!-- footer -->
+        <%- include('../partial/footer'); %>
 
         <script src="/js/staff.js"></script>
         <script src="/js/nav.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
     </body>
-
 </html>

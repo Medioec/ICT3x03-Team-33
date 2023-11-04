@@ -30,6 +30,30 @@ async function getAllMovies() {
     }
 }
 
+// Function to retrieve a movie by its ID
+async function getMovieById(movieId) {
+    try {
+        const response = await fetch(`https://movie:8082/getMovieById/${movieId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            agent: httpsAgent
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error(`Failed to get movie with ID: ${movieId}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in getMovieById:', error);
+        throw error;
+    }
+}
+
 // Function for staff to create a new movie entry in the database
 async function createMovie(token, movieData) {
     try {
@@ -56,38 +80,17 @@ async function createMovie(token, movieData) {
     }
 }
 
-// Function to retrieve a movie by its ID
-async function getMovieById(movieId) {
-    try {
-        const response = await fetch(`https://movie/getMovieById/${movieId}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            agent: httpsAgent
-        });
-
-        if (!response.ok) {
-            console.error('Response not OK. Status:', response.status);
-            throw new Error(`Failed to get movie with ID: ${movieId}`);
-        }
-
-        return response.json();
-    } catch (error) {
-        console.error('Error in getMovieById:', error);
-        throw error;
-    }
-}
 
 // Function to update a movie entry by its ID
-async function updateMovieById(movieId, movieData) {
+async function updateMovieById(token, movieId, movieData) {
     try {
         const response = await fetch(`https://movie/updateMovieById/${movieId}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
+
             },
             body: JSON.stringify(movieData),
             agent: httpsAgent
@@ -106,13 +109,14 @@ async function updateMovieById(movieId, movieData) {
 }
 
 // Function to delete a movie entry in the database
-async function deleteMovieById(movieId) {
+async function deleteMovieById(token, movieId) {
     try {
         const response = await fetch(`https://movie/deleteMovieById/${movieId}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
             agent: httpsAgent
         });
@@ -132,31 +136,6 @@ async function deleteMovieById(movieId) {
 ///////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SHOWTIMES FUNCTIONS //////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
-
-// Function to create a new showtime entry in the database
-async function createShowtime(showtimeData) {
-    try {
-        const response = await fetch('https://movie/createShowtime', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(showtimeData),
-            agent: httpsAgent
-        });
-
-        if (!response.ok) {
-            console.error('Response not OK. Status:', response.status);
-            throw new Error('Failed to create a showtime');
-        }
-
-        return response.json();
-    } catch (error) {
-        console.error('Error in createShowtime:', error);
-        throw error;
-    }
-}
 
 // Function to retrieve all showtimes from the database
 async function getAllShowtimes() {
@@ -206,6 +185,31 @@ async function getShowtimeById(showtime_id) {
     }
 }
 
+// Function to create a new showtime entry in the database
+async function createShowtime(token, showtimeData) {
+    try {
+        const response = await fetch('http://movie:8082/createShowtime', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(showtimeData)
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error('Failed to create a showtime');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in createShowtime:', error);
+        throw error;
+    }
+}
+
 // Function to update a showtime entry by its ID
 async function updateShowtimeById(showtime_id, showtimeData) {
     try {
@@ -213,7 +217,8 @@ async function updateShowtimeById(showtime_id, showtimeData) {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json', 
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(showtimeData),
             agent: httpsAgent
@@ -238,9 +243,9 @@ async function deleteShowtimeById(showtime_id) {
             method: 'DELETE',
             headers: {
                 'Accept': 'application.json',
-                'Content-Type': 'application.json'
+                'Content-Type': 'application.json',
+                "Authorization": `Bearer ${token}`
             },
-            agent: httpsAgent
         });
 
         if (!response.ok) {
@@ -255,6 +260,32 @@ async function deleteShowtimeById(showtime_id) {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// CINEMA FUNCTIONS ///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+// Function to retrieve all showtimes from the database
+async function getAllCinemas() {
+    try {
+        const response = await fetch('http://movie:8082/getAllCinemas', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Response not OK. Status:', response.status);
+            throw new Error('Failed to get all cinemas');
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Error in getAllCinemas:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createMovie,
     getAllMovies,
@@ -265,5 +296,6 @@ module.exports = {
     getAllShowtimes,
     getShowtimeById,
     updateShowtimeById,
-    deleteShowtimeById
+    deleteShowtimeById,
+    getAllCinemas
 };

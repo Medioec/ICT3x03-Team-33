@@ -56,68 +56,23 @@
                 <h1 id="movieTitle"> <%= showtimeDetails.movieTitle %></h1>
             </div>
             <div class="col-md-9">
-                <div class="flex-row" id="showtimeRow2">
-                    <div class="p-2">
-                        <div class="button-container">
-                            <div class="row" id="dropdownHeader">Cinema:</div>
-                            <div class="row">
-                                <div class="dropdown">
-                                    <button id="cinemaDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        <%= showtimeDetails.cinemaName %>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">GV Bugis</a></li>
-                                        <li><a class="dropdown-item" href="#">Shaw Paya Lebar</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+
+                <div class="row">
+                    <div class="col-md-4">                
+                        Cinema:
+                        <%= showtimeDetails.cinemaName %>
                     </div>
-                    <div class="p-2">
-                        <!-- nts. showtimes date -->
-                        <div class="button-container">
-                            <div class="row" id="dropdownHeader">Date:</div>
-                            <div class="row">
-                                <div class="dropdown">
-                                    <button id="dateDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        <%= showtimeDetails.showDate %>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">MONDAY 23-10-23</a></li>
-                                        <li><a class="dropdown-item" href="#">TUESDAY 24-10-23</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-4">                
+                        Date:
+                        <%= showtimeDetails.showDate %>
                     </div>
-                    <div class="p-2">
-                        <!-- nts. showtimes time -->
-                        <div class="button-container">
-                            <div class="row" id="dropdownHeader">Time:</div>
-                            <div class="row">
-                                <div class="dropdown">
-                                    <button id="movieDropdown" class="btn btn-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown">
-                                        <%= showtimeDetails.showTime %>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">12:00PM</a></li>
-                                        <li><a class="dropdown-item" href="#">1:45PM</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-2" id="seatingPlanCol">
-                        <button id="location" class="btn btn-primary">
-                            View Seating Plan
-                        </button>
+                    <div class="col-md-4">                
+                        Time:
+                        <%= showtimeDetails.showTime %>
                     </div>
                 </div>
 
-                <!-- seat selection here -->
+                <!-- seat selection legend -->
                 <ul class="showcase">
                     <li>
                         <div class="seat display" id="showcaseSeats"></div>
@@ -132,6 +87,7 @@
                         <small>Sold</small>
                     </li>
                 </ul>
+
                 <div class="seatContainer">
                     <div class="screen" id="seatingPlanScreen">
                         <a>
@@ -140,75 +96,88 @@
                     </div>
                     <div class="row">
                         <div class="seatNumbers">A</div>
-                        <div class="seat" id="A1"></div>
-                        <div class="seat" id="A2"></div>
-                        <div class="seat" id="A3"></div>
-                        <div class="seat" id="A4"></div>
-                        <div class="seat" id="A5"></div>
-                        <div class="seat" id="A6"></div>
-                        <div class="seat" id="A7"></div>
-                        <div class="seat" id="A8"></div>
+                        <div class="seat" id="1A"></div>
+                        <div class="seat" id="2A"></div>
+                        <div class="seat" id="3A"></div>
+                        <div class="seat" id="4A"></div>
+                        <div class="seat" id="5A"></div>
+                        <div class="seat" id="6A"></div>
+                        <div class="seat" id="7A"></div>
+                        <div class="seat" id="8A"></div>
                     </div>
                     
                     <div class="row">
                         <div class="seatNumbers">B</div>
-                        <div class="seat" id="B1"></div>
-                        <div class="seat" id="B2"></div>
-                        <div class="seat" id="B3"></div>
-                        <div class="seat sold" id="B4"></div>
-                        <div class="seat sold" id="B5"></div>
-                        <div class="seat" id="B6"></div>
-                        <div class="seat" id="B7"></div>
-                        <div class="seat" id="B8"></div>
+                        <div class="seat" id="1B"></div>
+                        <div class="seat" id="2B"></div>
+                        <div class="seat" id="3B"></div>
+                        <div class="seat sold" id="4B"></div>
+                        <div class="seat sold" id="5B"></div>
+                        <div class="seat" id="6B"></div>
+                        <div class="seat" id="7B"></div>
+                        <div class="seat" id="8B"></div>
                     </div>
+                    
                     <div class="row">
                         <div class="seatNumbers">C</div>
-                        <div class="seat" id="C1"></div>
-                        <div class="seat" id="C2"></div>
-                        <div class="seat" id="C3"></div>
-                        <div class="seat" id="C4"></div>
-                        <div class="seat" id="C5"></div>
-                        <div class="seat" id="C6"></div>
-                        <div class="seat sold" id="C7"></div>
-                        <div class="seat sold" id="C8"></div>
+                        <div class="seat" id="1C"></div>
+                        <div class="seat" id="2C"></div>
+                        <div class="seat" id="3C"></div>
+                        <div class="seat" id="4C"></div>
+                        <div class="seat" id="5C"></div>
+                        <div class="seat" id="6C"></div>
+                        <div class="seat sold" id="7C"></div>
+                        <div class="seat sold" id="8C"></div>
                     </div>
                     
                     <div class="row">
                         <div class="seatNumbers">D</div>
-                        <div class="seat" id="D1"></div>
-                        <div class="seat" id="D2"></div>
-                        <div class="seat" id="D3"></div>
-                        <div class="seat" id="D4"></div>
-                        <div class="seat" id="D5"></div>
-                        <div class="seat" id="D6"></div>
-                        <div class="seat" id="D7"></div>
-                        <div class="seat" id="D8"></div>
+                        <div class="seat" id="1D"></div>
+                        <div class="seat" id="2D"></div>
+                        <div class="seat" id="3D"></div>
+                        <div class="seat" id="4D"></div>
+                        <div class="seat" id="5D"></div>
+                        <div class="seat" id="6D"></div>
+                        <div class="seat" id="7D"></div>
+                        <div class="seat" id="8D"></div>
                     </div>
                     
                     <div class="row">
                         <div class="seatNumbers">E</div>
-                        <div class="seat" id="E1"></div>
-                        <div class="seat" id="E2"></div>
-                        <div class="seat" id="E3"></div>
-                        <div class="seat" id="E4"></div>
-                        <div class="seat" id="E5"></div>
-                        <div class="seat" id="E6"></div>
-                        <div class="seat sold" id="E7"></div>
-                        <div class="seat sold" id="E8"></div>
+                        <div class="seat" id="1E"></div>
+                        <div class="seat" id="2E"></div>
+                        <div class="seat" id="3E"></div>
+                        <div class="seat" id="4E"></div>
+                        <div class="seat" id="5E"></div>
+                        <div class="seat" id="6E"></div>
+                        <div class="seat sold" id="7E"></div>
+                        <div class="seat sold" id="8E"></div>
                     </div>
                     
                     <div class="row">
                         <div class="seatNumbers">F</div>
-                        <div class="seat" id="F1"></div>
-                        <div class="seat" id="F2"></div>
-                        <div class="seat" id="F3"></div>
-                        <div class="seat" id="F4"></div>
-                        <div class="seat" id="F5"></div>
-                        <div class="seat sold" id="F6"></div>
-                        <div class="seat sold" id="F7"></div>
-                        <div class="seat sold" id="F8"></div>
+                        <div class="seat" id="1F"></div>
+                        <div class="seat" id="2F"></div>
+                        <div class="seat" id="3F"></div>
+                        <div class="seat" id="4F"></div>
+                        <div class="seat" id="5F"></div>
+                        <div class="seat sold" id="6F"></div>
+                        <div class="seat sold" id="7F"></div>
+                        <div class="seat sold" id="8F"></div>
                     </div>
-                    
+
+                    <div class="row">
+                        <div class="seatNumbers">G</div>
+                        <div class="seat" id="1G"></div>
+                        <div class="seat sold" id="2G"></div>
+                        <div class="seat" id="3G"></div>
+                        <div class="seat sold" id="4G"></div>
+                        <div class="seat" id="5G"></div>
+                        <div class="seat" id="6G"></div>
+                        <div class="seat" id="7G"></div>
+                        <div class="seat" id="8G"></div>
+                    </div>
+
                     <div class="row">
                         <div class="seatNumbers" id="seatingPlanSeat">1</div>
                         <div class="seatNumbers">2</div>
@@ -285,6 +254,9 @@
     <!-- footer -->
     <%- include('../partial/footer'); %>
 
+    <script>  
+        window.showtimeDetails = <%- JSON.stringify(showtimeDetails) %>;
+    </script>
     <script src="/js/booking.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
 </body>

@@ -39,10 +39,12 @@ function checkUserRole(requiredRole) {
 
                 // if validation fails, user doesn't have permissions
                 if (response.status !== 200) {
+                    req.loggedIn = false;
                     return res.status(403).send('Access Forbidden');
                 }
 
                 // if validation passes, call next middleware
+                req.loggedIn = true;
                 next();
             })
             

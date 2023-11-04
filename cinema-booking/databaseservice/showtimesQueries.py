@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 showtimes_bp = Blueprint("showtimes", __name__)
 
 # log showtimes queries started
-logger.info("Showtimes queries started.")
+logger.info(f"Showtimes queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -24,7 +24,7 @@ db_config = {
 @showtimes_bp.route('/create_showtime', methods=['POST'])
 def create_showtime():
     # Log the addition of a new showtime entry
-    logger.info("Adding new showtime started.")
+    logger.info(f"Adding new showtime started.")
     try:
         data = request.get_json()
         cinema_id = data['cinemaId']
@@ -45,7 +45,7 @@ def create_showtime():
         conn.close()
 
         # Log the successful creation of a new showtime entry
-        logger.info("Showtime added successfully with new showtimeId: {new_showtime_id}.")
+        logger.info(f"Showtime added successfully with new showtimeId: {new_showtime_id}.")
         return jsonify({"message": "Showtime added successfully", "showtimeId": new_showtime_id}), 201
     except Exception as e:
         # Log the error
@@ -94,7 +94,7 @@ def get_showtime_by_id(showtime_id):
 @showtimes_bp.route('/get_all_showtimes', methods=['GET'])
 def get_all_showtimes():
     # Log the retrieval of all showtime entries
-    logger.info("Retrieving all showtime details.")
+    logger.info(f"Retrieving all showtime details.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -120,12 +120,12 @@ def get_all_showtimes():
                 showtime_list.append(showtime_details)
 
             # Log the successful retrieval of all showtime entries
-            logger.info("Showtime details retrieved successfully.")
+            logger.info(f"Showtime details retrieved successfully.")
             return jsonify(showtime_list), 200
         else:
             # No showtimes found
             # Log the error
-            logger.warning("No showtimes found.")
+            logger.warning(f"No showtimes found.")
             return jsonify({"message": "No showtimes found"}), 404
     except Exception as e:
         # Log the error

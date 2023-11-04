@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 cinema_bp = Blueprint("cinema", __name__)
 
 # Log cinema queries started
-logger.info("Cinema queries started.")
+logger.info(f"Cinema queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @cinema_bp.route('/add_cinema', methods=['POST'])
 def add_cinema():
     # Log the addition of a new cinema entry
-    logger.info("Adding new cinema started.")
+    logger.info(f"Adding new cinema started.")
     try:
         data = request.get_json()
         cinemaName = data['cinemaName']
@@ -44,7 +44,7 @@ def add_cinema():
             conn.close()
             
             # Log the successful creation of a new cinema entry
-            logger.info("Cinema added successfully with new cinemaId: {new_cinema_id}.")
+            logger.info(f"Cinema added successfully with new cinemaId: {new_cinema_id}.")
             return jsonify({"message": "Cinema added successfully", "cinemaId": new_cinema_id}), 201
             
         except IntegrityError as e:
@@ -54,7 +54,7 @@ def add_cinema():
             conn.close()
             
             # Log the duplicate entry error
-            logger.warning("Duplicate entry detected: This cinema already exists. cinemaName: {cinemaName}, locationName: {locationName}")
+            logger.warning(f"Duplicate entry detected: This cinema already exists. cinemaName: {cinemaName}, locationName: {locationName}")
             return jsonify({"error": "Duplicate entry: This cinema already exists."}), 409
     except Exception as e:
         # Log the error
@@ -87,11 +87,11 @@ def get_cinema_by_id(cinema_id):
             }
             
             # Log the successful retrieval of a cinema
-            logger.info("Cinema retrieved successfully.")
+            logger.info(f"Cinema retrieved successfully.")
             return jsonify(cinema_details), 200
         else:
             #log the cinema not found error
-            logger.warning("Cinema not found with cinemaId: {cinema_id}.")
+            logger.warning(f"Cinema not found with cinemaId: {cinema_id}.")
             return jsonify({"message": "Cinema not found"}), 404
 
     except Exception as e:
@@ -102,7 +102,7 @@ def get_cinema_by_id(cinema_id):
 @cinema_bp.route('/get_all_cinemas', methods=['GET'])
 def get_all_cinemas():
     # Log the retrieval of all cinemas
-    logger.info("Retrieving all cinemas from the database.")
+    logger.info(f"Retrieving all cinemas from the database.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -125,11 +125,11 @@ def get_all_cinemas():
                 cinema_list.append(cinema_details)
 
             # Log the successful retrieval of all cinemas
-            logger.info("All cinemas retrieved successfully.")
+            logger.info(f"All cinemas retrieved successfully.")
             return jsonify(cinema_list), 200
         else:
             # Log the no cinemas found error
-            logger.warning("No cinemas found with cinemaId: {cinema_id}.")
+            logger.warning(f"No cinemas found with cinemaId: {cinema_id}.")
             return jsonify({"message": "No cinemas found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -170,12 +170,12 @@ def update_cinema_by_id(cinema_id):
             conn.close()
             
             # Log the successful update of a cinema entry
-            logger.info("Cinema updated successfully with cinemaId: {cinema_id}.")
+            logger.info(f"Cinema updated successfully with cinemaId: {cinema_id}.")
             return jsonify({"message": "Cinema updated successfully"}), 200            
         else:
             # Cinema does not exist
             # log the cinema not found error
-            logger.warning("Cinema not found with cinemaId: {cinema_id}.")
+            logger.warning(f"Cinema not found with cinemaId: {cinema_id}.")
             return jsonify({"message": "Cinema not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -214,12 +214,12 @@ def delete_cinema_by_id(cinema_id):
             conn.close()
             
             # Log the successful deletion of a cinema entry
-            logger.info("Cinema deleted successfully.")
+            logger.info(f"Cinema deleted successfully.")
             return jsonify({"message": "Cinema deleted successfully"}), 200
         else:
             # Cinema does not exist
             # Log the cinema not found error
-            logger.warning("Cinema not found with cinemaId: {cinema_id}.")
+            logger.warning(f"Cinema not found with cinemaId: {cinema_id}.")
             return jsonify({"message": "Cinema not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500

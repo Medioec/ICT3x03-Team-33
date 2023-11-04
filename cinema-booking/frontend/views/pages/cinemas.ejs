@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Showtimes</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="/css/nav.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/showtimes.css" />
+</head>
+<main>
+
+    <body>
+    
+    <!-- Navbar -->
+    <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
+
+    <div class="container">
+    
+      <div class="row" id="cinemaRow">
+          <h2 class="showcase-heading">Nearest Cinema: <%= cinemaName %></h2>
+      </div>
+  
+      <% let groupedShowtimes = {}; %>
+  
+      <% filteredCinemaShowtimes.forEach(function(showtime) { %>
+          <% const movieTitle = titles[filteredCinemaShowtimes.indexOf(showtime)]; %>
+          <% if (!groupedShowtimes[movieTitle]) { %>
+              <% groupedShowtimes[movieTitle] = []; %>
+          <% } %>
+          <% groupedShowtimes[movieTitle].push(showtime); %>
+      <% }); %>
+  
+      <% Object.keys(groupedShowtimes).forEach(function(movieTitle) { %>
+          <div class="row" id="showtimeRow">
+              <div class="col-md-2 dateTab">
+              <h1><%= movieTitle %></h1>
+              </div>
+              <div class="col-md-8 dateTab">
+                  <% const sortedShowtimes = groupedShowtimes[movieTitle].sort(function(a, b) {
+                      const aDate = new Date(`2000-01-01 ${a.showTime}`);
+                      const bDate = new Date(`2000-01-01 ${b.showTime}`);
+                      return aDate - bDate;
+                  }); %>
+                  <% sortedShowtimes.forEach(function(showtime) { %>
+                      <a class="btn btn-primary" href="/booking?showtimeId=<%= showtime.showtimeId %>" role="button"><%= showtime.showTime %></a>
+                  <% }); %>
+              </div>
+          </div>
+      <% }); %>
+    
+    </div>
+  
+
+    </body>
+
+</main>
+
+<%- include('../partial/footer'); %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    </body>
+
+</html>
+
+
+

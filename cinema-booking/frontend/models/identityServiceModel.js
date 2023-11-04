@@ -49,8 +49,35 @@ async function logoutRequest(token) {
     return response;
 }
 
+async function verifyStaffActivationToken(token) {
+    const response = await fetch(`http://identity:8081/activate_staff_account/${token}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    });
+
+    return response;
+}
+
+async function setStaffPasswordRequest(token, body) {
+    const response = await fetch(`http://identity:8081/staff_set_password/${token}`, {
+        method: "PUT",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+    });
+
+    return response;
+}
+
 module.exports = {
     loginRequest,
     registerRequest,
-    logoutRequest
+    logoutRequest,
+    verifyStaffActivationToken,
+    setStaffPasswordRequest
 };

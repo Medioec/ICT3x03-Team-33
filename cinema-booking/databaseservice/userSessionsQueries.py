@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 user_sessions_bp = Blueprint("user_sessions", __name__)
 
 # Log user session queries started
-logger.info("User session queries started.")
+logger.info(f"User session queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @user_sessions_bp.route('/create_user_session', methods=['POST'])
 def create_user_session():
     # Log the addition of a new user session
-    logger.info("Adding new user session started.")
+    logger.info(f"Adding new user session started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -48,7 +48,7 @@ def create_user_session():
 
         # Return HTTP 201 Created to indicate successful resource creation
         # log the successful creation of a new user session
-        logger.info("User session added successfully. sessionId: {sessionId}")
+        logger.info(f"User session added successfully. sessionId: {sessionId}")
         return jsonify({"message": "User session added successfully"}), 201
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -62,7 +62,7 @@ def create_user_session():
 @user_sessions_bp.route('/get_user_session', methods=['POST'])
 def get_user_session():
     # Log the getting user session
-    logger.info("Getting user session started.")
+    logger.info(f"Getting user session started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -92,12 +92,12 @@ def get_user_session():
             }
             
             # log the successful retrieval of a user session
-            logger.info("User session retrieved successfully. sessionId: {sessionId}")
+            logger.info(f"User session retrieved successfully. sessionId: {sessionId}")
             return jsonify(response_data), 200
         else:
             # Session does not exist
             # log the error
-            logger.error("Session not found. sessionId: {sessionId}")
+            logger.error(f"Session not found. sessionId: {sessionId}")
             return jsonify({"message": "No data found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -110,7 +110,7 @@ def get_user_session():
 @user_sessions_bp.route('/get_userId_hash_role', methods=['POST'])
 def get_userId_hash_role():
     # Log the getting user pwhash and role
-    logger.info("Getting user pwhash and role started.")
+    logger.info(f"Getting user pwhash and role started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -140,12 +140,12 @@ def get_userId_hash_role():
             }
             
             # log the successful retrieval of a user pwhash and role
-            logger.info("User pwhash and role retrieved successfully. username: {username}")
+            logger.info(f"User pwhash and role retrieved successfully. username: {username}")
             return jsonify(response_data), 200
         else:
             # User does not exist
             # log the error
-            logger.error("User not found. username: {username}")
+            logger.error(f"User not found. username: {username}")
             return jsonify({"message": "No data found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -158,7 +158,7 @@ def get_userId_hash_role():
 @user_sessions_bp.route('/update_timestamp', methods=['PUT'])
 def update_timestamp():
     # Log the updating of timestamp
-    logger.info("Updating timestamp started.")
+    logger.info(f"Updating timestamp started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -184,12 +184,12 @@ def update_timestamp():
             conn.close()
             # Session does not exist
             # log the error
-            logger.error("Session not found. sessionId: {sessionId}")
+            logger.error(f"Session not found. sessionId: {sessionId}")
             return jsonify({"error": "Session not found"}), 404
         else:
             conn.close()
             # log the successful update of timestamp
-            logger.info("Timestamp updated successfully. sessionId: {sessionId}")
+            logger.info(f"Timestamp updated successfully. sessionId: {sessionId}")
             return jsonify({"message": "Session updated successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -199,7 +199,7 @@ def update_timestamp():
 @user_sessions_bp.route('/store_key_in_database', methods=['POST'])
 def store_key_in_database():
     # Log the storing of key in db
-    logger.info("Storing key in db started.")
+    logger.info(f"Storing key in db started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -220,25 +220,25 @@ def store_key_in_database():
         
         # login result and encrypted hash, expiry timestamp
         # log the successful storing of key in db
-        logger.info("Key stored in db successfully. userId: {userId}")
+        logger.info(f"Key stored in db successfully. userId: {userId}")
         return jsonify({
             "loginResult": "Success",  # This can be dynamic based on your login logic
             "expiryTimestamp": expiryTimestamp,
-            "message" : "your mother pass, passaway"
+            "message" : "Login session created successfully"
             }), 201
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in store_key_in_database: {str(e)}")
         return jsonify({"error": str(e),
-                        "message":"your mother failure"}), 500
+                        "message":"Database Error"}), 500
 ##### End of Store encryption key associated with SessionID #####    
 
 #####     Delete a user session by its ID     #####
 @user_sessions_bp.route('/delete_session_by_id', methods=['DELETE'])
 def delete_session_by_id():
     # Log the deletion of a user session
-    logger.info("Deleting user session started.")
+    logger.info(f"Deleting user session started.")
     try:
         # get sessionId from json
         data = request.get_json()
@@ -269,12 +269,12 @@ def delete_session_by_id():
             conn.close()
             
             # log the successful deletion of a user session
-            logger.info("User session deleted successfully. sessionId: {sessionId}")
+            logger.info(f"User session deleted successfully. sessionId: {sessionId}")
             return jsonify({"message": "Session deleted successfully"}), 200
         else:
             # Session does not exist
             # log the error
-            logger.error("Session not found. sessionId: {sessionId}")
+            logger.error(f"Session not found. sessionId: {sessionId}")
             return jsonify({"message": "Session not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -287,7 +287,7 @@ def delete_session_by_id():
 @user_sessions_bp.route('/update_session_status_by_id', methods=['PUT'])
 def update_session_status_by_id():
     # Log the updating of a user session status
-    logger.info("Updating user session status started.")
+    logger.info(f"Updating user session status started.")
     try:
         # get sessionId from json
         data = request.get_json()
@@ -320,12 +320,12 @@ def update_session_status_by_id():
             conn.close()
             
             # log the successful update of a user session status
-            logger.info("User session status updated successfully. sessionId: {sessionId}")
+            logger.info(f"User session status updated successfully. sessionId: {sessionId}")
             return jsonify({"message": "Session status updated successfully"}), 200
         else:
             # Session does not exist
             # log the error
-            logger.error("Session not found. sessionId: {sessionId}")
+            logger.error(f"Session not found. sessionId: {sessionId}")
             return jsonify({"message": "Session not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
@@ -338,7 +338,7 @@ def update_session_status_by_id():
 @user_sessions_bp.route('/get_role_by_id', methods=['POST'])
 def get_role_by_id():
     # Log the getting user role
-    logger.info("Getting user role started.")
+    logger.info(f"Getting user role started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -367,12 +367,12 @@ def get_role_by_id():
             }
             
             # log the successful retrieval of a user role
-            logger.info("User role retrieved successfully. userId: {userId}")
+            logger.info(f"User role retrieved successfully. userId: {userId}")
             return jsonify(response_data), 200
         else:
             # User does not exist
             # log the error
-            logger.error("User not found. userId: {userId}")
+            logger.error(f"User not found. userId: {userId}")
             return jsonify({"message": "No data found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors

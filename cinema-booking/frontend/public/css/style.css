@@ -33,8 +33,21 @@
   padding-bottom: 20px;
 }
 
-#booking {
+#bookingRow {
   text-align: center;
+  display: inline-flex;
+  background-color: #f7f7f9;
+  padding: 10px;
+  margin: 40px 0px 20px 0px;
+}
+
+#movieDropdown, #cinemaDropdown, #timingDropdown {
+  margin: 10px;
+}
+
+#reset, #showtimes {
+  height: max-content;
+  margin: 10px;
 }
 
 .button-container {
@@ -48,9 +61,8 @@
 .button-container .dropdown .btn {
   margin: 0 10px;
   background-color: white;
-  color: #585858;
+  color: black;
   border: 1px solid #000;
-  width: 200px;
 }
 
 .button-container .dropdown .btn::after {
@@ -67,7 +79,6 @@
   background-color: white;
   border: 1px solid #000;
   color: gray;
-  width: 200px;
 }
 
 .button-container .dropdown-menu .dropdown-item {
@@ -75,7 +86,7 @@
 }
 
 .button-container .dropdown-menu .dropdown-item.active {
-  background-color: #007bff;
+  background-color: #d8d8d8;
   color: gray;
 }
 
@@ -88,6 +99,13 @@
 .location-container button img {
   max-height: 20px;
   vertical-align: sub;
+}
+
+
+.bookingHeaders{
+  font-weight: 600;
+  text-decoration: none;
+  color: black;
 }
 
 .booking-box {
@@ -105,4 +123,18 @@
 .loginWarning{
   padding: 10px;
   color: red;
+}
+
+#ccRow, #ccCard{
+  margin: 5px 0px 5px 0px;
+}
+
+#captchaError, #makePaymentWarning{
+  color: red;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+#saveCard{
+  padding-left: 25px;
 }

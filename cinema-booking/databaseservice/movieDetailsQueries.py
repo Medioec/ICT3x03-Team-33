@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 movie_details_bp = Blueprint("movie_details", __name__)
 
 # Log movie details queries started
-logger.info("Movie details queries started.")
+logger.info(f"Movie details queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -24,7 +24,7 @@ db_config = {
 @movie_details_bp.route('/create_movie', methods=['POST'])
 def create_movie():
     # Log the addition of a new movie entry
-    logger.info("Adding new movie started.")
+    logger.info(f"Adding new movie started.")
     try:
         data = request.get_json()
         title = data['title']
@@ -46,7 +46,7 @@ def create_movie():
         conn.close()
 
         # Log the successful creation of a new movie entry
-        logger.info("Movie added successfully with new movieId: {new_movie_id}.")
+        logger.info(f"Movie added successfully with new movieId: {new_movie_id}.")
         return jsonify({"message": "Movie added successfully", "movieId": new_movie_id}), 201
     except Exception as e:
         # Log the error
@@ -82,12 +82,12 @@ def get_movie_by_id(movie_id):
             }
             
             # Log the successful retrieval of a movie entry
-            logger.info("Movie retrieved successfully.")
+            logger.info(f"Movie retrieved successfully.")
             return jsonify(movie_details), 200
         else:
             # Movie does not exist
             # Log the error
-            logger.warning("Movie not found.")
+            logger.warning(f"Movie not found.")
             return jsonify({"message": "Movie not found"}), 404
     except Exception as e:
         # Log the error
@@ -100,7 +100,7 @@ def get_movie_by_id(movie_id):
 @movie_details_bp.route('/get_all_movies', methods=['GET'])
 def get_all_movies():
     # Log the retrieval of all movies
-    logger.info("Retrieving all movies from the database.")
+    logger.info(f"Retrieving all movies from the database.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -127,11 +127,11 @@ def get_all_movies():
                 movie_list.append(movie_details)
 
             # Log the successful retrieval of all movies
-            logger.info("Movies retrieved successfully.")
+            logger.info(f"Movies retrieved successfully.")
             return jsonify(movie_list), 200
         else:
             # Log the error
-            logger.warning("No movies found.")
+            logger.warning(f"No movies found.")
             return jsonify({"message": "No movies found"}), 404
     except Exception as e:
         # Log the error
@@ -178,12 +178,12 @@ def update_movie_by_id(movie_id):
             conn.close()
             
             # Log the successful update of a movie entry
-            logger.info("Movie updated successfully. movieId: {movie_id}.")
+            logger.info(f"Movie updated successfully. movieId: {movie_id}.")
             return jsonify({"message": "Movie updated successfully"}), 200            
         else:
             # Movie does not exist
             # log the movie not found error
-            logger.warning("Movie not found with movieId: {movie_id}.")
+            logger.warning(f"Movie not found with movieId: {movie_id}.")
             return jsonify({"message": "Movie not found"}), 404
     except Exception as e:
         # Log the error
@@ -222,12 +222,12 @@ def delete_movie_by_id(movie_id):
             conn.close()
             
             # Log the successful deletion of a movie entry
-            logger.info("Movie deleted successfully. movieId: {movie_id}.")
+            logger.info(f"Movie deleted successfully. movieId: {movie_id}.")
             return jsonify({"message": "Movie deleted successfully"}), 200
         else:
             # Movie does not exist
             # Log the error
-            logger.warning("Movie not found with movieId: {movie_id}.")
+            logger.warning(f"Movie not found with movieId: {movie_id}.")
             return jsonify({"message": "Movie not found"}), 404
     except Exception as e:
         # Log the error

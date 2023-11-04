@@ -28,9 +28,6 @@
         <ul class="navbar-nav">
             <!-- if user is logged in -->
             <% if (loggedIn) { %>
-              <li class="nav-item">
-                  <a class="nav-link" href="/profile">Profile</a>
-              </li>
               <li id="logout-button" class="nav-item">
                   <a class="nav-link">Logout</a>
               </li>
@@ -38,6 +35,9 @@
 
           <!-- if user is not logged in -->
           <% } else { %>
+          <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+          </li>
           <li class="nav-item">
               <a class="nav-link" href="/login">Login</a>
           </li>

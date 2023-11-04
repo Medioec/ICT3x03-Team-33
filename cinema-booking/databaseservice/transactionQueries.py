@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 transaction_bp = Blueprint("transaction", __name__)
 
 # Log transaction queries started
-logger.info("Transaction queries started.")
+logger.info(f"Transaction queries started.")
 
 # Set up db config credentials
 db_config = {
@@ -25,7 +25,7 @@ db_config = {
 @transaction_bp.route('/create_transaction', methods=['POST'])
 def create_transaction():
     # Log the addition of a new transaction entry
-    logger.info("Adding new transaction started.")
+    logger.info(f"Adding new transaction started.")
     try:
         data = request.get_json()
         transactionId = data['transactionId']
@@ -43,9 +43,9 @@ def create_transaction():
             conn.commit()
             cursor.close()
             conn.close()
-            
+
             # Log the successful creation of a new transaction entry
-            logger.info("Transaction added successfully with new transactionId: {transaction_id}.")
+            logger.info(f"Transaction added successfully with new transactionId: {transaction_id}.")
             return jsonify({"message": "Transaction added successfully", "transactionId": transaction_id}), 201
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
@@ -65,7 +65,7 @@ def create_transaction():
 @transaction_bp.route('/get_all_transactions_by_userId/<uuid:userId>', methods=['GET'])
 def get_all_transactions_by_userId(userId):
     # Log the retrieval of all transaction by userId
-    logger.info("Retrieving all transactions by userId started.")
+    logger.info(f"Retrieving all transactions by userId started.")
     try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
@@ -88,11 +88,11 @@ def get_all_transactions_by_userId(userId):
                 transaction_list.append(one_transaction)
 
             # Log the successful retrieval of all transaction by userId
-            logger.info("All transactions by userId retrieved successfully. userId: {userId}.")
+            logger.info(f"All transactions by userId retrieved successfully. userId: {userId}.")
             return jsonify(transaction_list), 200
         else:
             # Log the error
-            logger.error("No transactions found.")
+            logger.error(f"No transactions found.")
             return jsonify({"message": "No transactions found"}), 404
     except Exception as e:
         # Log the error

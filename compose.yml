@@ -30,6 +30,7 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
+            - frontend-to-payment
         environment:
             - CAPTCHA_KEY=${CAPTCHA_KEY}
         volumes:
@@ -50,9 +51,11 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
+            - identity-to-email
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            EMAIL_SECRET_KEY: ${EMAIL_SECRET_KEY}
         ports:
             - "${IDENTITY_PORT}"
         volumes:
@@ -69,6 +72,24 @@ services:
             - database
             - databaseservice
         restart: unless-stopped
+
+    email:
+        build: 
+            context: ./cinema-booking
+            dockerfile: ./email/Dockerfile
+        networks:
+            - identity-to-email
+            - booking-to-email
+        environment:
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            EMAIL_NAME: ${EMAIL_NAME}
+            EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+        ports:
+            - "${EMAIL_PORT}"
+        depends_on:
+            - identity
+            - booking
 
     movie:
         build: 
@@ -99,6 +120,7 @@ services:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
+            - booking-to-email
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
@@ -118,6 +140,7 @@ services:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
+            - frontend-to-payment
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
@@ -179,6 +202,21 @@ services:
             DB_NAME: ${DB_NAME}
             DB_NORMALUSER: ${DB_NORMALUSER}
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
+            ADMIN_ID: ${ADMIN_ID}
+            ADMIN_PASSWORDHASH: ${ADMIN_PASSWORDHASH}
+            ADMIN_EMAIL: ${ADMIN_EMAIL}
+            ADMIN_USERNAME: ${ADMIN_USERNAME}
+            ADMIN_USERROLE: ${ADMIN_USERROLE}
+            STAFF_ID: ${STAFF_ID}
+            STAFF_PASSWORDHASH: ${STAFF_PASSWORDHASH}
+            STAFF_EMAIL: ${STAFF_EMAIL}
+            STAFF_USERNAME: ${STAFF_USERNAME}
+            STAFF_USERROLE: ${STAFF_USERROLE}
+            MEMBER_ID: ${MEMBER_ID}
+            MEMBER_PASSWORDHASH: ${MEMBER_PASSWORDHASH}
+            MEMBER_EMAIL: ${MEMBER_EMAIL}
+            MEMBER_USERNAME: ${MEMBER_USERNAME}
+            MEMBER_USERROLE: ${MEMBER_USERROLE}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
             - postgres_container:/var/lib/postgresql/data
@@ -237,9 +275,15 @@ networks:
     driver: bridge
   frontend-to-movie:
     driver: bridge
+  frontend-to-payment:
+    driver: bridge
   booking-to-payment:
     driver: bridge
   identity-to-payment:
+    driver: bridge
+  identity-to-email:
+    driver: bridge
+  booking-to-email:
     driver: bridge
   identity-to-databaseservice:
     driver: bridge

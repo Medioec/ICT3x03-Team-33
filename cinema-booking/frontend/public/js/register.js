@@ -86,7 +86,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const errorData = await response.json();
             document.getElementById("error-message").textContent = errorData.message;
           }
-        } catch (error) {
+          return response.json();
+        }
+        catch (error) {
           // Handle network errors or issues parsing the response
           document.getElementById("error-message").textContent = "An error occurred. Please try again.";
         }

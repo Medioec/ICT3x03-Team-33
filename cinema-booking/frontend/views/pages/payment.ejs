@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
+
+    <main>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h2>Payment Information</h2>
+             
+              <div class="row" id="ccRow">
+                <a>Use an existing credit card?</a>
+                <% if (creditCards && creditCards.length > 0) { %>
+                  <form class="btn-group-toggle" data-toggle="buttons">
+                    <% creditCards.forEach((card, index) => { %>
+                      <!-- Render credit card information for each card as an option in the same group -->
+                      <div class="row" id="ccRow">
+                        <label class="btn btn-outline-primary">
+                          <input type="radio" name="creditCard" id="creditCard<%= index %>" autocomplete="off">
+                          Card Number: <%= card.creditCardNumber %>
+                        </label>
+                      </div>
+                    <% }); %>
+                    <div class="row" id="ccRow">
+                      <label class="btn btn-outline-secondary">
+                        <input type="radio" name="creditCard" id="noneSelected" autocomplete="off">
+                        <a>Add a new credit card</a>
+                      </label>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="pay">Make Payment</button>
+                  </form>
+                <% } else { %>
+                  <!-- if there are no existing credit cards -->
+                  <label class="btn btn-outline-primary">
+                    <input type="radio" name="creditCard" id="noneSelected" autocomplete="off">
+                    <a>Add a new credit card</a>
+                  </label>
+                  <a>No existing credit cards. Please add a new one below.</a>
+                <% } %>
+              </div>
+
+              <a id="makePaymentWarning"></a>
+                          
+              <div class="row" id="ccRow">
+          
+                  <form class="row needs-validation" novalidate>
+                    <div class="row" id="ccRow">
+                  
+                      <div class="row" id="ccRow">
+                          <label for="creditCardNumber" class="form-label">Card Number</label>
+                          <input type="text" class="form-control" id="creditCardNumber" required>
+                        </div>
+                        
+                        <div class="row" id="ccRow">
+                          <label for="creditCardName" class="form-label">Name on Card</label>
+                          <input type="text" class="form-control" id="creditCardName" required>
+                        </div>
+                  
+                    </div>  
+                  
+                    <div class="row" id="ccRow">
+                    
+                      <div class="col-md-6">
+                        <label for="creditCardExpiry" class="form-label">Expiry Date (Input as MM/YY)</label>
+                        <input type="text" class="form-control" id="creditCardExpiry" required>
+                      </div>
+                    
+                      <div class="col-md-4">
+                        <label for="cvv" class="form-label">CVV</label>
+                        <input type="text" class="form-control" id="cvv" required>
+                      </div>
+                  
+                    </div>
+                    <div class="row" id="ccRow">
+                        <!-- uncomment below if testing on 3x03.redapplepie.com -->
+                        <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LcPUOAoAAAAAOU1Zy_KJVlo5Osn4EtA9eNT1sd1"
+                          data-callback="onSuccess" data-action="action"></div> -->
+                          
+                        <!-- uncomment below if testing on stg-3x03.redapplepie.com -->
+                        <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LeVl-coAAAAAE9CkECF9qgWWfLP1aAhjgrbTPbJ"
+                          data-callback="onSuccess" data-action="action"></div> -->
+                  
+                        <!-- uncomment below if testing on localhost -->
+                        <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdDtsooAAAAAHj_xBabr_6QUfmu3cUnSSQSnKTP"
+                          data-callback="onSuccess" data-action="action"></div>
+                          <a id="captchaError"></a>
+                    </div>
+                    <div class="col-auto" id="ccRow">
+                      <button type="submit" class="btn btn-primary" id="saveCard">Save Card Information</button>
+                    </div>
+                  </form>
+
+              </div>
+
+          </div>
+
+          
+          <div class="col-md-6">
+            <h2>Ticket Information</h2>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Movie: <%- showtimeDetails.movieTitle %></h5>
+                <p class="card-text">Cinema: <%- showtimeDetails.cinemaName %></p>
+                <p class="card-text">Theater: <%- showtimeDetails.theaterId %></p>
+                <p class="card-text">Date: <%- showtimeDetails.showDate %></p>
+                <p class="card-text">Time: <%- showtimeDetails.showTime %></p>
+                <p class="card-text">Seat Number: <%- JSON.stringify(seat) %></p>
+                <p class="card-text">Price: $10.50</p>
+              </div>
+            </div>
+          </div>
+        
+        </div>
+      </div>
+
+    </main>
+
+    <!-- footer -->
+    <%- include('../partial/footer'); %>
+
+    <!-- Scripts -->
+    <script>       
+      window.cardData = <%- JSON.stringify(creditCards) %>;
+      window.seat = <%- JSON.stringify(seat) %>;  
+      window.showtimes = <%- JSON.stringify(showtimes) %>;      
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script src="/js/payment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

@@ -23,11 +23,6 @@
   <!-- Navbar -->
   <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
 
-    <script>
-      // Convert showtimeDetails to a JSON string and log it to the browser console
-      console.log(JSON.stringify(<%= JSON.stringify(showtimeDetails) %>));
-    </script>
-
     <main>
           <section id="movieDetails">
             <div class="container">
@@ -119,8 +114,7 @@
     <!-- Footer -->
     <%- include('../partial/footer'); %>
 
-      <script src="/js/moviedetails.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
 
 </body>
 

@@ -88,7 +88,7 @@ def getAllMovies():
 @app.route('/getMovieById/<int:movie_id>', methods=["GET"])
 def getMovieById(movie_id):
     try:
-        #ensure movie_id is an integer
+        #ensure movie_id is an integer, throws exception otherwise
         validateInt = int(movie_id)
         url = f"https://databaseservice/databaseservice/moviedetails/get_movie_by_id/{validateInt}"
         response = session.get(url)
@@ -97,10 +97,9 @@ def getMovieById(movie_id):
         elif response.status_code == 404:
             return jsonify({"message": "Movie not found"}), 404
         else:
-            return jsonify({"message": "Get movie with id: " + str(movie_id) + " failed with uncaught exception"}), 500
+            return jsonify({"message": "Get movie with id: " + str(movie_id) + " failed"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-#####     End of retrieve movie by ID     #####
 
 #####     Update a movie entry by its ID     #####
 @app.route('/updateMovieById/<int:movie_id>', methods=['PUT'])
@@ -308,6 +307,21 @@ def getShowtimeById(showtime_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 #####     End of retrieve showtime by ID     #####
+
+#####     Retrieve all cinemas from db     #####
+@app.route('/getAllCinemas', methods=["GET"])
+def getAllCinemas():
+    try:
+        url = f"http://databaseservice:8085/databaseservice/cinemas/get_all_cinemas"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({"message": "Get all cinemas failed"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+#####     End of retrieve all cinemas    #####
 
 #####     Update a showtime entry by its ID     #####
 @app.route('/updateShowtimeById/<int:showtime_id>', methods=['PUT'])
