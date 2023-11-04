@@ -67,7 +67,7 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	CREATE TABLE BookingDetails (
 		seatId VARCHAR(255) NOT NULL,
 		showtimeId INT NOT NULL,
-		userId UUID NOT NULL UNIQUE,
+		userId UUID NOT NULL,
 		transactionId UUID NOT NULL,
 		ticketId SERIAL UNIQUE NOT NULL,
 		ticketPriceId INT NOT NULL,
