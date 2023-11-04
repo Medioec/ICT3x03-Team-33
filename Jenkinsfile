@@ -1,17 +1,29 @@
 pipeline {
     agent none
     stages {
+        stage('OWASP DependencyCheck') {
+            agent { label 'builtin' }
+            steps {
+                dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
+            }
+        }
+        stage('Sonarqube') {
+            agent { label 'builtin' }
+            steps {
+                script {
+                    def scannerHome = tool 'sonarqube';
+                    withSonarQubeEnv('sonarqube') {
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=3x03 -Dsonar.sources=."
+                    }
+                }
+
+            }
+        }
         stage('Build Test') {
             agent { label 'builtin' }
             steps {
                 sh 'chmod 700 -R scripts/'
                 sh './scripts/docker-build.sh test'
-            }
-        }
-        stage('OWASP DependencyCheck') {
-            agent { label 'builtin' }
-            steps {
-                dependencyCheck additionalArguments: '--format HTML --format XML', odcInstallation: 'OWASP Dependency Check'
             }
         }
         stage('Test') {
