@@ -197,7 +197,7 @@ def update_timestamp():
 #####   End of updating keys and expiry   #####
 
 ##### Store encryption key associated with SessionID, for testing purpose, almost duplicate of user session #####
-@user_sessions_bp.route('/store_key_in_database', methods=['POST'])
+@user_sessions_bp.route('/store_key_in_database', methods=['PUT'])
 def store_key_in_database():
     # Log the storing of key in db
     logger.info(f"Storing key in db started.")
@@ -213,8 +213,11 @@ def store_key_in_database():
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
-        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus, encryptionKey) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus, encryptionKey))
+        # insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus, encryptionKey) VALUES (%s, %s, %s, %s, %s)"
+        # cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus, encryptionKey))
+
+        update_query = "UPDATE usersessions SET expiryTimestamp = %s, currStatus = %s, encryptionKey = %s WHERE sessionId = %s"
+        cursor.execute(update_query, (expiryTimestamp, currStatus, encryptionKey, sessionId))
         conn.commit()
         cursor.close()
         conn.close()
@@ -381,3 +384,53 @@ def get_role_by_id():
         logger.error(f"Error in get_role_by_id: {str(e)}")
         return jsonify({"error": str(e)}), 500
 #####   End of user role by user ID retrieval   #####
+
+##### Retrieves currStatus based on session ID #####
+@user_sessions_bp.route('/get_userId_status_by_sessionId', methods=['POST'])
+def get_status_by_sessionId():
+    # Log the getting current status
+    logger.info(f"Getting current status started.")
+    try:
+        # Get data from the request
+        data = request.get_json()
+        sessionId = data['sessionId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Construct the SQL query to retrieve the userId and current status using sessionId
+        select_data_query = "SELECT userId, currStatus FROM usersessions WHERE sessionId = %s "
+        cursor.execute(select_data_query, (sessionId,))
+        data_result = cursor.fetchall()
+
+        # Close the cursor and the database connection
+        cursor.close()
+        conn.close()
+
+        # Separate the data into two attributes in a JSON response
+        if data_result:
+            # Assuming there's one result
+            userId, currStatus = data_result[0]
+
+            response_data = {
+                "userId": userId,
+                "currStatus": currStatus
+            }
+            
+            # log the successful retrieval of a current status and userId
+            logger.info(f"Current status and user id retrieved successfully. currStatus: {currStatus}")
+            return jsonify(response_data), 200
+        
+        else:
+            # User does not exist
+            # log the error
+            logger.error(f"Session not found. sessionId: {sessionId}")
+            return jsonify({"message": "No data found"}), 404
+        
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in get_userId_status_by_sessionId: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+#####   End of currStatus based on session ID retrieval  #####

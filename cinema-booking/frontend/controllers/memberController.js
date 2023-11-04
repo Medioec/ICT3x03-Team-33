@@ -119,8 +119,6 @@ exports.verifyAccount = async (req, res) => {
         
         // successful verification, show success page
         res.status(200).send('Account successfully verified!');
-        
-        // res.redirect(`/setPassword?token=${token}`);
 
     } catch (error) {
         // Handle errors

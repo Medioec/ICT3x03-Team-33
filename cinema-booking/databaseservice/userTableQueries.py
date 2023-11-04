@@ -147,6 +147,58 @@ def get_user_details():
         return jsonify({"error": str(e)}), 500 
 #####   End of get user information     #####    
 
+##### Get user information #####
+@user_bp.route('/get_user_details_by_id', methods=['POST'])    
+def get_user_details_by_id():
+    # Log the retrieval of a user
+    logger.info(f"Retrieving user details by ID started.")
+    try:
+        # Get data from the request
+        data = request.get_json()
+        userId = data['userId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Check if the user exists in the "user" table
+        select_query = "SELECT * FROM cinemauser WHERE userId = %s"
+        cursor.execute(select_query, (userId,))
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if user:
+            # User found, return HTTP 200 OK
+            user_details = {
+                "userId": user[0],
+                "email": user[1],
+                "username": user[2],
+                "passwordHash": user[3],
+                "userRole": user[4],
+                "isUserBanned": user[5],
+                "activationLink": user[6],
+                "isLinkUsed": user[7],
+                "otp": user[8],
+                "otpExpiryTimestamp": user[9]
+            }
+            
+            # Log the successful retrieval of a user
+            logger.info(f"User retrieved successfully. userId: {userId}")
+            return jsonify(user_details), 200
+        else:
+            # User not found, return HTTP 404 Not Found
+            # Log the user not found error
+            logger.warning(f"User not found with userId: {userId}.")
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in get_user_details_by_id: {str(e)}")
+        return jsonify({"error": str(e)}), 500 
+#####   End of get user information     #####    
+
 ##### Checks if username is taken #####
 @user_bp.route('/check_user', methods=['POST'])    
 def check_user():
@@ -425,21 +477,21 @@ def set_otp():
 
 
 ##### Get OTP information #####
-@user_bp.route('/get_otp_passwordHash', methods=['POST'])    
+@user_bp.route('/get_otp_details', methods=['POST'])    
 def get_otp_details():
     # Log the retrieval of a user
     logger.info(f"Retrieving OTP details started.")
     try:
         # Get data from the request
         data = request.get_json()
-        username = data['username']
+        userId = data['userId']
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        select_data_query = "SELECT passwordHash, otp, otpExpiryTimestamp FROM CinemaUser WHERE username = %s "
-        cursor.execute(select_data_query, (username,))
+        select_data_query = "SELECT username, otp, otpExpiryTimestamp FROM CinemaUser WHERE userId = %s "
+        cursor.execute(select_data_query, (userId,))
         data_result = cursor.fetchall()
 
         cursor.close()
@@ -456,16 +508,16 @@ def get_otp_details():
             }
 
             # Log the successful retrieval of a user
-            logger.info(f"OTP details retrieved successfully. username: {username}")
+            logger.info(f"OTP details retrieved successfully. userId: {userId}")
             return jsonify(response_data), 200
         else:
             # User not found, return HTTP 404 Not Found
             # Log the user not found error
-            logger.warning(f"User not found with username: {username}.")
+            logger.warning(f"User not found with OTP link: {userId}.")
             return jsonify({"message": "User not found"}), 404
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
-        logger.error(f"Error in get_otp_passwordHash: {str(e)}")
+        logger.error(f"Error in get_otp_details: {str(e)}")
         return jsonify({"error": str(e)}), 500 
 #####   End of get OTP information     #####    

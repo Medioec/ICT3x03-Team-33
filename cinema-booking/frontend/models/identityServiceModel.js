@@ -15,12 +15,13 @@ async function loginRequest(body) {
     return response;
 }
 
-async function verifyOTP(body) {
+async function verifyOTP(token, body) {
     const response = await fetch("http://identity:8081/verify_otp", {
         method: "POST",
         headers: {
             "Accept": "application/json",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(body),
     });

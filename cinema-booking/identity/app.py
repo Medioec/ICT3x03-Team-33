@@ -211,7 +211,8 @@ def login():
     # if account activated, get password hash and email from DB
     dbHash = response.json()["passwordHash"]
     email = response.json()["email"]
-    
+    userId = response.json()["userId"]
+
     print("password hash", dbHash)
 
     # verify password
@@ -246,55 +247,113 @@ def login():
                 "username": username
     }
     response = requests.post("http://email:587/send_otp", json=requestData)
-    
     if response.status_code != 200:
         # log otp email failure
         logger.error(f"Email sending of OTP to {username} failed. Error: {response.json()['message']}")
         return jsonify({"message": "Error occurred"}), response.status_code
+    
+    try:
+        # generate a partial token with currStatus = unverified
+        sessionId = user_utils.generateUUID()
 
-    return jsonify({"message": "OTP sent"}), 200
+        # set token expiration to 1 minute and get expiry timestamp in iso format
+        expirationTime = timedelta(minutes=1)
+        current_time = datetime.utcnow()
+        expirationTimestamp = current_time + expirationTime
+        expirationTimestamp = expirationTimestamp.isoformat()
+        
+        additional_claims = {
+            "currStatus": "unverified"
+        }
+
+        # generate session token storing username + user role
+        sessionToken = create_access_token(identity=sessionId, expires_delta=expirationTime, additional_claims=additional_claims)
+    except:
+        return jsonify({"message": "Token generation error"}), 500
+    
+    # store session token in db
+    requestData = {"sessionId": sessionId,
+                   "userId": userId,
+                   "expiryTimestamp": expirationTimestamp,
+                   "currStatus": "unverified"}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+
+    # get error message from response if insert unsuccessful
+    if response.status_code != 201:
+        # log login failure
+        logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
+        error_message = response.json().get("message", "Error occurred")
+        return jsonify({"message": error_message}), response.status_code
+    
+    else:
+        print("token generated successfully", sessionToken)
+        # return session token to client 
+        return jsonify({"sessionToken": sessionToken}), 200
     
 # 2nd half of login flow -> get user inputted otp, verify otp and return session token
 @app.route("/verify_otp", methods=["POST"])
+@jwt_required()
 def verify_otp():
     # logs OTP input attempt
-    logger.info(f"Attempting login...")
+    logger.info(f"Attempting OTP verification...")
+    
+    # check if otp token is valid
+    sessionId = get_jwt_identity()
+    token = get_jwt()
+    currStatus = token["currStatus"]
+    
+    # get currStatus from db
+    requestData = {"sessionId": sessionId}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
+    if response.status_code != 200:
+        logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
+        return jsonify({"message": "Invalid session"}), 403
+    
+    # get current status from db
+    db_currStatus = response.json()["currStatus"]
+
+    # verify that status is unverified and matches in db
+    if currStatus != 'unverified' or currStatus != db_currStatus:
+        return jsonify({"message": "Invalid session"}), 403
     
     # get data from OTP form
     data = request.get_json()
-    username = data['username']
     user_input_otp = data['otp']
     current_time = int(time.time())
 
     # validate and sanitize user input
-    username = html.escape(username)
     user_input_otp = html.escape(user_input_otp)
-    user_input_otp = user_utils.validateOTP(user_input_otp)
-
+    if not user_utils.validateOTP(user_input_otp):
+        return jsonify({"message": "Invalid OTP"}), 401
+    
     # get otp and expiry timestamp from db
-    requestData = {"username": username}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user", json=requestData)
+    userId = response.json()["userId"]
+    requestData = {"userId": userId}
+    response =  requests.post("http://databaseservice:8085/databaseservice/user/get_user_details_by_id", json=requestData)
     if response.status_code != 200:
         # log otp retrieval failure
-        logger.error(f"OTP retrieval for {username} failed. Error: {response.json()['message']}")
+        logger.error(f"OTP retrieval failed. Error: {response.json()['message']}")
         return jsonify({"message": "Error occurred"}), response.status_code
     
     db_otp = response.json()["otp"]
-    db_timestamp = response.json()["otpExpiryTimestamp"]
-    password = response.json()["passwordHash"]
-    
+    db_timestamp = int(response.json()["otpExpiryTimestamp"])
+
     # check if OTP has expired
     if current_time > db_timestamp:
         # log otp expiry
-        logger.error(f"OTP for {username} has expired.")
+        logger.error(f"OTP for userId {userId} has expired.")
         return jsonify({"message": "OTP has expired"}), 400
     
+    print(user_input_otp, db_otp)
+
     if user_input_otp != db_otp:
         # log otp verification failure
-        logger.error(f"OTP verification for {username} failed.")
-        return jsonify({"message": "OTP is incorrect"}), 400
+        logger.error(f"OTP verification for userId {userId} failed.")
+        return jsonify({"message": "OTP is incorrect"}), 401
     
-    # if OTP is correct, generate session token and return to client
+    # if OTP is correct, generate full session token and return to client
+    password = response.json()["passwordHash"]
+
     # Generate a Fernet encryption key using password
     fix_salt = b'\x00' * 16
     phlogin = PasswordHasher(parallelism=1, memory_cost=262144, time_cost=4, salt_len=16)
@@ -308,7 +367,6 @@ def verify_otp():
     # Create dictionary with encoded, then serialize the dictionary
     #fernet_json = json.dumps({"fernet_key": fernet_str})
     cipher_suite = Fernet(fernet_keystring)
-    
 
     # Example of Encryption 
     # encrypted_data = cipher_suite.encrypt(b"Sensitive Data")
@@ -326,25 +384,22 @@ def verify_otp():
         current_time = datetime.utcnow()
         expirationTimestamp = current_time + expirationTime
         expirationTimestamp = expirationTimestamp.isoformat()
-
-        # generate session id
-        sessionId = user_utils.generateUUID()
         
-        # get user role
+        # get user role to set in  token
         userRole = response.json()["userRole"]
         additional_claims = {
             "sessionId": sessionId,
             "userRole": userRole,
-            "hash": encrypted_hash.decode()
+            "hash": encrypted_hash.decode(),
+            "currStatus": "active"
         }
 
         # generate session token storing username + user role
         sessionToken = create_access_token(identity=sessionId, expires_delta=expirationTime, additional_claims=additional_claims)
+    
     except:
         return jsonify({"message": "Token generation error"}), 500
-    
-    # After generating the encryption key (fernet_key)
-    # insert session token, sessionID, encryption_key and expiry into db
+
     requestData = {
         "fernet_key": fernet_keystring,
         "sessionId": sessionId,
@@ -353,14 +408,13 @@ def verify_otp():
         "currStatus": "active",
         #"encrypted_dbHash": encrypted_dbHash  # Store the encrypted hash
     }
-    
     #response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/store_key_in_database", json=requestData)
+    response = requests.put("http://databaseservice:8085/databaseservice/usersessions/store_key_in_database", json=requestData)
 
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
         # log login failure
-        logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
+        logger.error(f"Login failed with userId {userId}. Error: {response.json()['message']}")
         error_message = response.json().get("message", "Error occurred")
         return jsonify({"message": error_message}), response.status_code
     
@@ -389,7 +443,6 @@ def logout():
 
     # set session status to inactive in db
     requestData = {"sessionId": sessionId, "currStatus": currStatus}
-    
     response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
@@ -416,10 +469,31 @@ def basicAuth():
     #logs authentication attempt
     logger.info(f"Basic authentication attempted. (user only)")
     
-    # logs login success
-    logger.info(f"Login successful")
+    # get sessionId and currStatus from token
+    sessionId = get_jwt_identity()
+    token = get_jwt()
+    currStatus = token["currStatus"]
+
+    # get currStatus from db
+    requestData = {"sessionId": sessionId}
+    response = requests.get("http://databaseservice:8085/databaseservice/usersessions/get_session_status_by_id", json=requestData)
+    if response.status_code != 200:
+        logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
+        return jsonify({"message": "Invalid session"}), 403
     
-    return jsonify({"message": "Authenticated"}), 200
+    db_currStatus = response.json()["currStatus"]
+
+    # verify that status is active and matches in db
+    if currStatus == 'active' and currStatus == db_currStatus:
+        # logs login success
+        logger.info(f"Login successful")
+        
+        return jsonify({"message": "Authenticated"}), 200
+
+    else:
+        # log authentication failure
+        logger.error(f"Authentication failed due to session not active")
+        return jsonify({"message": "Invalid session"}), 403
 
 # check if user is logged in with valid token and verify their role
 @app.route("/enhancedAuth", methods=["POST"])
@@ -427,10 +501,11 @@ def basicAuth():
 def enhancedAuth():
     logger.info(f"Enhanced authentication attempted (user and role).")
     try:
-        # get session id + role from token
+        # get session id + role + currStatus from token
         sessionId = get_jwt_identity()
         token = get_jwt()
         role = token["userRole"]
+        currStatus = token["currStatus"]
             
         # check against db to see if it's a legit token
         requestData = {"sessionId": sessionId}
@@ -443,20 +518,30 @@ def enhancedAuth():
 
         # get userId from db
         userId = response.json()["userId"]
-        
-        # check that the user role in the db matches the user role in the token
-        requestData = {"userId": userId}
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
-        dbRole = response.json()["userRole"]
+        db_currStatus = response.json()["currStatus"]
 
-        if role != dbRole:
-            # log unauthorized access
-            logger.error(f"Unauthorized access detected")
-            return jsonify({"message": "Invalid token"}), 401
+        # verify that status is active and matches in db
+        if currStatus == 'active' and currStatus == db_currStatus:
+
+            # check that the user role in the db matches the user role in the token
+            requestData = {"userId": userId}
+            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_role_by_id", json=requestData)    
+            dbRole = response.json()["userRole"]
+
+            if role != dbRole:
+                # log unauthorized access
+                logger.error(f"Unauthorized access detected")
+                return jsonify({"message": "Invalid token"}), 401
+            
+            else:
+                # log authentication success
+                logger.info(f"Authentication successful")
+                return jsonify({"message": "Authenticated"}), 200
+        
         else:
-            # log authentication success
-            logger.info(f"Authentication successful")
-            return jsonify({"message": "Authenticated"}), 200
+            # log authentication failure
+            logger.error(f"Authentication failed due to session not active")
+            return jsonify({"message": "Invalid session"}), 403
     
     except:
         return jsonify({"message": "Error occurred"}), 500

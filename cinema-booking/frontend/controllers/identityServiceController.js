@@ -24,12 +24,22 @@ exports.getLogin = (req, res) => {
 exports.postLogin = async (req, res) => {
     try {
         const data = await identityService.loginRequest(req.body);
-        
+
         if (data.status === 200) {
-            // temporarily store username in session
-            req.session.username = username;
+            // get partial token
+            json_response = await data.json();
+            const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
+            const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
+
+            res.cookie('token', json_response.sessionToken, {
+                path: '/',
+                maxAge: expiryDelta,
+                httpOnly: true
+                // TODO: add more cookie options (samesite, secure, etc.)
+            });
+
             logger('info', 'Verifying OTP for user ' + req.body.username + ' from ' + req.socket.remoteAddress);
-            return res.status(data.status).json({'status': 'success', 'message': 'Verify OTP' });
+            return res.status(data.status).json({'status': 'success', 'message': 'Verify OTP'});
         }   
 
         else if (data.status == 403) {
@@ -56,18 +66,19 @@ exports.getOTP = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('pages/otp.ejs', { loggedIn });
+    res.render('pages/otp.ejs');
 };
 
 exports.postOTP = async (req, res) => {
     try {
-        // get username from session and add to request body
-        username = req.session.username;
-        req.body.username = username;
+        // get partial token
+        const token = req.cookies.token;
 
-        const data = await identityService.verifyOTP(req.body);
+        const data = await identityService.verifyOTP(token, req.body);
         
         if (data.status === 200) {
+            res.clearCookie('token');
+
             json_response = await data.json();
             const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
             const expiryDelta = (decodedToken.exp - decodedToken.iat) * 1000;
@@ -141,7 +152,7 @@ exports.logout = async (req, res) => {
         // if not logged in, don't try to logout
         if (!loggedIn) {
             res.clearCookie('token');
-            return res.status(401).json({ message: 'Not logged in.' });
+            return res.status(401).json({ message: 'Not logged in.'});
         }
 
         // if logged in, allow logout
