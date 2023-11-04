@@ -35,7 +35,7 @@ def create_transaction():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO Transaction (transactionId, creditCardId, transactionDateTime) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO Transactions (transactionId, creditCardId, transactionDateTime) VALUES (%s, %s, %s)"
         
         try:
             cursor.execute(insert_query, (transactionId, creditCardId, transactionDateTime))
@@ -70,7 +70,7 @@ def get_all_transactions_by_userId(userId):
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        select_query = "SELECT * FROM Transaction WHERE userId = %s"
+        select_query = "SELECT * FROM Transactions WHERE userId = %s"
         cursor.execute(select_query, (userId,))
         transactions = cursor.fetchone()
 

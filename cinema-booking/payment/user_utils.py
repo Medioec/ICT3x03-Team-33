@@ -39,7 +39,7 @@ def validateCvv(cvv):
 
 # Generates random UUID
 def processPayment():
-    random_uuid = str(uuid.uuid4())
+    random_uuid = uuid.uuid4()
     return random_uuid
 
 # Returns current datetime
