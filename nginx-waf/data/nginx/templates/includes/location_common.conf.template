@@ -38,7 +38,7 @@ add_header Content-Security-Policy "default-src 'self'; form-action 'self'; obje
 add_header Referrer-Policy "strict-origin";
 
 # Ensures the browser only interacts with the server over HTTPS, reducing the risk of man-in-the-middle attacks.
-add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
 # Allows only geolocation access, restricting camera and microphone for enhanced user privacy.
 add_header Permissions-Policy "geolocation=*, camera=(), microphone=()";

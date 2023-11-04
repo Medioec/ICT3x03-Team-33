@@ -101,7 +101,6 @@ server {
     ssl_session_timeout 1d;
     ssl_session_cache shared:MozSSL:10m;
     ssl_session_tickets off;
-    add_header Strict-Transport-Security "max-age=63072000" always;
 
     ssl_dhparam /etc/ssl/certs/dhparam-2048.pem;
 
