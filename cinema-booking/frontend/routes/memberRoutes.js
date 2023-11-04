@@ -23,7 +23,7 @@ router.get('/payment', checkUserRole(member_role), memberController.getMemberPay
 router.post('/addcreditcard', checkUserRole(member_role), memberController.postCreditCard);
 
 // add credit card
-router.delete('/deletecreditcard', checkUserRole(member_role), memberController.deleteCreditCard);
+router.delete('/deletecreditcard', memberController.deleteCreditCard);
 
 // process booking 
 router.post('/processbooking', checkUserRole(member_role), memberController.postGenerateBooking);

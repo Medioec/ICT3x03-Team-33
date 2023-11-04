@@ -87,9 +87,6 @@ async function updateOneCreditCard(token, creditCardData) {
 }
 
 async function deleteCreditCard(token, creditCardId) {
-    const requestData = {
-        creditCardId: creditCardId
-    };
 
     const response = await fetch("http://payment:8084/deleteCreditCard", {
         method: "DELETE",
@@ -98,7 +95,7 @@ async function deleteCreditCard(token, creditCardId) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(requestData),
+        body: creditCardId,
     });
 
     const responseData = await response.json();
