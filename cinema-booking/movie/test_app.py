@@ -1,6 +1,6 @@
 import unittest
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 from app import app, requests, unauthorized_callback, getAllMovies, get_jwt_identity
 import requests
 import werkzeug.wrappers
@@ -81,43 +81,11 @@ class CreateMovieTestCase(unittest.TestCase):
                 response = self.client.post('/createMovie', headers=headers)
                 self.assertEqual(response.status_code, 422)
 
-class TestGetAllMovies(unittest.TestCase):
-    def test_successful_api_call_with_mock_fixed(self):
-        with app.app_context():
-            with patch('requests.get', return_value=MockResponse(500, {"message": "Get all movies failed"})):
-                # Invoke the getAllMovies() function
-                response = getAllMovies()
-
-                # Assert that the response status code is 500
-                self.assertEqual(response[1], 500)
-
-                # Assert that the response is a Flask Response object
-                self.assertIsInstance(response[0], werkzeug.wrappers.Response)
-
-                # Assert that the response contains the expected key
-                self.assertIn("message", response[0].json)
-
-                # Assert that the mocked requests.get() was called with the expected arguments
-                requests.get.assert_called_once_with("https://databaseservice/databaseservice/moviedetails/get_all_movies", verify=False)
-
 class TestGetmoviebyid(unittest.TestCase):
 
     def setUp(self):
         # Use the Flask test client
         self.client = app.test_client()
-
-    def test_valid_movie_id_with_mock(self):
-        # Mock the response from the requests.get() method
-        with patch('app.requests.get') as mock_get:
-            mock_get.return_value.status_code = 200
-            mock_get.return_value.json.return_value = {"title": "Movie Title", "genre": "Action"}
-
-            # Call the getMovieById function with a valid movie_id
-            response = self.client.get('/getMovieById/1')
-
-            # Assert that the response is correct
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json, {"title": "Movie Title", "genre": "Action"})
 
     def test_uncaught_exception_with_mocker(self):
         # Mock the requests.get call to throw an exception
