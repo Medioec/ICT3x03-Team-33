@@ -147,7 +147,7 @@ def register():
                 "activation_link": activation_link,
                 "username": username
     }
-    response = requests.post("http://email:587/send_member_activation_email", json=requestData) 
+    response = requests.post("https://email/send_member_activation_email", json=requestData) 
 
     # if email unsuccessful, delete user from db so admin can try again
     if response.status_code != 200:
@@ -255,7 +255,7 @@ def login():
                 "otp": otp,
                 "username": username
     }
-    response = requests.post("http://email:587/send_otp", json=requestData)
+    response = requests.post("https://email/send_otp", json=requestData)
     if response.status_code != 200:
         # log otp email failure
         logger.error(f"Email sending of OTP to {username} failed. Error: {response.json()['message']}")
@@ -615,7 +615,7 @@ def create_staff():
                     "activation_link": activation_link,
                     "username": username
         }
-        response = requests.post("http://email:587/send_staff_activation_email", json=requestData) 
+        response = requests.post("https://email/send_staff_activation_email", json=requestData) 
 
         if response.status_code != 200:
             # delete user from db
@@ -681,7 +681,7 @@ def create_staff():
                         "activation_link": activation_link,
                         "username": username
             }
-            response = requests.post("http://email:587/send_staff_activation_email", json=requestData) 
+            response = requests.post("https://email/send_staff_activation_email", json=requestData) 
 
             if response.status_code != 200:
                 # delete user from db
