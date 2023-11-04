@@ -53,12 +53,14 @@
                 <% } else { %>
                   <!-- if there are no existing credit cards -->
                   <label class="btn btn-outline-primary">
-                    <input type="radio" name="creditCard" id="noneSelected" checked>
+                    <input type="radio" name="creditCard" id="noneSelected" autocomplete="off">
                     <a>Add a new credit card</a>
                   </label>
                   <a>No existing credit cards. Please add a new one below.</a>
                 <% } %>
               </div>
+
+              <a id="makePaymentWarning"></a>
                           
               <div class="row" id="ccRow">
           
@@ -138,6 +140,11 @@
     <%- include('../partial/footer'); %>
 
     <!-- Scripts -->
+    <script>       
+      window.cardData = <%- JSON.stringify(creditCards) %>;
+      window.seat = <%- JSON.stringify(seat) %>;  
+      window.showtimes = <%- JSON.stringify(showtimes) %>;      
+    </script>
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="/js/payment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

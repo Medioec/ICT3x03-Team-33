@@ -18,8 +18,7 @@ const captchaFeedback = document.getElementById('captchaError');
     form.style.display = 'none';
 
     const paymentBtn = document.getElementById('pay');
-    // Hide the payment initially if no credit card is selected
-    paymentBtn.style.display = 'none';
+    const makePaymentWarning = document.getElementById('makePaymentWarning');
 
     const creditCardNumberInput = document.getElementById('creditCardNumber');
     const creditCardNameInput = document.getElementById('creditCardName');
@@ -55,15 +54,15 @@ const captchaFeedback = document.getElementById('captchaError');
 
     // Function to handle radio button change
     function handleRadioButtonChange() {
-    if (noneSelectedRadio.checked) {
-        // If "Add a new credit card" is selected, reveal the form
-        form.style.display = '';
-        paymentBtn.style.display = 'none';
-    } else {
-        // If a credit card option is selected, hide the form
-        form.style.display = 'none';
-        paymentBtn.style.display = '';
-    }
+      if (noneSelectedRadio.checked) {
+          // If "Add a new credit card" is selected, reveal the form
+          form.style.display = '';
+          paymentBtn.style.display = 'none';
+      } else {
+          // If a credit card option is selected, hide the form
+          form.style.display = 'none';
+          paymentBtn.style.display = '';
+      }
     }
 
     creditCardRadios.forEach((radio) => {
@@ -105,7 +104,7 @@ const captchaFeedback = document.getElementById('captchaError');
         .then(response => {
             if (response.ok) {
                 console.log('Credit card added successfully');
-                window.location.reload();
+                window.location.href = '/memberprofile';
             }
         })
     
@@ -117,22 +116,66 @@ const captchaFeedback = document.getElementById('captchaError');
     }, false);
   
     //////////////////////////////////////////////////////////////////////////
-
-    // Function to handle the "Make Payment" button click
     function handlePaymentButtonClick() {
         const selectedRadio = document.querySelector('input[name="creditCard"]:checked');
         if (selectedRadio) {
-            const cardIndex = selectedRadio.id.replace('creditCard', ''); 
-            const selectedCardId = creditCards[cardIndex].creditCardId;
-            console.log(`Selected credit card ID: ${selectedCardId}`);
+            const selectedCreditCardNumber = selectedRadio.parentElement.textContent.replace('Card Number: ', '').trim();
+            const selectedCard = cardData.find(card => card.creditCardNumber === selectedCreditCardNumber);
+
+            if (selectedCard) {
+              const selectedCardId = parseInt(selectedCard.creditCardId, 10); 
+              const showtimeId = parseInt(showtimes, 10); 
+              const seatId = seat;               
+              const ticketPriceId = 1;
+  
+              const paymentData = {
+                  creditCardId: selectedCardId,
+                  showtimeId: showtimeId,
+                  seatId: seatId,
+                  ticketPriceId: ticketPriceId
+              };
+
+              const bookingData = JSON.stringify(paymentData);
+              console.log(bookingData);
+
+                if(bookingData.length > 0){
+                  fetch("/processbooking", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: bookingData,
+                  })
+                  .then(response => {
+                      if (response.ok) {
+                          return response.json(); 
+                      } else {
+                          throw new Error('Server returned an error'); 
+                      }
+                  })
+                  .then(data => {
+                      console.log('Payment Successful');
+                      alert("Payment Successful!");
+                      window.location.href = '/memberhome';
+                  })
+                  .catch(error => {
+                      console.error('Error occurred', error);
+                      alert("An error occurred while processing your payment."); 
+                  });
+                }
+
+            } else {
+                console.log('Credit card not found in cardData');
+            }
         } else {
-            console.log('No credit card selected');
+            makePaymentWarning.textContent = 'Please select an option first!';
         }
     }
-
     paymentBtn.addEventListener('click', handlePaymentButtonClick);
 
-      //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
 
 
     function validateCreditCardNumber(creditCardNumber) {
@@ -219,6 +262,8 @@ const captchaFeedback = document.getElementById('captchaError');
     
     //////////////////////////////////////////////////////////////////////////
 
+    handleRadioButtonChange();
+
   })();
   
-  handleRadioButtonChange();
+

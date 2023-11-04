@@ -49,8 +49,8 @@ def makePayment():
     else:
         blob = response.json()['blob']
 
-    sessionId = data['sessionId']
-    hash = data['hash']
+    token = get_jwt()
+    hash = token["hash"]
     
     # Get session encryption key from db here
     payload = {
@@ -352,10 +352,12 @@ def updateOneCreditCard():
     response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
-    
+       
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
     
     # validate cc information
     if not user_utils.validateCreditCardNumber(creditCardNumber):

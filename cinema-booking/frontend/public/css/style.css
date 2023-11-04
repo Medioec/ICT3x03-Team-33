@@ -129,7 +129,7 @@
   margin: 5px 0px 5px 0px;
 }
 
-#captchaError{
+#captchaError, #makePaymentWarning{
   color: red;
   font-size: 0.8rem;
   text-decoration: none;
