@@ -83,7 +83,7 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	CREATE TABLE Transactions (
 		transactionId UUID PRIMARY KEY NOT NULL,
 		creditCardId INT NOT NULL,
-		transcationDateTime TIMESTAMP NOT NULL
+		transactionDateTime TIMESTAMP NOT NULL
 	);
 
 	ALTER TABLE UserSessions
