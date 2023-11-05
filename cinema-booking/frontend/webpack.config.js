@@ -1,12 +1,12 @@
 const path = require('path');
-//using module bundler webpacker
+
 module.exports = {
   mode: 'development',
-  // Entry point of your application
-  entry: './public/js/register.js', 
-  // Output configuration
+  entry: './public/js/register.js',
   output: {
-    path: path.resolve(__dirname, 'dist'), // The output directory
-    filename: 'bundle.js' // The name of the output file
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
   },
+  
+  devtool: 'source-map', // This will generate a separate source map file instead of using eval, which is less safe.
 };
