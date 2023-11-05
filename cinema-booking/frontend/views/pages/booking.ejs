@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- nts. replace with MovieDetails title -->
     <title>Seat Selection for <%= showtimeDetails.movieTitle %></title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
@@ -44,7 +43,11 @@
         </div>
     </div>  
     <!-- Navbar -->
-    <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+    <% if (loggedIn) { %>
+        <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
+      <% } else { %>
+        <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+      <% } %>
 
     <div class="container">
         <div class="row">

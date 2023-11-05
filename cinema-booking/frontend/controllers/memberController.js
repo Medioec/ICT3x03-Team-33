@@ -52,20 +52,31 @@ exports.getMemberBookingPage = async (req, res) => {
         const token = req.cookies.token;
 
         const bookingHistory = await bookingService.retrieveAllBookings(token);
-        const bookingShowtime = bookingHistory.map((booking) => booking.showtimeId);
-        const showtimeArray = [];
+        const cinemas = await movieService.getAllCinemas();
 
-        for (const showtimeId of bookingShowtime) {
-            const showtime = await movieService.getShowtimeById(showtimeId);
-            showtimeArray.push(showtime);
+        if (Array.isArray(bookingHistory) && bookingHistory.length > 0) {
+            const showtimeArray = [];
+
+            for (const booking of bookingHistory) {
+                const showtime = await movieService.getShowtimeById(booking.showtimeId);
+                // Find the corresponding cinema for this showtime
+                const cinema = cinemas.find((cinema) => cinema.cinemaId === showtime.cinemaId);
+                
+                // Attach cinema information to the showtime
+                showtime.cinema = cinema;
+
+                showtimeArray.push(showtime);
+            }
+
+            return res.render('pages/memberbooking.ejs', { showtimeArray, bookingHistory, loggedIn });
+        } else {
+            console.log('No bookings found');
+            return res.render('pages/memberbooking.ejs', { showtimeArray: [], bookingHistory: [], loggedIn });
         }
-
-        return res.render('pages/memberbooking.ejs', { showtimeArray, bookingShowtime, loggedIn });
     } catch (error) {
         console.error("Error in getMemberBookingPage:", error);
     }
 };
-
 
 exports.getMemberProfilePage = async (req, res) => {
     try {
@@ -109,7 +120,7 @@ exports.postCreditCard = async (req, res) => {
 
         // Ensure that the creditCardDetails object contains the necessary properties
         if (!creditCardDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         }
 
         const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
@@ -118,7 +129,7 @@ exports.postCreditCard = async (req, res) => {
             return res.status(200).json({ message: 'Credit Card added successfully' });
         } else if (creditCard.status === 400) {
             // Handle a 400 Bad Request response
-            return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         } else {
             // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
@@ -138,7 +149,7 @@ exports.deleteCreditCard = async (req, res) => {
 
         // Ensure that the creditCardDetails object contains the necessary properties
         if (!creditCardDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         }
 
         // Delete the credit card
@@ -149,7 +160,7 @@ exports.deleteCreditCard = async (req, res) => {
             return res.status(200).json({ message: 'Credit Card deleted successfully' });
         } else if (creditCard.status === 400) {
             // Handle a 400 Bad Request response
-            return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         } else {
             // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
@@ -169,7 +180,7 @@ exports.postGenerateBooking = async (req, res) => {
 
         // Ensure that the bookingDetails object contains the necessary properties
         if (!bookingDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing booking details' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         }
 
         const booking = await bookingService.generateBooking(token, bookingDetails);
@@ -178,7 +189,7 @@ exports.postGenerateBooking = async (req, res) => {
             return res.status(201).json({ message: 'Booking generated successfully' });
         } else if (booking.status === 400) {
             // Handle a 400 Bad Request response
-            return res.status(400).json({ message: 'Bad Request - Invalid booking data' });
+            return res.status(400).json({ message: 'Internal Server Error' });
         } else {
             // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });

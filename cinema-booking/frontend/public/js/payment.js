@@ -106,7 +106,10 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(response => {
               if (response.ok) {
                 alert('Credit card added successfully');
-                window.location.reload();
+                // Construct the URL with selected seat ID and showtime ID as query parameters
+                const paymentURL = `/payment?seat=${encodeURIComponent(seat)}&showtimeId=${encodeURIComponent(showtimes)}`;
+                // Navigate to the payment page with selected seat ID and showtime ID as query parameters
+                window.location.href = paymentURL;
               }
           })
       
