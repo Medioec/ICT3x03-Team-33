@@ -66,6 +66,7 @@ pipeline {
                         chmod 700 -R scripts/
                         . ./scripts/set-env.sh
                         ./scripts/cert-gen.sh
+                        ./scripts/docker-kill-volumes.sh stg
                         ./scripts/docker-deploy.sh stg
                         ./scripts/test.sh stg
                     '''
