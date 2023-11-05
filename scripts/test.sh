@@ -5,10 +5,9 @@ then
     echo "Invalid env \"$1\" specified";
     exit 1;
 fi
-echo "Starting test on environment: $1"
+echo "Environment: $1"
 cp env/$1/.env .env
 docker compose -p cinema-$1 -f test-compose.yml run --rm ubuntu
 status=$?
-echo "Test completed with status: $status"
 rm .env
 exit $status

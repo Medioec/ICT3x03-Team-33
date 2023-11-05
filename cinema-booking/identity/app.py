@@ -41,13 +41,6 @@ logger.info(f"Identity Service started")
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 jwt = JWTManager(app)
 
-# required for tls e.g. use session.get(url) to make request instead
-session = requests.Session()
-client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
-ca_cert = '/app/ca-cert.pem'
-session.cert = client_cert
-session.verify = ca_cert
-
 # create serializer for generating links
 EMAIL_SECRET_KEY = os.getenv("EMAIL_SECRET_KEY")
 serializer = URLSafeTimedSerializer(EMAIL_SECRET_KEY)
@@ -78,10 +71,8 @@ def register():
     if not user_utils.validateUsername(username):
         return jsonify({"message": "Username does not meet the requirements"}), 400
     
-    is_valid, validation_message = user_utils.validatePassword(password)
-    if not is_valid:
-        logger.info(f"Password validation failed: {validation_message}")
-        return jsonify({"message": validation_message}), 400
+    if not user_utils.validatePassword(password):
+        return jsonify({"message": "Password does not meet the requirements"}), 400
     
     # check if username exists in db
     try:
@@ -92,7 +83,7 @@ def register():
     
     except Exception as e:
         logger.error(f"Error during username availability check: {str(e)}")
-        return jsonify({"message": "Internal Server Error"}), 500
+        return jsonify({"message": {str(e)}}), 500
     
     # check if email address is valid
     try:
@@ -106,7 +97,7 @@ def register():
         if not user_utils.isEmailAvailable(email):
             return jsonify({"message": "Email is already in use"}), 409
     except Exception as e:
-        return jsonify({"message": "Internal Server Error"}), 500
+        return jsonify({"message": {str(e)}}), 500
 
     ph = PasswordHasher()
     hash = ph.hash(password)
@@ -137,7 +128,7 @@ def register():
         "activationLink": activation_link,
     }
     
-    response = session.post("https://databaseservice/databaseservice/user/add_user", json=data)
+    response = requests.post("http://databaseservice:8085/databaseservice/user/add_user", json=data)
     if response.status_code != 201:
         return jsonify({"message": "Database insert error"}), 500
     
@@ -184,7 +175,7 @@ def login():
             logger.warning(f"Login attempt with non-existent username '{username}'.")
             return jsonify({"message": "Username or password was incorrect"}), 404
     except Exception as e:
-        return jsonify({"message": "Internal Server Error"}), 500
+        return jsonify({"message": str(e)}), 500
 
     # get password hash and role from db
     requestData = {"username": username}
@@ -294,7 +285,8 @@ def verify_otp():
     sessionId = get_jwt_identity()
     token = get_jwt()
     currStatus = token["currStatus"]
-    
+    expirationTime = token["exp"]
+
     # get currStatus from db
     requestData = {"sessionId": sessionId}
     response = session.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
@@ -434,7 +426,7 @@ def logout():
     # set session status to inactive in db
     requestData = {"sessionId": sessionId, "currStatus": currStatus}
     
-    response = session.put("https://databaseservice/databaseservice/usersessions/update_session_status_by_id", json=requestData)
+    response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
 
     if response.status_code == 200:
         # log logout success
@@ -453,6 +445,50 @@ def unauthorized_callback(callback):
     logger.error(f"Unauthorized access detected")
     return jsonify({"message": "Unauthorized access"}), 401
 
+# check if otp has been verified
+@app.route("/isOTPTokenValid", methods=["POST"])
+@jwt_required() # verifies jwt integrity + expiry
+def isOTPTokenValid():
+    #logs authentication attempt
+    logger.info(f"Is OTP verification attempted. (user only)")
+    
+    # get sessionId, currStatus and timestamp from token
+    sessionId = get_jwt_identity()
+    token = get_jwt()
+    currStatus = token["currStatus"]
+
+    # get currStatus from db
+    requestData = {"sessionId": sessionId}
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    if response.status_code != 200:
+        logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
+        return jsonify({"message": "Invalid session"}), 404
+    
+    db_currStatus = response.json()["currStatus"]
+    
+    # get exp from token and db and convert into same format
+    exp = token["exp"]
+    exp = datetime.fromtimestamp(exp)
+    db_timestamp = response.json()["expiryTimestamp"]
+    db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+
+    # check if token is expired
+    if exp > db_timestamp:
+        logger.info(f"Token expired {sessionId}")
+        return jsonify({"message": "Token expired"}), 401
+    
+    # verify that status is unverified and matches in db
+    if currStatus == 'unverified' and currStatus == db_currStatus:
+        # logs login success
+        logger.info(f"OTP verification status correct")
+        return jsonify({"message": "Token status correct"}), 200
+
+    else:
+        # log authentication failure
+        logger.error(f"Authentication failed due to session not active")
+        return jsonify({"message": "Invalid session"}), 401
+
+
 # check if user is logged in with valid token
 @app.route("/basicAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
@@ -470,10 +506,21 @@ def basicAuth():
     response = session.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
     if response.status_code != 200:
         logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
-        return jsonify({"message": "Invalid session"}), 403
+        return jsonify({"message": "Invalid session"}), 404
     
     db_currStatus = response.json()["currStatus"]
 
+    # get exp from token and db and convert into same format
+    exp = token["exp"]
+    exp = datetime.fromtimestamp(exp)
+    db_timestamp = response.json()["expiryTimestamp"]
+    db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+
+    # check if token is expired
+    if exp > db_timestamp:
+        logger.info(f"Token expired {sessionId}")
+        return jsonify({"message": "Token expired"}), 401
+    
     # verify that status is active and matches in db
     if currStatus == 'active' and currStatus == db_currStatus:
         # logs login success
@@ -499,13 +546,24 @@ def enhancedAuth():
             
         # check against db to see if it's a legit token
         requestData = {"sessionId": sessionId}
-        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
+        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
         
         if response.status_code != 200:
             # log authentication failure
             logger.error(f"Authentication failed due to database error Error: {response.json()['message']}")
             return jsonify({"message": "Database error"}), 500
 
+        # get exp from token and db and convert into same format
+        exp = token["exp"]
+        exp = datetime.fromtimestamp(exp)
+        db_timestamp = response.json()["expiryTimestamp"]
+        db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+
+        # check if token is expired
+        if exp > db_timestamp:
+            logger.info(f"Token expired {sessionId}")
+            return jsonify({"message": "Token expired"}), 401
+    
         # get userId from db
         userId = response.json()["userId"]
         db_currStatus = response.json()["currStatus"]
@@ -521,7 +579,7 @@ def enhancedAuth():
             if role != dbRole:
                 # log unauthorized access
                 logger.error(f"Unauthorized access detected")
-                return jsonify({"message": "Invalid token"}), 401
+                return jsonify({"message": "Invalid token"}), 403
             
             else:
                 # log authentication success
@@ -557,12 +615,36 @@ def create_staff():
         # logs sanitized user input
         logger.info(f"Sanitized user input: Email: {email}, Username: {username}")
 
+        if not email or not username:
+            return jsonify({"message": "Please fill in all form data"}), 400
+
+        # ensure username and password contain only allowed characters
+        if not user_utils.validateUsername(username):
+            return jsonify({"message": "Username does not meet the requirements"}), 400
+        
+        # check if username exists in db
+        try:
+            if not user_utils.isUsernameAvailable(username):
+                # log registration failure due to username already taken
+                logger.warning(f"Username '{username}' is already taken.")
+                return jsonify({"message": "Username is already taken"}), 409
+        
+        except Exception as e:
+            logger.error(f"Error during username availability check: {str(e)}")
+            return jsonify({"message": {str(e)}}), 500
+        
+        # check if email address is valid
+        try:
+            validate_email(email, check_deliverability=True)
+        except EmailNotValidError:
+            return jsonify({"message": "Email is invalid"}), 400
+
         # check if email address is still available 
         try:
             if not user_utils.isEmailAvailable(email):
                 return jsonify({"message": "Email is already in use"}), 409
         except Exception as e:
-            return jsonify({"message": "Internal Server Error"}), 500
+            return jsonify({"message": {str(e)}}), 500
 
         try:
             # create a unique activation link
@@ -572,15 +654,18 @@ def create_staff():
         except Exception as e:
             return jsonify({"message": "Error occurred"}), 500
 
-        role = "staff"
+        # store in db activation link in db -> will use this to verify when staff uses their activation link
         userId = user_utils.generateUUID()
-        
+        role = "staff"
+
+        # insert all info into db
         data = {
             "userId": userId,
             "email": email,
             "username": username,
-            "passwordHash": hash,
-            "userRole": role
+            "passwordHash": activation_link,
+            "userRole": role,
+            "activationLink": activation_link,
         }
 
         response = session.post("https://databaseservice/databaseservice/user/add_staff", json=data)
@@ -602,80 +687,10 @@ def create_staff():
 
             return jsonify({"message": "Error occurred"}), 500
         
-        # if insert unsuccessful, return error message from databaseservice
         else:
-            try:
-                if not user_utils.isUsernameAvailable(username):
-                    # log registration failure due to username already taken
-                    logger.warning(f"Username '{username}' is already taken.")
-                    return jsonify({"message": "Username is already taken"}), 409
-            
-            except Exception as e:
-                logger.error(f"Error during username availability check: {str(e)}")
-                return jsonify({"message": "Error occurred"}), 500
-            
-            # check if email address is valid
-            try:
-                validate_email(email, check_deliverability=True)
-            except EmailNotValidError:
-                return jsonify({"message": "Email is invalid"}), 400
-
-            # check if email address is still available 
-            try:
-                if not user_utils.isEmailAvailable(email):
-                    return jsonify({"message": "Email is already in use"}), 409
-            except Exception as e:
-                return jsonify({"message": "Error occurred"}), 500
-
-            try:
-                # create a unique activation link
-                # timestamp is embedded into token, will be checked when token is decoded
-                link_type = "activate-staff-account"
-                activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
-            except Exception as e:
-                print("error generating email link", e)
-
-            # store in db activation link in db -> will use this to verify when staff uses their activation link
-            userId = user_utils.generateUUID()
-            role = "staff"
-
-            # insert all info into db
-            data = {
-                "userId": userId,
-                "email": email,
-                "username": username,
-                "passwordHash": activation_link,
-                "userRole": role,
-                "activationLink": activation_link,
-            }
-            
-            response = session.post("https://databaseservice/databaseservice/user/add_staff", json=data)
-            if response.status_code != 201:
-                return jsonify({"message": "Database insert error"}), 500
-
-            # send email to user with activation link
-            requestData = {
-                        "email": email,
-                        "activation_link": activation_link,
-                        "username": username
-            }
-            response = session.post("https://email/send_staff_activation_email", json=requestData) 
-
-            if response.status_code != 200:
-                # delete user from db
-                data = {"userId": userId}
-                delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
-
-                print("delete_response", delete_response)
-
-                return jsonify({"message": "Error sending email"}), 500
-            
-            else:
-                return jsonify({"message": "Email sent"}), 200
-    except Exception as e:
-        logger.error({"message": f"Error occurred in /create_staff: {str(e)}"})
+            return jsonify({"message": "Email sent"}), 200
+    except:
         return jsonify({"message": "Error occurred"}), 500
-
 ############################## END OF STAFF REGISTRATION #########################################
 
 ############################## VERIFY STAFF ACCOUNT ACTIVATION LINK #########################################
@@ -823,15 +838,5 @@ def activate_member_account(token):
         return jsonify({"message": "Error occurred"}), 500    
 ############################## END OF ACTIVATE MEMBER ACCOUNT #########################################
 
-############################## GENERATE OTP #########################################
-# generates otp and sends to user's email
-# @app.route("/generate_otp", methods=["GET"])
-# def generate_otp(token):
-#     try:
-
-
-#     except:
-#         return jsonify({"message": "Error occurred"}), 500   
-############################## END OF GENERATE OTP #########################################
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8081)

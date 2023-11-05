@@ -27,7 +27,6 @@ def send_staff_activation_email():
 
     # Create activation link
     activation_link = f'https://{base_host}:{https_port}/activate?token={activation_link}'
-    print("activation link: {}".format(activation_link))
 
     # create email
     subject = "Activate Your Account"
@@ -88,7 +87,6 @@ def send_member_activation_email():
     username = data["username"]
     activation_link = data["activation_link"]
 
-    # TODO: replace with actual url in production
     activation_link = f'https://{base_host}:{https_port}/verify?token={activation_link}'
 
     # create email

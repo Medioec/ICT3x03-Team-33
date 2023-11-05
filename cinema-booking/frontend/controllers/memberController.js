@@ -51,6 +51,7 @@ exports.getMemberBookingPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
         const token = req.cookies.token;
+        console.log(token);
 
         const bookingHistory = await bookingService.retrieveAllBookings(token);
         const cinemas = await movieService.getAllCinemas();
@@ -79,40 +80,33 @@ exports.getMemberBookingPage = async (req, res) => {
 exports.getMemberProfilePage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
-        const token = req.cookies.token;
 
-        const creditCards = await paymentService.getAllCreditCards(token);
-        console.log(creditCards);
-
-        return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
+        return res.render('pages/memberprofile.ejs', { loggedIn });
     } catch (error) {
         console.error("Error in getMemberProfilePage:", error); 
         res.status(500).send('Internal Server Error');
     }
 };
 
-
 exports.getMemberPaymentPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
-        const token = req.cookies.token;
-
+        
         // seat & movie information selected by user passed over 
-        const seat = req.query.seat;        
+        const seats = req.query.seats;
         const showtimes = req.query.showtimeId;
         
         // necessary details 
         const showtimeDetails = await movieService.getShowtimeById(showtimes);
-        const creditCards = await paymentService.getAllCreditCards(token);
 
-        return res.render('pages/payment.ejs', {seat, showtimes, showtimeDetails, creditCards, loggedIn });
+        return res.render('pages/payment.ejs', {seats, showtimeDetails, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
 };
 
 exports.postCreditCard = async (req, res) => {
-    try {
+    try{
         const token = req.cookies.token;
         const creditCardDetails = req.body; 
 
@@ -122,6 +116,7 @@ exports.postCreditCard = async (req, res) => {
         }
 
         const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
+        console.log(creditCard);
 
         if (creditCard.status === 201) {
             return res.status(201).json({ message: 'Credit Card added successfully' });
@@ -130,8 +125,6 @@ exports.postCreditCard = async (req, res) => {
         } else {
             return res.status(500).json({ message: 'Internal Server Error' });
         }
-    } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 

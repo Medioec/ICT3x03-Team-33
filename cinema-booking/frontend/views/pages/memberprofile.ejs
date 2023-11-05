@@ -87,9 +87,9 @@
   </div>
 
   <!-- Container for credit cards -->
-  <div class="container">
+  <div class="container mt-5">
     
-    <div class="row" id="ccRow">
+    <div class="row">
       <h2>All Credit Cards</h2>
      
       <div class="row" id="ccRow">
@@ -117,6 +117,40 @@
                   </button>
                 
                 </div>
+                
+                <div class="col-md-6">
+                  <label for="creditCardName" class="form-label">Name on Card</label>
+                  <input type="text" class="form-control" id="creditCardName" required>
+                </div>
+          
+            </div>  
+          
+            <div class="row">
+            
+              <div class="col-md-3">
+                <label for="creditCardExpiry" class="form-label">Expiry Date (Input as MM/YY)</label>
+                <input type="text" class="form-control" id="creditCardExpiry" required>
+              </div>
+            
+              <div class="col-md-3">
+                <label for="cvv" class="form-label">CVV</label>
+                <input type="text" class="form-control" id="cvv" required>
+              </div>
+          
+            </div>
+            <div class="col-12">
+              <div class="recaptcha-error">
+                <!-- uncomment below if testing on 3x03.redapplepie.com -->
+                <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LcPUOAoAAAAAOU1Zy_KJVlo5Osn4EtA9eNT1sd1"
+                  data-callback="onSuccess" data-action="action"></div> -->
+                  
+                <!-- uncomment below if testing on stg-3x03.redapplepie.com -->
+                <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LeVl-coAAAAAE9CkECF9qgWWfLP1aAhjgrbTPbJ"
+                  data-callback="onSuccess" data-action="action"></div> -->
+          
+                <!-- uncomment below if testing on localhost -->
+                <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdDtsooAAAAAHj_xBabr_6QUfmu3cUnSSQSnKTP"
+                  data-callback="onSuccess" data-action="action"></div>
               </div>
             </div>
           <% }); %>
@@ -168,7 +202,8 @@
                   <button type="submit" class="btn btn-primary" id="saveCard">Save Card Information</button>
                 </div>
           </form>
-
+                
+      </div>
     </div>
 
   </div>
@@ -183,6 +218,7 @@
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="/js/memberprofile.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/validatecard.js"></script>
 
 </body>
 

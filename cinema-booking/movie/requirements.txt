@@ -4,4 +4,3 @@ Werkzeug==3.0.0
 requests==2.31.0
 pycryptodome==3.19.0
 Flask-JWT-Extended==4.5.3
-gunicorn==21.2.0

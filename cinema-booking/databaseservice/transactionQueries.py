@@ -42,7 +42,7 @@ def create_transaction():
             conn.commit()
             cursor.close()
             conn.close()
-
+            
             # Log the successful creation of a new transaction entry
             logger.info(f"Transaction added successfully with transactionId: {transactionId}.")
             return jsonify({"message": "Transaction added successfully", "transactionId": transactionId}), 201

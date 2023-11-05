@@ -43,8 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     cvvFeedback.textContent = "Invalid CVV";
     cvvInput.parentNode.appendChild(cvvFeedback);
 
-    //////////////////////////////////////////////////////////////////////////
-
     form.addEventListener(
       "submit",
       (event) => {
@@ -103,8 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       false
     );
-
-    //////////////////////////////////////////////////////////////////////////
 
     function validateCreditCardNumber(creditCardNumber) {
       // regex to check if the cc number contains only numbers

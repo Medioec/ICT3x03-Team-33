@@ -2,8 +2,7 @@
     This file contains utility functions for the identity service.
     These include: checking availability of username and email, validating password, generating random number and generating uuid.
 '''
-from zxcvbn import zxcvbn
-import hashlib
+
 import requests
 import re
 import secrets 
@@ -11,17 +10,10 @@ import uuid
 import string
 import time
 
-# required for tls e.g. use session.get(url) to make request instead
-session = requests.Session()
-client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
-ca_cert = '/app/ca-cert.pem'
-session.cert = client_cert
-session.verify = ca_cert
-
 # check if username is available/does not exist in db
 def isUsernameAvailable(username):
     data = {"username": username}
-    response = session.post("https://databaseservice/databaseservice/user/check_user", json=data)
+    response = requests.post("http://databaseservice:8085/databaseservice/user/check_user", json=data)
 
     # if username is not found in db, username is available
     if response.status_code == 404:
@@ -37,7 +29,7 @@ def isUsernameAvailable(username):
 # check if email is available/does not exist in db
 def isEmailAvailable(email):
     data = {"email": email}
-    response = session.post("https://databaseservice/databaseservice/user/check_email", json=data)
+    response = requests.post("http://databaseservice:8085/databaseservice/user/check_email", json=data)
 
     # if email is not found in db, email is available
     if response.status_code == 404:
@@ -62,34 +54,11 @@ def validateUsername(username):
 with open('/app/wordlist/blacklistedPW.txt', 'r', encoding='latin-1') as f:
     BLACKLISTED_PASSWORDS = set(line.strip() for line in f)
 
-def check_pwned_api(password):
-    # Hash the password with SHA-1
-    sha1password = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
-    first5_char, tail = sha1password[:5], sha1password[5:]
-    url = f'https://api.pwnedpasswords.com/range/{first5_char}'
-    response = requests.get(url)
-    
-    # Check if the password has been breached
-    return tail in (line.split(':')[0] for line in response.text.splitlines())
-
-def password_strength(password):
-    results = zxcvbn(password)
-    # returns the strength score
-    return results['score']
-
+# ensure that password is valid
 def validatePassword(password):
     # Check if password is in the blacklist
     if password in BLACKLISTED_PASSWORDS:
-        return False, "Password is in the blacklist."
-
-    # # Check password against Have I Been Pwned API
-    if check_pwned_api(password):
-        return False, "Password has been breached before according to Have I Been Pwned."
-
-    # Check password strength just for user to gauge their password strength
-    # strength_score = password_strength(password)
-    # if strength_score < 2:  # You can set the threshold as you see fit
-    #     return False, f"Password is too weak (score: {strength_score})."
+        return False
 
     # Regular expression pattern check
     # ensure that password is 12 - 32 characters 
@@ -134,3 +103,18 @@ def generateOTPWithTimestamp(len, expires_in_seconds):
 # verify that only alphanumeric characters are used
 def validateOTP(otp):
     return otp.isalnum()
+
+# def generateOTPWithTimestamp(totp, expires_in_seconds):
+#     current_totp = totp.now()
+
+#     current_time = int(time.time())
+#     expiry_timestamp = current_time + expires_in_seconds
+
+#     return current_totp, expiry_timestamp
+
+# def generateOTP(totp):
+#     current_totp = totp.now()
+#     return current_totp
+
+# def verifyOTP(totp, user_input):
+#     return totp.verify(user_input)
