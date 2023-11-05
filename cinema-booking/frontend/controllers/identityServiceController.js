@@ -60,14 +60,14 @@ exports.postLogin = async (req, res) => {
 };
 
 exports.getOTP = (req, res) => {
-    // get logged in status and token
+    // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
-    const token = req.cookies.token;
 
-    // if logged in alr or not logged in yet, don't try to access otp page
-    if (loggedIn || !token) {
-        return res.redirect('/login');
+    // if logged in, don't try to login again
+    if (loggedIn) {
+        return res.redirect('/');
     }
+
     res.render('pages/otp.ejs');
 };
 
@@ -109,8 +109,8 @@ exports.postOTP = async (req, res) => {
         }
 
         else {
-            logger('info', 'OTP expired for user' + req.body.username + ' from ' + req.socket.remoteAddress);
-            return res.status(401).json({'status': 'expired', 'message': 'OTP expired. Login again' });
+            logger('info', 'OTP expired for user' + req.body.username + ' from ' + req.ip);
+            return res.status(401).json({'status': 'fail', 'message': 'OTP expired' });
         }
         
     } catch (error) {
