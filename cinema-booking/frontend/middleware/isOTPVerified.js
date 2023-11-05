@@ -34,7 +34,7 @@ const isOTPVerified = (req, res, next) => {
                 })
             }
 
-            ekse {
+            else {
                 next();
             }
         }
