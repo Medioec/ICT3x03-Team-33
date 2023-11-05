@@ -223,7 +223,7 @@ def login():
         return jsonify({"message": "Username or password was incorrect"}), 404
     
     # if username and password are valid, generate otp, insert into db and send to user's email
-    otp, otpExpiryTimestamp = user_utils.generateOTPWithTimestamp(len=6, expires_in_seconds=60)
+    otp, otpExpiryTimestamp = user_utils.generateOTPWithTimestamp(len=6, expires_in_seconds=900)
     
     # insert otp into db
     requestData = {"username": username,
@@ -251,8 +251,8 @@ def login():
         # generate a partial token with currStatus = unverified
         sessionId = user_utils.generateUUID()
 
-        # set token expiration to 1 minute and get expiry timestamp in iso format
-        expirationTime = timedelta(minutes=1)
+        # set token expiration to 5 minutes and get expiry timestamp in iso format
+        expirationTime = timedelta(minutes=5)
         current_time = datetime.utcnow()
         expirationTimestamp = current_time + expirationTime
         expirationTimestamp = expirationTimestamp.isoformat()
@@ -332,7 +332,7 @@ def verify_otp():
     db_timestamp = response.json()["otpExpiryTimestamp"]
 
     # check if OTP has expired
-    if current_time > db_timestamp:
+    if current_time > int(db_timestamp):
         # log otp expiry
         logger.error(f"OTP for userId {userId} has expired.")
         return jsonify({"message": "OTP has expired"}), 400
