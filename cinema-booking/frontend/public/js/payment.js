@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
       cvvFeedback.textContent = 'Invalid CVV';
       cvvInput.parentNode.appendChild(cvvFeedback);
     
+      const radioInput = document.querySelector('input[type="radio"][data-value]');
+
       //////////////////////////////////////////////////////////////////////////
 
       const noneSelectedRadio = document.getElementById('noneSelected');
@@ -128,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const selectedRadio = document.querySelector('input[name="creditCard"]:checked');
           if (selectedRadio) {
               const selectedCreditCardNumber = selectedRadio.parentElement.textContent.replace('Card Number: ', '').trim();
-              const selectedCard = cardData.find(card => card.creditCardNumber === selectedCreditCardNumber);
+              const selectedCard = radioInput.getAttribute('data-value');
 
               if (selectedCard) {
                 const selectedCardId = parseInt(selectedCard.creditCardId, 10); 

@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteMessage = document.getElementById("deleteBody");
         deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardId}?`;
     
-        const creditCardFinal = JSON.stringify({ creditCardNumber });
+        const creditCardFinal = JSON.stringify({ creditCardId });
 
         console.log("after final", creditCardFinal);
 

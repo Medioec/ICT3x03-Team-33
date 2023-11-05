@@ -37,7 +37,8 @@
                       <!-- Render credit card information for each card as an option in the same group -->
                       <div class="row" id="ccRow">
                         <label class="btn btn-outline-primary">
-                          <input type="radio" name="creditCard" id="creditCard<%= index %>" autocomplete="off">
+                          <input type="radio" name="creditCard" id="creditCard<%= index %>" 
+                          data-value="<%= card.creditCardId %>" autocomplete="off">
                           Card Number: <%= card.creditCardNumber %>
                         </label>
                       </div>
@@ -93,15 +94,6 @@
                   
                     </div>
                     <div class="row" id="ccRow">
-                        <!-- uncomment below if testing on 3x03.redapplepie.com -->
-                        <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LcPUOAoAAAAAOU1Zy_KJVlo5Osn4EtA9eNT1sd1"
-                          data-callback="onSuccess" data-action="action"></div> -->
-                          
-                        <!-- uncomment below if testing on stg-3x03.redapplepie.com -->
-                        <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LeVl-coAAAAAE9CkECF9qgWWfLP1aAhjgrbTPbJ"
-                          data-callback="onSuccess" data-action="action"></div> -->
-                  
-                        <!-- uncomment below if testing on localhost -->
                         <div id="recaptcha" class="g-recaptcha" data-sitekey="<%= captchaKey %>"
                           data-callback="onSuccess" data-action="action"></div>
                           <a id="captchaError"></a>
@@ -122,7 +114,7 @@
               <div class="card-body">
                 <h5 class="card-title">Movie: <%- showtimeDetails.movieTitle %></h5>
                 <p class="card-text">Cinema: <%- showtimeDetails.cinemaName %></p>
-                <p class="card-text">Cinema: <p id="showtimeId"><%- showtimeDetails.showtimeId %></p></p>
+                <p class="card-text">Showtime Id: <p id="showtimeId"><%- showtimeDetails.showtimeId %></p></p>
                 <p class="card-text">Theater: <%- showtimeDetails.theaterId %></p>
                 <p class="card-text">Date: <%- showtimeDetails.showDate %></p>
                 <p class="card-text">Time: <%- showtimeDetails.showTime %></p>
