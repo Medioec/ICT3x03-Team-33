@@ -142,7 +142,7 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 
 	);
 
-	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole, isLinkUsed)
 	VALUES (
 		'$MEMBER_ID',
 		'$MEMBER_EMAIL',
