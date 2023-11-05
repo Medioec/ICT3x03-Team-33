@@ -155,15 +155,8 @@ def register():
         data = {"userId": userId}
         delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
 
-        try:
-            logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
-            response_json = delete_response.json()
-            # get error message from response. if no message, use default "Error occurred"
-            error_message = response_json.get("message", "Error occurred")
-            return jsonify({"message": error_message}), response.status_code
-        
-        except json.JSONDecodeError as e:
-            return jsonify({"message": "Error occurred"}), 500
+        logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
+        return jsonify({"message": "Error occurred"}), 500
 
     return jsonify({"message": "Registration successful"}), 200
 
@@ -200,17 +193,10 @@ def login():
     print("getting password hash", response.status_code)
 
     if response.status_code != 200:
-        # get error message from response. if no message, use default "Error occurred"
-        try:
-            # log login failure
-            logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
-            response_json = response.json()
-            # get error message from response. if no message, use default "Error occurred"
-            error_message = response_json.get("message", "Error occurred")
-            return jsonify({"message": error_message}), response.status_code
+        # log login failure
+        logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
+        return jsonify({"message": "Error occurred"}), 500
     
-        except json.JSONDecodeError as e:
-            return jsonify({"message": "JSON response decode error"}), 500
     
     # check if account is activated
     isLinkedUsed = response.json()["isLinkUsed"]
@@ -291,11 +277,9 @@ def login():
     if response.status_code != 201:
         # log login failure
         logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
-        error_message = response.json().get("message", "Error occurred")
-        return jsonify({"message": error_message}), response.status_code
+        return jsonify({"message": "Error occurred"}), 500
     
     else:
-        print("token generated successfully", sessionToken)
         # return session token to client 
         return jsonify({"sessionToken": sessionToken}), 200
     
@@ -352,8 +336,6 @@ def verify_otp():
         # log otp expiry
         logger.error(f"OTP for userId {userId} has expired.")
         return jsonify({"message": "OTP has expired"}), 400
-    
-    print(user_input_otp, db_otp)
 
     if user_input_otp != db_otp:
         # log otp verification failure
@@ -424,8 +406,7 @@ def verify_otp():
     if response.status_code != 201:
         # log login failure
         logger.error(f"Login failed with userId {userId}. Error: {response.json()['message']}")
-        error_message = response.json().get("message", "Error occurred")
-        return jsonify({"message": error_message}), response.status_code
+        return jsonify({"message": "Error occurred"}), 500
     
     else:
         # return session token to client 
@@ -462,7 +443,7 @@ def logout():
     else:
         # log database error
         logger.error(f"Logout failed due to database error. Error: {response.json()['message']}")
-        return jsonify({"message": "Database error"}), 500
+        return jsonify({"message": "Error occurred"}), 500
 ############################## END OF LOGOUT #########################################
 
 ############################## AUTH #########################################
@@ -634,7 +615,7 @@ def create_staff():
             
             except Exception as e:
                 logger.error(f"Error during username availability check: {str(e)}")
-                return jsonify({"message": {str(e)}}), 500
+                return jsonify({"message": "Error occurred"}), 500
             
             # check if email address is valid
             try:
@@ -647,7 +628,7 @@ def create_staff():
                 if not user_utils.isEmailAvailable(email):
                     return jsonify({"message": "Email is already in use"}), 409
             except Exception as e:
-                return jsonify({"message": {str(e)}}), 500
+                return jsonify({"message": "Error occurred"}), 500
 
             try:
                 # create a unique activation link
@@ -695,7 +676,8 @@ def create_staff():
             else:
                 return jsonify({"message": "Email sent"}), 200
     except Exception as e:
-        return jsonify({"message": f"Error occurred: {str(e)}"}), 500
+        logger.error({"message": f"Error occurred in /create_staff: {str(e)}"})
+        return jsonify({"message": "Error occurred"}), 500
 
 ############################## END OF STAFF REGISTRATION #########################################
 

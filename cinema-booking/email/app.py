@@ -5,6 +5,7 @@ import requests
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import logging
 
 app = Flask(__name__)  
 CORS(app)
@@ -74,7 +75,7 @@ def send_staff_activation_email():
         return jsonify({"message": "Email sent!"}), 200
     
     except Exception as e:
-        return jsonify({"message": f"Error sending email: {str(e)}"}), 500
+        return jsonify({"message": "Error occurred"}), 500
 ############################## END OF SEND STAFF ACTIVATION LINK #########################################
 
 ############################## SEND MEMBER ACTIVATION LINK #########################################
@@ -138,7 +139,7 @@ def send_member_activation_email():
         return jsonify({"message": "Email sent!"}), 200
     
     except Exception as e:
-        return jsonify({"message": f"Error sending email: {str(e)}"}), 500
+        return jsonify({"message": "Error occurred"}), 500
 ############################## END OF SEND MEMBER ACTIVATION LINK #########################################
 
 ############################## SEND OTP #########################################
@@ -193,7 +194,7 @@ def send_otp():
         return jsonify({"message": "Email sent!"}), 200
     
     except Exception as e:
-        return jsonify({"message": f"Error sending email: {str(e)}"}), 500
+        return jsonify({"message": "Error occurred"}), 500
 ############################## END OF SEND OTP #########################################
 
 if __name__ == "__main__":
