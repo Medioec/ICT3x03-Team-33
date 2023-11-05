@@ -9,8 +9,8 @@ $('.otp-input').each((index1, input) => {
         // Get the current value and convert it to uppercase
         let sanitizedValue = currentInput.val().toUpperCase();
 
-        // Allow only alphanumeric characters
-        sanitizedValue = sanitizedValue.replace(/[^A-Z0-9]/g, '');
+        // Allow only a single alphanumeric character
+        sanitizedValue = sanitizedValue.replace(/[^A-Z0-9]/g, '').substr(0, 1);
 
         // Update the input field with the uppercase sanitized value
         currentInput.val(sanitizedValue);
@@ -66,6 +66,13 @@ otpForm.on('submit', function (e) {
             throw new Error(data.message);
         }
 
+        // if token expired, redirect to login page
+        else if (data.status === 'expired') {
+            document.getElementById("error-message").textContent = data.message;
+            setTimeout(() => window.location.href = "/login", 1500);
+        }
+
+
         switch (data.userRole) {
             case "member":
               window.location.href = "/member";
@@ -75,7 +82,9 @@ otpForm.on('submit', function (e) {
               window.location.href = "/staff";
               break;
 
-            // TODO ADD A CASE FOR ADMIN
+            case "admin":
+                window.location.href = "/createStaff";
+                break;
         }
     })
 });
