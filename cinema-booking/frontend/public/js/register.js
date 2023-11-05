@@ -190,13 +190,15 @@ zxcvbnOptions.setOptions(options);
 // Add an event listener to the password input field
 document.getElementById('userPassword').addEventListener('input', function(event) {
   const passwordInput = event.target;
-  const passwordStrengthResult = zxcvbn(passwordInput.value);
+  
+  const passwordStrengthResult = zxcvbn(passwordInput.value, options);
   const strengthMeter = document.getElementById('password-strength-meter');
   const strengthBar = document.getElementById('password-strength-bar');
+
   if (strengthMeter) {
     const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
     strengthMeter.textContent = `Strength: ${strengthText[passwordStrengthResult.score]}`;
-    
+
     // Update the width of the bar based on the score
     if (strengthBar) {
       strengthBar.style.width = `${(passwordStrengthResult.score + 1) * 20}%`;
