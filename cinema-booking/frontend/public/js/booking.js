@@ -1,7 +1,7 @@
-const showtimeId = document.getElementById('stIdLbl').value;
 
 document.addEventListener("DOMContentLoaded", function () {
-
+  
+    const showtimeId = document.getElementById('stIdLbl').textContent;
     const container = document.querySelector('.seatContainer');
     const seats = document.querySelectorAll('.row .seat:not(.occupied)');
     const count = document.getElementById('count');
