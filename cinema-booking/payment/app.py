@@ -423,7 +423,7 @@ def deleteCreditCard():
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
     url = f"https://databaseservice/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{creditCardId}"
-    response = session.delete(url)
+    response = requests.delete(url)
     
     if response.status_code == 200:
         # Credit card was deleted successfully, return the response from the databaseservice
