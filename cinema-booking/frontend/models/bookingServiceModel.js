@@ -36,9 +36,14 @@ async function retrieveAllBookings(token) {
             "Authorization": `Bearer ${token}`
         }
     });
-
-    const responseData = await response.json();
-    return responseData;
+    if (response.status === 200) {
+        const responseData = await response.json();
+        return responseData;
+    } else if (response.status === 404) {
+        console.log('No bookings found');
+    } else {
+        throw new Error('Internal Server Error');
+    }
 }
 
 async function retrieveAllBookedSeats(showtimeId) {

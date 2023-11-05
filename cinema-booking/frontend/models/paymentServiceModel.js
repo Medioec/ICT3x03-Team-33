@@ -88,9 +88,6 @@ async function updateOneCreditCard(token, creditCardData) {
 
 async function deleteCreditCard(token, creditSent) {
 
-    console.log("model", creditSent);
-    console.log("model", JSON.stringify(creditSent));
-
     const response = await fetch("http://payment:8084/deleteCreditCard", {
         method: "DELETE",
         headers: {
@@ -101,8 +98,13 @@ async function deleteCreditCard(token, creditSent) {
         body: JSON.stringify(creditSent),
     });
 
-    const responseData = await response.json();
-    return responseData;
+    if (response.status === 200) {
+        return response;
+    } else if (response.status === 400) {
+        throw new Error('Bad Request - Invalid credit card data');
+    } else {
+        throw new Error('Internal Server Error');
+    }
 }
 
 module.exports = {

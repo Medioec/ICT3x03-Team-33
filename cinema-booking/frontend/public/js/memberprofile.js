@@ -60,12 +60,18 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         const sanitizedCvv = DOMPurify.sanitize(cvvInput.value);
 
+        console.log("1", cvvInput.value);
+
+        console.log("2", sanitizedCvv);
+
         const formData = {
           creditCardNumber: sanitizedCreditCardNumber,
           creditCardName: sanitizedCreditCardName,
           creditCardExpiry: sanitizedCreditCardExpiry,
           cvv: sanitizedCvv,
         };
+
+        console.log("3", formData);
 
         const creditCardData = JSON.stringify(formData);
         if (!form.checkValidity() || captchaState === false) {
@@ -291,7 +297,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     cvvInput.addEventListener("input", () => {
-      if (!validateCvv(cvvInput.value)) {
+      const cvvValue = cvvInput.value;
+      const isValidCvv = validateCvv(cvvValue);
+    
+      if (!isValidCvv) {
         cvvInput.setCustomValidity("Invalid CVV");
         cvvFeedback.style.display = "block";
       } else {
@@ -299,6 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cvvFeedback.style.display = "none";
       }
     });
+    
 
     //////////////////////////////////////////////////////////////////////////
   })();

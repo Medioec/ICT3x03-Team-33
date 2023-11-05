@@ -118,10 +118,6 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	ADD CONSTRAINT fk_booking_details_transactionId
 	FOREIGN KEY (transactionId) REFERENCES Transactions(transactionId);
 
-	ALTER TABLE Transactions
-	ADD CONSTRAINT fk_transaction_creditCardId
-	FOREIGN KEY (creditCardId) REFERENCES CreditCard(creditCardId);
-
 	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
 	VALUES (
 		'$ADMIN_ID', 
