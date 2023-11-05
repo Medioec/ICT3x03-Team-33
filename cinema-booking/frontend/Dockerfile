@@ -14,6 +14,8 @@ RUN npm install
 COPY . .
 
 EXPOSE 443
+# Build your application
+RUN npm run build
 
 # Start your application
 CMD ["npm", "start"]
