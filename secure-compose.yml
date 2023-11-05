@@ -156,6 +156,21 @@ services:
             DB_NAME: ${DB_NAME}
             DB_NORMALUSER: ${DB_NORMALUSER}
             DB_NORMALPASSWORD: ${DB_NORMALPASSWORD}
+            ADMIN_ID: ${ADMIN_ID}
+            ADMIN_PASSWORDHASH: ${ADMIN_PASSWORDHASH}
+            ADMIN_EMAIL: ${ADMIN_EMAIL}
+            ADMIN_USERNAME: ${ADMIN_USERNAME}
+            ADMIN_USERROLE: ${ADMIN_USERROLE}
+            STAFF_ID: ${STAFF_ID}
+            STAFF_PASSWORDHASH: ${STAFF_PASSWORDHASH}
+            STAFF_EMAIL: ${STAFF_EMAIL}
+            STAFF_USERNAME: ${STAFF_USERNAME}
+            STAFF_USERROLE: ${STAFF_USERROLE}
+            MEMBER_ID: ${MEMBER_ID}
+            MEMBER_PASSWORDHASH: ${MEMBER_PASSWORDHASH}
+            MEMBER_EMAIL: ${MEMBER_EMAIL}
+            MEMBER_USERNAME: ${MEMBER_USERNAME}
+            MEMBER_USERROLE: ${MEMBER_USERROLE}
         volumes:
             - ./cinema-booking/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
             - postgres_container:/var/lib/postgresql/data
