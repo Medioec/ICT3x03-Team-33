@@ -157,7 +157,7 @@ def register():
 
         try:
             logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
-            response_json = response.json()
+            response_json = delete_response.json()
             # get error message from response. if no message, use default "Error occurred"
             error_message = response_json.get("message", "Error occurred")
             return jsonify({"message": error_message}), response.status_code

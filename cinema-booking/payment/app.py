@@ -283,7 +283,7 @@ def getAllCreditCards():
 
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
