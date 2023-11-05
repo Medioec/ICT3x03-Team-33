@@ -56,7 +56,7 @@ server {
         set $always_redirect on;
 
         if ($always_redirect = on) {
-            return 301 https://$host$request_uri:${HTTPS_PORT};
+            return 301 https://$host:${HTTPS_PORT}$request_uri;
         }
 
         include includes/proxy_backend.conf;
