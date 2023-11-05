@@ -1,3 +1,7 @@
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 // check if user is logged in
 const isOTPVerified = (req, res, next) => {
     try {
@@ -11,13 +15,14 @@ const isOTPVerified = (req, res, next) => {
             req.status = currStatus;
 
             if (currStatus == 'unverified') {
-                fetch("http://identity:8081/isOTPTokenValid", { 
+                fetch("https://identity/isOTPTokenValid", { 
                     method: "POST",
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
-                    }
+                    },
+                    agent: httpsAgent
                 })
                 .then(response => {      
                     // if otp token is valid          
