@@ -32,7 +32,7 @@
               <div class="row" id="ccRow">
                 <a>Use an existing credit card?</a>
                 <% if (creditCards && creditCards.length > 0) { %>
-                  <form class="btn-group-toggle" data-toggle="buttons">
+                  <form class="btn-group-toggle" data-toggle="buttons" id="existingCC">
                     <% creditCards.forEach((card, index) => { %>
                       <!-- Render credit card information for each card as an option in the same group -->
                       <div class="row" id="ccRow">
@@ -64,7 +64,7 @@
                           
               <div class="row" id="ccRow">
           
-                  <form class="row needs-validation" novalidate>
+                  <form class="row needs-validation" id="addNewCC" novalidate >
                     <div class="row" id="ccRow">
                   
                       <div class="row" id="ccRow">

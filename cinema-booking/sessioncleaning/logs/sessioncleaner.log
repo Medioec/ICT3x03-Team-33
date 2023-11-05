@@ -1,0 +1,6 @@
+05-Nov-23 14:38:21 - root - INFO - Database Service started
+05-Nov-23 14:38:21 - root - INFO - delete_inactive_sessions called
+05-Nov-23 14:38:21 - root - INFO - Deleted inactive sessions
+05-Nov-23 14:38:21 - root - INFO - delete_inactive_sessions called
+05-Nov-23 14:38:21 - root - INFO - delete_inactive_sessions called
+05-Nov-23 14:38:21 - root - INFO - No inactive sessions to delete

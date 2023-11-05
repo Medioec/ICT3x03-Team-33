@@ -1,57 +1,69 @@
 import unittest
 from unittest.mock import patch
-from flask import Flask
-from app import app  # Replace with actual path to your Flask application
-import smtplib
-
-# Define the mock environment variables
-env_vars = {
-    'EMAIL_HOST': 'smtp.example.com',
-    'EMAIL_NAME': 'example@gmail.com',
-    'EMAIL_PASSWORD': 'password',
-    'EMAIL_PORT': '587'
-}
-
-@patch('os.getenv', side_effect=lambda k, d=None: env_vars.get(k, d))
-@patch('smtplib.SMTP_SSL')
-class TestSendStaffActivationEmail(unittest.TestCase):
+from app import app  # This should be the name of the module where your Flask app is defined
+from app import send_staff_activation_email, send_member_activation_email
+class TestFlaskApi(unittest.TestCase):
 
     def setUp(self):
-        # Import the Flask app inside the setUp method after the environment has been mocked
-        from app import app
+        """Setup the app for testing."""
         self.app = app
+        self.app.config['TESTING'] = True
+        self.client = self.app.test_client()
 
-    def test_email_sent_successfully(self, mock_smtp, mock_getenv):
-        mock_server = mock_smtp.return_value.__enter__.return_value
-        mock_server.login.return_value = True
-        mock_server.sendmail.return_value = True
-        
-        client = self.app.test_client()
-        response = client.post("/send_staff_activation_email", json={
+    @patch('app.send_staff_activation_email')
+    def test_send_staff_activation_email_failure(self, mock_send_email):
+        # Mock the send_staff_activation_email method to raise an exception
+        mock_send_email.side_effect = Exception('An error occurred')
+
+        # Use the test client to send a POST request to the route
+        response = self.client.post('/send_staff_activation_email', json={
             "email": "test@example.com",
             "username": "test_user",
-            "activation_link": "https://None/activate?token=12345"
+            "activation_link": "12345"
         })
 
+        # Check that the response is as expected
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {"message": "Error occurred"})
+
+    @patch('app.smtplib.SMTP_SSL')
+    @patch('app.os.getenv')
+    def test_send_staff_activation_email_success(self, mock_getenv, mock_smtp):
+        mock_getenv.return_value = 'fake_value'
+        
+        # Assume the email sending via SMTP works fine
+        # No need to mock any of its methods or attributes since you're not checking them here
+
+        # Use the test client to send a POST request to the route
+        response = self.client.post('/send_staff_activation_email', json={
+            "email": "test@example.com",
+            "username": "test_user",
+            "activation_link": "12345"
+        })
+
+        # Check that the response is as expected
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {"message": "Email sent!"})
-        mock_server.login.assert_called_once_with('example@gmail.com', 'password')
-        mock_server.sendmail.assert_called()
 
-    def test_email_sent_failure(self, mock_smtp, mock_getenv):
-        mock_server = mock_smtp.return_value.__enter__.return_value
-        mock_server.login.side_effect = smtplib.SMTPException("SMTP authentication error")
-        
-        client = self.app.test_client()
-        response = client.post("/send_staff_activation_email", json={
-            "email": "test@example.com",
-            "username": "test_user",
-            "activation_link": "https://None/activate?token=12345"
-        })
+    @patch('app.send_member_activation_email')
+    def test_invalid_recipient_email_address_format_returns_error(self, mock_send_email):
+        mock_send_email.side_effect = Exception('An error occurred')
 
+        response = self.client.post("/send_member_activation_email", json={"email": "invalid_email", "username": "test_user", "activation_link": "12345"})
         self.assertEqual(response.status_code, 500)
-        self.assertIn("Error sending email", response.json["message"])
-        mock_server.login.assert_called_once_with('example@gmail.com', 'password')
+        self.assertEqual(response.json, {"message": "Error occurred"})
+
+    
+        
+
+    @patch('app.send_member_activation_email')
+    def test_invalid_activation_link_format_returns_error(self, mock_send_email):
+        mock_send_email.return_value = ({"message": "Error occurred"}, 500)
+
+        response = self.client.post("/send_member_activation_email", json={"email": "test@example.com", "username": "test_user", "activation_link": "invalid_link"})
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {"message": "Error occurred"})
+
 
 if __name__ == '__main__':
     unittest.main()

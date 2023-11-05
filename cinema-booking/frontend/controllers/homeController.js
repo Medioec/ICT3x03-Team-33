@@ -18,8 +18,7 @@ exports.getHomePage = [async (req, res) => {
         showtimes = null;
         cinemas = null;
     }
-        return res.render('index.ejs', { movies, cinemas, showtimes, loggedIn });
-
+    return res.render('index.ejs', { movies, cinemas, showtimes, loggedIn });
 }];
 
 
@@ -128,5 +127,58 @@ exports.getBookingForMoviePage = [async (req, res) => {
         res.render('pages/booking.ejs', { bookedSeats, showtimeDetails, loggedIn });
     } catch (error) {
         console.error("Error in getBookingForMoviePage:", error);
+    }
+}];
+
+exports.getAllMovies = [async (req, res) => {
+    try {
+        const movies = await movieService.getAllMovies();
+        return res.status(200).json(movies);
+    } catch (error) {
+        console.error("Error in getAllMovies:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
+
+
+exports.getAllCinemas = [async (req, res) => {  
+    try {
+        const cinemas = await movieService.getAllCinemas();
+        return res.status(200).json(cinemas);
+    } catch (error) {
+        console.error("Error in getAllCinemas:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
+
+exports.getAllShowtimes = [async (req, res) => {  
+    try {
+        const showtimeData = await movieService.getAllShowtimes();
+        return res.status(200).json(showtimeData);
+    } catch (error) {
+        console.error("Error in getAllShowtimes:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
+
+exports.getShowtimeById = [async (req, res) => {  
+    try {
+        const showtimeId = req.query.showtimeId;
+        const showtimeData = await movieService.getAllShowtimes(showtimeId);
+        return res.status(200).json(showtimeData);
+    } catch (error) {
+        console.error("Error in getAllShowtimes:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
+
+exports.getAllBookedSeats = [async (req, res) => {
+    try {
+        const showtimeId = req.query.showtimeId;
+        const bookedSeats = await bookingService.retrieveAllBookedSeats(showtimeId);
+        return res.status(200).json(bookedSeats);
+    } catch (error) {
+        console.error("Error in getAllBookedSeats:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 }];
