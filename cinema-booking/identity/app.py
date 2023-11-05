@@ -465,9 +465,6 @@ def basicAuth():
     token = get_jwt()
     currStatus = token["currStatus"]
 
-    print(sessionId)
-    print(currStatus)
-
     # get currStatus from db
     requestData = {"sessionId": sessionId}
     response = session.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
@@ -480,7 +477,7 @@ def basicAuth():
     # verify that status is active and matches in db
     if currStatus == 'active' and currStatus == db_currStatus:
         # logs login success
-        logger.info(f"Login successful")
+        logger.info(f"Session {sessionId} authorized")
         return jsonify({"message": "Authenticated"}), 200
 
     else:

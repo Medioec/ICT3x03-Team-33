@@ -189,6 +189,7 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
             EMAIL_NAME: ${EMAIL_NAME}
             EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+            HTTPS_PORT: ${HTTPS_PORT}
             BASE_HOST: ${BASE_HOST}
         volumes:
             - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro

@@ -35,8 +35,6 @@ function checkUserRole(requiredRole) {
                 agent: httpsAgent
             })
             .then(response => {
-                console.log(response);
-
                 // if validation fails, user doesn't have permissions
                 if (response.status !== 200) {
                     req.loggedIn = false;
