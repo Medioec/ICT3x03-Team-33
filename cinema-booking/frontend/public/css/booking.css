@@ -50,10 +50,6 @@ h4 .totalPrice {
   border-style: solid;
 }
 
-.seat-sold:nth-last-of-type(2) {
-  margin-left: 18px;
-}
-
 .seat:not(.seat-sold):hover {
   cursor: pointer;
   transform: scale(1.2);
