@@ -20,13 +20,13 @@ router.get('/memberprofile', checkUserRole(member_role), memberController.getMem
 router.get('/payment', checkUserRole(member_role), memberController.getMemberPaymentPage);
 
 // add credit card
-router.post('/addcreditcard', checkUserRole(member_role), memberController.postCreditCard);
+router.post('/addcreditcard', memberController.postCreditCard);
 
 // add credit card
-router.delete('/deletecreditcard', checkUserRole(member_role), memberController.deleteCreditCard);
+router.delete('/deletecreditcard', memberController.deleteCreditCard);
 
 // process booking 
-router.post('/processbooking', checkUserRole(member_role), memberController.postGenerateBooking);
+router.post('/processbooking', memberController.postGenerateBooking);
 
 // Add other routes as needed
 module.exports = router;

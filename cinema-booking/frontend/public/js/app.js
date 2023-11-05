@@ -159,12 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (selectedCinema) {
         const cinemaId = selectedCinema.cinemaId;
 
-        console.log("selectedMovie:", selectedMovieTitle);
-        console.log("selectedMovieId:", movieId);
-        console.log("selectedCinemaName:", selectedCinemaName);
-        console.log("selectedCinemaId:", cinemaId);
-        console.log("selectedTiming:", selectedTiming);
-
         // Find the showtimeId by matching selectedTiming with showtimeInfoArray
         const selectedShowtime = showtimeInfoArray.find(showtime => {
           const showtimeString = `${showtime.showDate}, ${showtime.showTime}`;

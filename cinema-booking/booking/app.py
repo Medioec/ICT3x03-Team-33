@@ -185,7 +185,7 @@ def retrieveAllBookedSeats(showtimeId):
         if response.status_code == 200:
             return response.json(), 200
         elif response.status_code == 404:
-            return jsonify({"message": f"No booked seats found for showtimeId given. showtimeId: {showtimeId}"}), 404
+            return jsonify({"message": f"No booked seats found for showtimeId given. showtimeId: {showtimeId}", "status": 404}), 404
         else:
             return jsonify({"message": "Error retrieving the booked seats"}), 500
         

@@ -41,8 +41,27 @@ async function retrieveAllBookings(token) {
     return responseData;
 }
 
+async function retrieveAllBookedSeats(showtimeId) {
+    const response = await fetch(`http://booking:8083/retrieveAllBookedSeats/${showtimeId}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (response.status === 200) {
+        return response;
+    } else if (response.status === 404) {
+        console.log('No bookings found');
+    } else {
+        throw new Error('Internal Server Error');
+    }
+}
+
 module.exports = {
     generateBooking,
     retrieveOneBooking,
-    retrieveAllBookings
+    retrieveAllBookings,
+    retrieveAllBookedSeats
 };

@@ -32,22 +32,23 @@
               <div class="card mb-3">
                 <div class="card-body">
                   <h5 class="card-title">Transaction ID: <%= booking.transactionId %></h5>
-                  <div class="col-md-6">
-                    <p class="card-text">Seat ID: <%= booking.seatId %></p>
-                    <p class="card-text">Showtime ID: <%= booking.showtimeId %></p>
-                    <p class="card-text">Ticket Price ID: <%= booking.ticketPriceId %></p>
-                  </div>
-                  <!-- Extracted data from showtimeArray -->
-                  <div class="col-md-6">
-                  <% showtimeArray.forEach(function(showtime) { %>
-                    <% if (showtime.showtimeId === booking.showtimeId) { %>
-                      <p class="card-text">Cinema Name: <%= showtime.cinemaName %></p>
-                      <p class="card-text">Movie Title: <%= showtime.movieTitle %></p>
-                      <p class="card-text">Show Date: <%= showtime.showDate %></p>
-                      <p class="card-text">Show Time: <%= showtime.showTime %></p>
-                      <p class="card-text">Theater Number: <%= showtime.theaterNumber %></p>
-                    <% } %>
-                  <% }); %>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="card-text">Seat ID: <%= booking.ticketId %></p>
+                      <p class="card-text">Showtime ID: <%= booking.showtimeId %></p>
+                    </div>
+                    <!-- Extracted data from showtimeArray -->
+                    <div class="col-md-6">
+                    <% showtimeArray.forEach(function(showtime) { %>
+                      <% if (showtime.showtimeId === booking.showtimeId) { %>
+                        <p class="card-text">Cinema Name: <%= showtime.cinemaName %></p>
+                        <p class="card-text">Movie Title: <%= showtime.movieTitle %></p>
+                        <p class="card-text">Date: <%= showtime.showDate %></p>
+                        <p class="card-text">Time: <%= showtime.showTime %></p>
+                        <p class="card-text">Theater Number: <%= showtime.theaterNumber %></p>
+                      <% } %>
+                    <% }); %>
+                    </div>
                   </div>
                 </div>
               </div>

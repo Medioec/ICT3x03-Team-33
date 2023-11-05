@@ -103,8 +103,8 @@ const captchaFeedback = document.getElementById('captchaError');
     
         .then(response => {
             if (response.ok) {
-                console.log('Credit card added successfully');
-                window.location.href = '/memberprofile';
+              alert('Credit card added successfully');
+              window.location.reload();
             }
         })
     
@@ -157,7 +157,7 @@ const captchaFeedback = document.getElementById('captchaError');
                   .then(data => {
                       console.log('Payment Successful');
                       alert("Payment Successful!");
-                      window.location.href = '/viewbooking';
+                      window.location.href = '/member';
                   })
                   .catch(error => {
                       console.error('Error occurred', error);
