@@ -12,7 +12,7 @@ const checkLoggedIn = (req, res, next) => {
                     "Authorization": `Bearer ${token}`
                 }
             })
-            .then(response => {                
+            .then(response => {           
                 if (response.status === 200) {
                     req.loggedIn = true;
                 } 
