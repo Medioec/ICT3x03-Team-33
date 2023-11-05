@@ -329,7 +329,7 @@ def verify_otp():
         return jsonify({"message": "Error occurred"}), response.status_code
     
     db_otp = response.json()["otp"]
-    db_timestamp = response.json()["otpExpiryTimestamp"]
+    db_timestamp = int(response.json()["otpExpiryTimestamp"])
 
     # check if OTP has expired
     if current_time > db_timestamp:
@@ -453,39 +453,6 @@ def unauthorized_callback(callback):
     logger.error(f"Unauthorized access detected")
     return jsonify({"message": "Unauthorized access"}), 401
 
-# check if otp has been verified
-@app.route("/isOTPTokenValid", methods=["POST"])
-@jwt_required() # verifies jwt integrity + expiry
-def isOTPTokenValid():
-    #logs authentication attempt
-    logger.info(f"Is OTP verification attempted. (user only)")
-    
-    # get sessionId, currStatus and timestamp from token
-    sessionId = get_jwt_identity()
-    token = get_jwt()
-    currStatus = token["currStatus"]
-
-    # get currStatus from db
-    requestData = {"sessionId": sessionId}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_hash_role_linkUsed", json=requestData)
-    if response.status_code != 200:
-        logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
-        return jsonify({"message": "Invalid session"}), 404
-
-    db_currStatus = response.json()["currStatus"]
-    
-    # verify that status is unverified and matches in db
-    if currStatus == 'unverified' and currStatus == db_currStatus:
-        # logs login success
-        logger.info(f"OTP verification status correct")
-        return jsonify({"message": "Token status correct"}), 200
-
-    else:
-        # log authentication failure
-        logger.error(f"Authentication failed due to session not active")
-        return jsonify({"message": "Invalid session"}), 404
-
-
 # check if user is logged in with valid token
 @app.route("/basicAuth", methods=["POST"])
 @jwt_required() # verifies jwt integrity + expiry
@@ -554,7 +521,7 @@ def enhancedAuth():
             if role != dbRole:
                 # log unauthorized access
                 logger.error(f"Unauthorized access detected")
-                return jsonify({"message": "Invalid token"}), 403
+                return jsonify({"message": "Invalid token"}), 401
             
             else:
                 # log authentication success
@@ -564,7 +531,7 @@ def enhancedAuth():
         else:
             # log authentication failure
             logger.error(f"Authentication failed due to session not active")
-            return jsonify({"message": "Invalid session"}), 404
+            return jsonify({"message": "Invalid session"}), 403
     
     except:
         return jsonify({"message": "Error occurred"}), 500
