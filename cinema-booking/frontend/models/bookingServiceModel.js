@@ -54,12 +54,13 @@ async function retrieveAllBookings(token) {
 }
 
 async function retrieveAllBookedSeats(showtimeId) {
-    const response = await fetch(`http://booking:8083/retrieveAllBookedSeats/${showtimeId}`, {
+    const response = await fetch(`https://booking/retrieveAllBookedSeats/${showtimeId}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
         },
+        agent: httpsAgent
     });
 
     if (response.status === 200) {

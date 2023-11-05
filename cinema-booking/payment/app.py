@@ -283,7 +283,7 @@ def getAllCreditCards():
 
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}
-    response = session.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
@@ -447,7 +447,7 @@ def deleteCreditCard():
     userId = response.json()["userId"]
     
     # Make an HTTP DELETE request to the databaseservice to delete the credit card
-    url = f"https://databaseservice:8085/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{creditCardId}"
+    url = f"https://databaseservice/databaseservice/creditcard/delete_credit_card_by_id/{userId}/{creditCardId}"
     response = requests.delete(url)
     
     if response.status_code == 200:
