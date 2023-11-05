@@ -28,7 +28,7 @@ h4 .totalPrice {
   margin-bottom: 40px;
 }
 
-.seat {
+.seat, .seat-sold {
   background-color: #ADD8E6;
   height: 26px;
   width: 32px;
@@ -45,25 +45,21 @@ h4 .totalPrice {
   border-style: solid;
 }
 
-.seat.sold {
+.seat-sold {
   background-color: grey;
   border-style: solid;
 }
 
-.seat:nth-of-type(2) {
-  margin-right: 18px;
-}
-
-.seat:nth-last-of-type(2) {
+.seat-sold:nth-last-of-type(2) {
   margin-left: 18px;
 }
 
-.seat:not(.sold):hover {
+.seat:not(.seat-sold):hover {
   cursor: pointer;
   transform: scale(1.2);
 }
 
-.showcase .seat:not(.sold):hover {
+.showcase .seat:not(.seat-sold):hover {
   cursor: default;
   transform: scale(1);
 }

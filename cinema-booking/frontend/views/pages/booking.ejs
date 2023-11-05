@@ -83,7 +83,7 @@
                         <small>Selected</small>
                     </li>
                     <li>
-                        <div class="seat sold"></div>
+                        <div class="seat-sold"></div>
                         <small>Sold</small>
                     </li>
                 </ul>
@@ -171,7 +171,7 @@
                         <div class="seat" id="1G"></div>
                         <div class="seat" id="2G"></div>
                         <div class="seat" id="3G"></div>
-                        <div class="seat sold" id="4G"></div>
+                        <div class="seat" id="4G"></div>
                         <div class="seat" id="5G"></div>
                         <div class="seat" id="6G"></div>
                         <div class="seat" id="7G"></div>
@@ -256,6 +256,7 @@
 
     <script>  
         window.showtimeDetails = <%- JSON.stringify(showtimeDetails) %>;
+        window.bookedSeats = <%- JSON.stringify(bookedSeats) %>;
     </script>
     <script src="/js/booking.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>

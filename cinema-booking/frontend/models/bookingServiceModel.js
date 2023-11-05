@@ -51,7 +51,8 @@ async function retrieveAllBookedSeats(showtimeId) {
     });
 
     if (response.status === 200) {
-        return response;
+        const responseData = await response.json();
+        return responseData;
     } else if (response.status === 404) {
         console.log('No bookings found');
     } else {
