@@ -3,6 +3,8 @@ const bookingService = require('../models/bookingServiceModel');
 const paymentService = require('../models/paymentServiceModel');
 const identityService = require('../models/identityServiceModel');
 
+const captchaKey = process.env.CAPTCHA_KEY;
+
 exports.getMembersHomePage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
@@ -87,7 +89,7 @@ exports.getMemberProfilePage = async (req, res) => {
         const creditCards = await paymentService.getAllCreditCards(token);
         console.log(creditCards);
 
-        return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
+        return res.render('pages/memberprofile.ejs', { creditCards, loggedIn, captchaKey });
     } catch (error) {
         console.error("Error in getMemberProfilePage:", error); 
         res.status(500).send('Internal Server Error');
@@ -108,7 +110,7 @@ exports.getMemberPaymentPage = async (req, res) => {
         const showtimeDetails = await movieService.getShowtimeById(showtimes);
         const creditCards = await paymentService.getAllCreditCards(token);
 
-        return res.render('pages/payment.ejs', {seat, showtimes, showtimeDetails, creditCards, loggedIn });
+        return res.render('pages/payment.ejs', {seat, showtimes, showtimeDetails, creditCards, loggedIn, captchaKey });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }

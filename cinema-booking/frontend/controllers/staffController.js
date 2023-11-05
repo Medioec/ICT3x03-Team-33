@@ -2,6 +2,8 @@
 const movieService = require('../models/movieServiceModel');
 const identityService = require('../models/identityServiceModel');
 
+const captchaKey = process.env.CAPTCHA_KEY;
+
 exports.getStaffDashboard = async (req, res) => {
     try {
         const movies = await movieService.getAllMovies();
@@ -48,7 +50,7 @@ exports.getStaffPasswordPage = async (req, res) => {
             return res.status(403).send('Unauthorized Access');
         }
 
-        res.render('pages/staffactivateaccount.ejs')
+        res.render('pages/staffactivateaccount.ejs', { captchaKey })
         
     } catch (error) {
         // Handle errors
