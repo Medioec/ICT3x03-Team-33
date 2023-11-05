@@ -33,7 +33,7 @@ async function getAllMovies() {
 // Function to retrieve a movie by its ID
 async function getMovieById(movieId) {
     try {
-        const response = await fetch(`https://movie:8082/getMovieById/${movieId}`, {
+        const response = await fetch(`https://movie/getMovieById/${movieId}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -188,14 +188,15 @@ async function getShowtimeById(showtime_id) {
 // Function to create a new showtime entry in the database
 async function createShowtime(token, showtimeData) {
     try {
-        const response = await fetch('http://movie:8082/createShowtime', {
+        const response = await fetch('https://movie/createShowtime', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify(showtimeData)
+            body: JSON.stringify(showtimeData),
+            agent: httpsAgent
         });
 
         if (!response.ok) {
@@ -246,6 +247,7 @@ async function deleteShowtimeById(showtime_id) {
                 'Content-Type': 'application.json',
                 "Authorization": `Bearer ${token}`
             },
+            agent: httpsAgent
         });
 
         if (!response.ok) {
@@ -266,12 +268,13 @@ async function deleteShowtimeById(showtime_id) {
 // Function to retrieve all showtimes from the database
 async function getAllCinemas() {
     try {
-        const response = await fetch('http://movie:8082/getAllCinemas', {
+        const response = await fetch('https://movie/getAllCinemas', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }
+            },
+            agent: httpsAgent
         });
 
         if (!response.ok) {

@@ -1,5 +1,9 @@
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 async function generateBooking(token, bookingData) {
-    const response = await fetch("http://booking:8083/generateBooking", {
+    const response = await fetch("https://booking/generateBooking", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -7,6 +11,7 @@ async function generateBooking(token, bookingData) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(bookingData),
+        agent: httpsAgent
     });
 
     const responseData = await response.json();
@@ -14,13 +19,14 @@ async function generateBooking(token, bookingData) {
 }
 
 async function retrieveOneBooking(token, ticketId) {
-    const response = await fetch(`http://booking:8083/retrieveOneBooking/${ticketId}`, {
+    const response = await fetch(`https://booking/retrieveOneBooking/${ticketId}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
-        }
+        },
+        agent: httpsAgent
     });
 
     const responseData = await response.json();
@@ -28,13 +34,14 @@ async function retrieveOneBooking(token, ticketId) {
 }
 
 async function retrieveAllBookings(token) {
-    const response = await fetch("http://booking:8083/retrieveAllBookings", {
+    const response = await fetch("https://booking/retrieveAllBookings", {
         method: "GET",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
-        }
+        },
+        agent: httpsAgent
     });
 
     const responseData = await response.json();

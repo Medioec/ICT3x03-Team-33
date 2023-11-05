@@ -21,7 +21,7 @@ async function loginRequest(body) {
 }
 
 async function verifyOTP(token, body) {
-    const response = await fetch("http://identity:8081/verify_otp", {
+    const response = await fetch("https://identity/verify_otp", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -29,6 +29,7 @@ async function verifyOTP(token, body) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(body),
+        agent: httpsAgent
     });
 
     return response;
@@ -63,37 +64,40 @@ async function logoutRequest(token) {
 }
 
 async function verifyStaffActivationToken(token) {
-    const response = await fetch(`http://identity:8081/activate_staff_account/${token}`, {
+    const response = await fetch(`https://identity/activate_staff_account/${token}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
-        }
+        },
+        agent: httpsAgent
     });
 
     return response;
 }
 
 async function setStaffPasswordRequest(token, body) {
-    const response = await fetch(`http://identity:8081/staff_set_password/${token}`, {
+    const response = await fetch(`https://identity/staff_set_password/${token}`, {
         method: "PUT",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body),
+        agent: httpsAgent
     });
 
     return response;
 }
 
 async function verifyMemberActivationToken(token) {
-    const response = await fetch(`http://identity:8081/activate_member_account/${token}`, {
+    const response = await fetch(`https://identity/activate_member_account/${token}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
-        }
+        },
+        agent: httpsAgent
     });
 
     return response;
