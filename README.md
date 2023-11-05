@@ -26,7 +26,9 @@ then, run the dev scripts in the scripts/ directory
 ./scripts/dev-deploy.sh
 ```
 
-3. Check if containers are running:\
+3. The app will now be available at `https://localhost`
+
+4. Check if containers are running:\
 On CLI, use these commands:\
 `docker ps` (lists running containers)\
 Then, navigate to the port number on your browser (e.g., `localhost:8080` for frontend)\
@@ -34,9 +36,9 @@ Then, navigate to the port number on your browser (e.g., `localhost:8080` for fr
 On Docker Desktop\
 Navigate to "Containers" section. Then, click on the ports for any of the containers to access it.\
 
-4a. Stop containers before building & making changes\
+5a. Stop containers before building & making changes\
 In windows powershell, to down all containers and volumes: `.\scripts\dev-kill-volumes.bat` \
 Linux: `./scripts/dev-kill-volumes.bat` \
 
-4b. In windows powershell to ONLY down the containers without messing with db: `.\scripts\dev-kill` \
+5b. In windows powershell to ONLY down the containers without messing with db: `.\scripts\dev-kill` \
 Linux: `./scripts/dev-kill` 
