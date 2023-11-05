@@ -40,8 +40,6 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${FRONTEND_PORT}"
-        depends_on:
-            - identity
         restart: unless-stopped
 
     identity:
@@ -69,9 +67,6 @@ services:
             options:
                 max-size: "10m"
                 max-file: "20"
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     email:
@@ -93,9 +88,6 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${EMAIL_PORT}"
-        depends_on:
-            - identity
-            - booking
         restart: unless-stopped
 
     movie:
@@ -114,9 +106,6 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${MOVIE_PORT}"
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     booking:
@@ -137,9 +126,6 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${BOOKING_PORT}"
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     payment:
@@ -160,9 +146,6 @@ services:
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${PAYMENT_PORT}"
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     databaseservice:
@@ -193,8 +176,6 @@ services:
             options:
                 max-size: "10m"
                 max-file: "20"
-        depends_on:
-            - database
         restart: unless-stopped
 
     database:
@@ -267,8 +248,6 @@ services:
             - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
             - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
-        depends_on:
-            - database
 
 networks:
     default:
