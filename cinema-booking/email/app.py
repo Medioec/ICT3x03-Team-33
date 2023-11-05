@@ -89,7 +89,7 @@ def send_member_activation_email():
     activation_link = data["activation_link"]
 
     # TODO: replace with actual url in production
-    activation_link = f'https://{base_host}/verify?token={activation_link}'
+    activation_link = f'https://{base_host}:{https_port}/verify?token={activation_link}'
 
     # create email
     subject = "Activate Your CineGo Account Now!"
