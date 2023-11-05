@@ -147,23 +147,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function getAllBookedSeats(showtimeId) {
     try {
-        const response = await fetch('/getAllBookedSeats', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }, 
-            body: JSON.stringify(showtimeId),
-        });
+      const response = await fetch('/getAllBookedSeats', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(showtimeId),
+      });
   
-        if (!response.ok) {
-            console.error('Response not OK. Status:', response.status);
-            throw new Error('Failed to get all cinemas');
-        }
+      if (!response.ok) {
+        console.error('Response not OK. Status:', response.status);
+        throw new Error('Failed to get booked seats');
+      }
   
-        return response.json();
+      const data = await response.json();
+  
+      if (Array.isArray(data)) {
+        return data;
+      } else {
+        // Handle the case when the response is not in the expected format
+        console.error('Invalid response format:', data);
+        return [];
+      }
     } catch (error) {
-        console.error('Error in getAllBookedSeats:', error);
-        throw error;
+      console.error('Error in getAllBookedSeats:', error);
+      throw error;
     }
   }
+  

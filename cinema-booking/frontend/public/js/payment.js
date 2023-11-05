@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const creditCardExpiryInput = document.getElementById('creditCardExpiry');
       const cvvInput = document.getElementById('cvv');
 
+
+      const seat = document.getElementById('seat').value;
+      const showtimeId = document.getElementById('showtimeId').value;
+
       //////////////////////////////////////////////////////////////////////////
 
       const creditCardNumberFeedback = document.createElement('div');

@@ -60,18 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         const sanitizedCvv = DOMPurify.sanitize(cvvInput.value);
 
-        console.log("1", cvvInput.value);
-
-        console.log("2", sanitizedCvv);
-
         const formData = {
           creditCardNumber: sanitizedCreditCardNumber,
           creditCardName: sanitizedCreditCardName,
           creditCardExpiry: sanitizedCreditCardExpiry,
           cvv: sanitizedCvv,
         };
-
-        console.log("3", formData);
 
         const creditCardData = JSON.stringify(formData);
         if (!form.checkValidity() || captchaState === false) {
@@ -178,8 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find the corresponding creditCardId based on the creditCardNumber from creditCardData
         const matchingCard = creditCardData.find((card) => card.creditCardNumber === creditCardNumber);
         
-        console.log("inside matched", matchingCard);
-
         if (!matchingCard) {
           // Handle the case where a matching card is not found in creditCardData
           console.error("Matching card not found in creditCardData");
@@ -190,15 +182,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteMessage = document.getElementById("deleteBody");
         deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardNumber}?`;
     
-        // Create a creditCard object with the found creditCardId
         const creditCardId = matchingCard.creditCardId;
-    
-        console.log("after matched", creditCardId);
-
-        const creditCardNo = JSON.stringify(creditCardId);
-
-        console.log("after JSON", creditCardNo);
-
+  
         const creditCardFinal = JSON.stringify({ creditCardId });
 
         console.log("after final", creditCardFinal);
@@ -235,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     dismissButtonsMod.forEach((button) => {
       button.addEventListener('click', function () {
-        console.log("dismissed");
         modifyCardModal.style.display = "none";
       });
     });
@@ -323,3 +307,8 @@ document.addEventListener('DOMContentLoaded', function() {
     //////////////////////////////////////////////////////////////////////////
   })();
 });
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  
