@@ -190,8 +190,6 @@ def login():
     requestData = {"username": username}
     response = session.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
 
-    print("getting password hash", response.status_code)
-
     if response.status_code != 200:
         # log login failure
         logger.error(f"Login failed with username {username}. Error: {response.json()['message']}")
@@ -208,13 +206,10 @@ def login():
     email = response.json()["email"]
     userId = response.json()["userId"]
 
-    print("password hash", dbHash)
-
     # verify password
     try:
         ph = PasswordHasher()
         ph.verify(dbHash, password)
-        print("password hashes match")
 
     # if password hashes do not match, throw error
     except Exception as e:
@@ -633,7 +628,8 @@ def create_staff():
                 link_type = "activate-staff-account"
                 activation_link = user_utils.generateEmailLinks(serializer, username, link_type) 
             except Exception as e:
-                print("error generating email link", e)
+                logger.error("Error generating email link: ", str(e))
+                return jsonify({"message": "Error occurred"}), 500
 
             # store in db activation link in db -> will use this to verify when staff uses their activation link
             userId = user_utils.generateUUID()
@@ -665,8 +661,6 @@ def create_staff():
                 # delete user from db
                 data = {"userId": userId}
                 delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
-
-                print("delete_response", delete_response)
 
                 return jsonify({"message": "Error sending email"}), 500
             
