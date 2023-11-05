@@ -1,7 +1,7 @@
 # test_credit_card.py
 
 import unittest
-from api_crypto import *
+import api_crypto
 from unittest.mock import MagicMock, patch
 from credit_card import CreditCard
 
