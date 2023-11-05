@@ -167,12 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteCardModal.style.display = "block";
     
         // Retrieve the credit card number from the clicked button
-        const creditCardNumber = button.getAttribute("data-card-id");
+        const creditCardNumber = button.getAttribute("data-card-number");
+        const creditCardId = button.getAttribute("data-card-id");
         console.log("credit card number", creditCardNumber)
     
         // Display a confirmation message in the modal
         const deleteMessage = document.getElementById("deleteBody");
-        deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardNumber}?`;
+        deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardId}?`;
     
         const creditCardFinal = JSON.stringify({ creditCardNumber });
 

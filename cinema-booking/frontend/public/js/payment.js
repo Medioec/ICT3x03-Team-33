@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const cvvInput = document.getElementById('cvv');
 
 
-      const seat = document.getElementById('seat').value;
-      const showtimeId = document.getElementById('showtimeId').value;
+      const seat = document.getElementById('seat').textContent;
+      const showtimeId = document.getElementById('showtimeId').textContent;
 
       //////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
               if (selectedCard) {
                 const selectedCardId = parseInt(selectedCard.creditCardId, 10); 
-                const showtimeId = parseInt(showtimes, 10); 
+                const showtimeId = parseInt(showtimeId, 10); 
                 const seatId = seat;               
                 const ticketPriceId = 1;
     

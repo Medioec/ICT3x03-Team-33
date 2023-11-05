@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedSeatId = null; 
     let bookedSeats;
 
+
+    console.log('showtimeId: ', showtimeId);
+
     getAllBookedSeats(showtimeId)
       .then(data => {
         bookedSeats = data;
@@ -99,15 +102,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         updateSelectedCount();
     });
+    console.log('showtimeId: ', showtimeId);
 
     checkoutButton.addEventListener('click', () => {
         if (loggedIn === 'true') {            
             // Check if a seat is selected using the selectedSeatId variable
-            if (selectedSeatId) {
-                const showtimeDetailsId = showtimeId; // Get the showtime ID from showtimeDetails
+            console.log('showtimeId: ', showtimeId);
 
+            if (selectedSeatId) {
                 // Construct the URL with selected seat ID and showtime ID as query parameters
-                const paymentURL = `/payment?seat=${encodeURIComponent(selectedSeatId)}&showtimeId=${encodeURIComponent(showtimeDetailsId)}`;
+                const paymentURL = `/payment?seat=${encodeURIComponent(selectedSeatId)}&showtimeId=${encodeURIComponent(showtimeId)}`;
                 
                 // Navigate to the payment page with selected seat ID and showtime ID as query parameters
                 window.location.href = paymentURL;
@@ -159,20 +163,17 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!response.ok) {
         console.error('Response not OK. Status:', response.status);
         throw new Error('Failed to get booked seats');
-      }
-  
-      const data = await response.json();
-  
-      if (Array.isArray(data)) {
-        return data;
       } else {
         // Handle the case when the response is not in the expected format
         console.error('Invalid response format:', data);
-        return [];
       }
-    } catch (error) {
+      return response.json();  
+    } 
+    catch (error) {
       console.error('Error in getAllBookedSeats:', error);
       throw error;
     }
   }
+  
+
   

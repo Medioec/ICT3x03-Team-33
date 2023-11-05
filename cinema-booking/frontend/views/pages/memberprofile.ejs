@@ -105,10 +105,10 @@
                   <p class="card-text">CVV: <%= card.cvv %></p>
                   
                   <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCardModal" 
-                    data-card-id="<%= card._id %>" data-card-number="<%= card.creditCardNumber %>">Delete</button>
+                    data-card-id="<%= card.creditCardId %>" data-card-number="<%= card.creditCardNumber %>">Delete</button>
 
                   <button class="btn btn-primary" data-toggle="modal" data-target="#modifyCardModal" 
-                    data-card-id="<%= card._id %>" 
+                    data-card-id="<%= card.creditCardId %>" 
                     data-card-number="<%= card.creditCardNumber %>"
                     data-card-expiry="<%= card.creditCardName %>"
                     data-card-name="<%= card.creditCardExpiry %>" 
