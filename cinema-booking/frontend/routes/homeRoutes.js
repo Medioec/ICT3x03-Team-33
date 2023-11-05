@@ -11,10 +11,10 @@ router.get('/', isOTPVerified, checkLoggedIn, homeController.getHomePage);
 // route to moviedetails for a specific movie
 router.get('/moviedetails', isOTPVerified, checkLoggedIn, homeController.getMovieDetailsPage);
 
-// all movies from navbar
+// all movies page from navbar
 router.get('/allmovies', isOTPVerified, checkLoggedIn, homeController.getAllMoviesPage);
 
-// all showtimes from navbar
+// all showtimes page from navbar
 router.get('/allshowtimes', isOTPVerified, checkLoggedIn, homeController.getAllShowtimesPage);
 
 // seat selection for selected movie
@@ -28,6 +28,12 @@ router.get('/getAllCinemas', checkHeaders, homeController.getAllCinemas);
 
 // get all showtimes
 router.get('/getAllShowtimes', checkHeaders, homeController.getAllShowtimes);
+
+// get showtime by id
+router.get('/getShowtimeById', checkHeaders, homeController.getShowtimeById);
+
+// get all booked seats
+router.get('/getAllBookedSeats', checkHeaders, homeController.getAllBookedSeats);
 
 // Add other routes as needed
 module.exports = router;

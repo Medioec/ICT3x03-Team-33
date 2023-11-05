@@ -160,3 +160,25 @@ exports.getAllShowtimes = [async (req, res) => {
         return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 }];
+
+exports.getShowtimeById = [async (req, res) => {  
+    try {
+        const showtimeId = req.query.showtimeId;
+        const showtimeData = await movieService.getAllShowtimes(showtimeId);
+        return res.status(200).json(showtimeData);
+    } catch (error) {
+        console.error("Error in getAllShowtimes:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
+
+exports.getAllBookedSeats = [async (req, res) => {
+    try {
+        const showtimeId = req.query.showtimeId;
+        const bookedSeats = await bookingService.retrieveAllBookedSeats(showtimeId);
+        return res.status(200).json(bookedSeats);
+    } catch (error) {
+        console.error("Error in getAllBookedSeats:", error);
+        return res.status(500).json({ 'message': 'Internal Server Error' });
+    }
+}];
