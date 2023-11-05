@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, jwt_required, get_jwt_identity, get_jwt)
 import os
 import requests
 import user_utils
@@ -12,6 +12,13 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
+
+# required for tls e.g. use session.get(url) to make request instead
+session = requests.Session()
+client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
+ca_cert = '/app/ca-cert.pem'
+session.cert = client_cert
+session.verify = ca_cert
 
 #####   throw error when JWT token is not valid     #####
 @jwt.unauthorized_loader
@@ -30,7 +37,7 @@ def makePayment():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     userId = response.json()["userId"]
@@ -39,8 +46,8 @@ def makePayment():
     data = request.get_json()
     creditCardId = data['creditCardId']
     
-    url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
-    response = requests.get(url)
+    url = f"https://databaseservice/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
+    response = session.get(url)
     
     if response.status_code == 404:
         return jsonify({"message": "Credit card not found"}), 404
@@ -49,15 +56,15 @@ def makePayment():
     else:
         blob = response.json()['blob']
 
-    sessionId = data['sessionId']
-    hash = data['hash']
+    token = get_jwt()
+    hash = token["hash"]
     
     # Get session encryption key from db here
     payload = {
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690001"})
     if response.status_code != 200:
@@ -97,7 +104,7 @@ def makePayment():
         }
 
         # Make an HTTP POST request to the databaseservice to create the transaction
-        response = requests.post("http://databaseservice:8085/databaseservice/transactions/create_transaction", json=transaction_data)
+        response = session.post("https://databaseservice/databaseservice/transactions/create_transaction", json=transaction_data)
 
         # Transaction was added successfully, return the response from the databaseservice
         if response.status_code == 201:
@@ -113,6 +120,8 @@ def makePayment():
     # If we reach this point, we've exhausted all retry attempts, break out of loop to prevent infinite loop
     return jsonify({"message": "Exceeded maximum retry attempts"}), 500
 
+###################################################################################################################################
+
 @app.route('/addCreditCard', methods=["POST"])
 @jwt_required()
 def addCreditCard():
@@ -127,16 +136,18 @@ def addCreditCard():
     sessionId = get_jwt_identity()
     if not sessionId:
         return jsonify({"message": "Error: No token sent"}), 500
-    
+
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
 
     # validate cc information
     if not user_utils.validateCreditCardNumber(creditCardNumber):
@@ -153,7 +164,7 @@ def addCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690101"})
     if response.status_code != 200:
@@ -177,7 +188,7 @@ def addCreditCard():
     }
     
     # Make an HTTP POST request to the databaseservice to create the credit card
-    response = requests.post("http://databaseservice:8085/databaseservice/creditcard/add_credit_card", json=credit_card_data)
+    response = session.post("https://databaseservice/databaseservice/creditcard/add_credit_card", json=credit_card_data)
     
     if response.status_code == 201:
         # Credit card was added successfully, return the response from the databaseservice
@@ -188,6 +199,8 @@ def addCreditCard():
     else:
         # Handle other errors
         return jsonify({"message": "Error adding the credit card"}), 500
+
+###################################################################################################################################
 
 @app.route('/getOneCreditCard', methods=["POST"])
 @jwt_required()
@@ -203,17 +216,19 @@ def getCreditCard(userId, creditCardId):
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
     
     # Make an HTTP GET request to the databaseservice to retrieve the credit card
-    url = f"http://databaseservice:8085/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
-    response = requests.get(url)
+    url = f"https://databaseservice/databaseservice/creditcard/get_credit_card_by_id/{userId}/{creditCardId}"
+    response = session.get(url)
     
     if response.status_code == 200:
         # Credit cards were retrieved successfully, return the response from the databaseservice
@@ -223,7 +238,7 @@ def getCreditCard(userId, creditCardId):
             "sessionId": sessionId
         }
         try:
-            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+            response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
         except:
             return jsonify({"error": "690201"})
         if response.status_code != 200:
@@ -255,7 +270,9 @@ def getCreditCard(userId, creditCardId):
     else:
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit card"}), 500
-    
+
+###################################################################################################################################
+
 @app.route('/getAllCreditCards', methods=["POST"])
 @jwt_required()
 def getAllCreditCards():
@@ -270,13 +287,15 @@ def getAllCreditCards():
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     
-    # TODO - Will need to pass in session information in POST request. To take from JWT
-    sessionId = data['sessionId']
-    hash = data['hash']
+    # set information retrieved via sessionId
+    userId = response.json()["userId"]
     
+    token = get_jwt()
+    hash = token["hash"]
+
     # Make an HTTP GET request to the databaseservice to retrieve all credit cards
-    url = f"http://databaseservice:8085/databaseservice/creditcard/get_all_credit_cards/{userId}"
-    response = requests.get(url)
+    url = f"https://databaseservice/databaseservice/creditcard/get_all_credit_cards/{userId}"
+    response = session.get(url)
     
     if response.status_code == 200:
         # Credit cards were retrieved successfully, return the response from the databaseservice
@@ -286,7 +305,7 @@ def getAllCreditCards():
             "sessionId": sessionId
         }
         try:
-            response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+            response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
         except:
             return jsonify({"error": "690201"})
         if response.status_code != 200:
@@ -317,6 +336,8 @@ def getAllCreditCards():
         # Handle other errors
         return jsonify({"message": "Error retrieving the credit cards"}), 500
 
+###################################################################################################################################
+
 @app.route('/updateOneCreditCard', methods=["PUT"])
 @jwt_required()
 def updateOneCreditCard():
@@ -335,13 +356,15 @@ def updateOneCreditCard():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
-    
+       
     # set information retrieved via sessionId
     userId = response.json()["userId"]
-    hash = response.json()['hash']
+    
+    token = get_jwt()
+    hash = token["hash"]
     
     # validate cc information
     if not user_utils.validateCreditCardNumber(creditCardNumber):
@@ -358,7 +381,7 @@ def updateOneCreditCard():
         "sessionId": sessionId
     }
     try:
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=payload)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=payload)
     except:
         return jsonify({"error": "690301"})
     if response.status_code != 200:
@@ -383,8 +406,8 @@ def updateOneCreditCard():
     }
         
     # Make an HTTP UPDATE request to the databaseservice to update the credit card
-    url = f"http://databaseservice:8085/databaseservice/creditcard/update_credit_card"
-    response = requests.put(url, json=updated_credit_card_data)
+    url = f"https://databaseservice/databaseservice/creditcard/update_credit_card"
+    response = session.put(url, json=updated_credit_card_data)
     
     if response.status_code == 200:
         # Credit card was updated successfully, return the response from the databaseservice
@@ -398,6 +421,8 @@ def updateOneCreditCard():
     else:
         # Handle other errors
         return jsonify({"message": "Error updating the credit card"}), 500
+
+###################################################################################################################################
 
 @app.route('/deleteCreditCard', methods=["DELETE"])
 @jwt_required()
@@ -414,7 +439,7 @@ def deleteCreditCard():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error"}), 500
     

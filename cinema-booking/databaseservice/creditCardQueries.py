@@ -76,8 +76,8 @@ def get_credit_card_by_id(userId, creditCardId):
         select_owner_query = "SELECT userId FROM CreditCard WHERE creditCardId = %s"
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
-
-        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
+    
+        if owner_id and str(owner_id[0]) == str(userId): # uuid need to convert to string
             # If the user owns the credit card, retrieve it
             select_query = "SELECT * FROM CreditCard WHERE creditCardId = %s"
             cursor.execute(select_query, (creditCardId,))

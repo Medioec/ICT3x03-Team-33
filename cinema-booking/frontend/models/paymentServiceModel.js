@@ -91,10 +91,17 @@ async function updateOneCreditCard(token, creditCardData) {
         agent: httpsAgent
     });
 
-    return response;
+    if (response.status === 200) {
+        return response;
+    } else if (response.status === 400) {
+        throw new Error('Bad Request - Invalid credit card data');
+    } else {
+        throw new Error('Internal Server Error');
+    }
 }
 
 async function deleteCreditCard(token, creditSent) {
+
     const response = await fetch("https://payment/deleteCreditCard", {
         method: "DELETE",
         headers: {

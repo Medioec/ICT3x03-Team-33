@@ -6,3 +6,4 @@ pycryptodome==3.19.0
 requests==2.31.0
 cryptography==41.0.4
 Flask-JWT-Extended==4.5.3
+gunicorn==21.2.0

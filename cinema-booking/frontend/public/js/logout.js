@@ -8,7 +8,9 @@ $("#logout-button").click(function () {
     })
 
     .then(response => {
-        window.location.href = "/";
+        if (response.ok) {
+            window.location.href = "/";
+        }
     })
 
     .catch(error => {

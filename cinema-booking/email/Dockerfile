@@ -26,4 +26,4 @@ COPY email/ /app
 EXPOSE 587
 
 # Run your Flask app
-CMD ["python", "app.py"]
+CMD gunicorn --conf gunicorn_conf.py wsgi:app

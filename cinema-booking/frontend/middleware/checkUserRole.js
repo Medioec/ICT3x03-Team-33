@@ -1,6 +1,10 @@
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 // function to check if the user is logged in and has the required role to access the page
 function checkUserRole(requiredRole) {
-    return (req, res, next) => {
+    return async (req, res, next) => {
         try {
             // get cookie
             const token = req.cookies.token;
@@ -21,13 +25,14 @@ function checkUserRole(requiredRole) {
             }
 
             // verify their role using identity service
-            const response = fetch("http://identity:8081/enhancedAuth", {
+            const response = fetch("https://identity/enhancedAuth", {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                }
+                },
+                agent: httpsAgent
             })
             .then(response => {
                 // if validation fails, user doesn't have permissions

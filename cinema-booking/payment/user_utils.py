@@ -1,7 +1,7 @@
 '''
     This file contains utility functions for the payment service.
 '''
-from datetime import datetime
+from datetime import datetime,timedelta
 import uuid
 import re
 
@@ -39,10 +39,12 @@ def validateCvv(cvv):
 
 # Generates random UUID
 def processPayment():
-    random_uuid = uuid.uuid4()
+    random_uuid = str(uuid.uuid4())
     return random_uuid
 
 # Returns current datetime
 def getTransactionDateTime():
-    return datetime.now()
+    current_time = datetime.utcnow()
+    current_time_iso = current_time.isoformat()
+    return current_time_iso
 
