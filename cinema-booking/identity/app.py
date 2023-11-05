@@ -337,24 +337,6 @@ def verify_otp():
         return jsonify({"message": "Error occurred"}), response.status_code
     
     db_otp = response.json()["otp"]
-    db_timestamp = response.json()["otpExpiryTimestamp"]
-
-    # check if OTP has expired
-    if current_time > db_timestamp:
-        # log otp expiry
-        logger.info(f"OTP for userId {userId} has expired.")
-
-        # update token status in db
-        requestData = {"sessionId": sessionId, "currStatus": "inactive"}
-        response = requests.put("http://databaseservice:8085/databaseservice/usersessions/update_session_status_by_id", json=requestData)
-        if response.status_code == 200:        
-            logger.info(f"Update token status for userId {userId} to expired successful")
-            return jsonify({"message": "OTP has expired"}), 400
-        
-        else:
-            logger.error(f"Error updating token status to expired for userId {userId}")
-            return jsonify({"message": "Error occurred"}), 500
-
 
     if user_input_otp != db_otp:
         # log otp verification failure
@@ -493,20 +475,17 @@ def isOTPTokenValid():
         return jsonify({"message": "Invalid session"}), 404
     
     db_currStatus = response.json()["currStatus"]
+    
+    # get exp from token and db and convert into same format
+    exp = token["exp"]
+    exp = datetime.fromtimestamp(exp)
     db_timestamp = response.json()["expiryTimestamp"]
+    db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
 
-    # verify that timestamp is not expired
-    db_timestamp = datetime.fromisoformat(db_timestamp)
-    current_time = datetime.utcnow()
-
-    print(current_time, db_timestamp)
-
-    print(current_time > db_timestamp)
-    if current_time > db_timestamp:
-        # TODO UPDATE DB TOKEN STATUS
-
-        logger.info(f"Authentication failed due to expired token")
-        return jsonify({"message": "Session expired"}), 403
+    # check if token is expired
+    if exp > db_timestamp:
+        logger.info(f"Token expired {sessionId}")
+        return jsonify({"message": "Token expired"}), 401
     
     # verify that status is unverified and matches in db
     if currStatus == 'unverified' and currStatus == db_currStatus:
@@ -534,13 +513,24 @@ def basicAuth():
 
     # get currStatus from db
     requestData = {"sessionId": sessionId}
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
+    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
         return jsonify({"message": "Invalid session"}), 404
     
     db_currStatus = response.json()["currStatus"]
 
+    # get exp from token and db and convert into same format
+    exp = token["exp"]
+    exp = datetime.fromtimestamp(exp)
+    db_timestamp = response.json()["expiryTimestamp"]
+    db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+
+    # check if token is expired
+    if exp > db_timestamp:
+        logger.info(f"Token expired {sessionId}")
+        return jsonify({"message": "Token expired"}), 401
+    
     # verify that status is active and matches in db
     if currStatus == 'active' and currStatus == db_currStatus:
         # logs login success
@@ -573,6 +563,17 @@ def enhancedAuth():
             logger.error(f"Authentication failed due to database error Error: {response.json()['message']}")
             return jsonify({"message": "Database error"}), 500
 
+        # get exp from token and db and convert into same format
+        exp = token["exp"]
+        exp = datetime.fromtimestamp(exp)
+        db_timestamp = response.json()["expiryTimestamp"]
+        db_timestamp = datetime.strptime(db_timestamp, "%a, %d %b %Y %H:%M:%S %Z")
+
+        # check if token is expired
+        if exp > db_timestamp:
+            logger.info(f"Token expired {sessionId}")
+            return jsonify({"message": "Token expired"}), 401
+    
         # get userId from db
         userId = response.json()["userId"]
         db_currStatus = response.json()["currStatus"]
