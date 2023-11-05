@@ -417,7 +417,7 @@ def verify_otp():
         "currStatus": "active",
         #"encrypted_dbHash": encrypted_dbHash  # Store the encrypted hash
     }
-    #response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+    #response = requests.post("https://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
     response = requests.put("https://databaseservice/databaseservice/usersessions/store_key_in_database", json=requestData)
 
     # get error message from response if insert unsuccessful
