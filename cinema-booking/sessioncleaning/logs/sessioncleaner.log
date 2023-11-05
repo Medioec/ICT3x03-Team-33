@@ -10,3 +10,9 @@
 05-Nov-23 21:42:17 - root - INFO - delete_inactive_sessions called
 05-Nov-23 21:42:17 - root - INFO - delete_inactive_sessions called
 05-Nov-23 21:42:17 - root - INFO - No inactive sessions to delete
+05-Nov-23 21:53:26 - root - INFO - Database Service started
+05-Nov-23 21:53:26 - root - INFO - delete_inactive_sessions called
+05-Nov-23 21:53:26 - root - INFO - Deleted inactive sessions
+05-Nov-23 21:53:26 - root - INFO - delete_inactive_sessions called
+05-Nov-23 21:53:26 - root - INFO - delete_inactive_sessions called
+05-Nov-23 21:53:26 - root - INFO - No inactive sessions to delete
