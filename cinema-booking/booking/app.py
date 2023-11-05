@@ -169,7 +169,7 @@ def retrieveAllBookedSeats(showtimeId):
         showtimeIdInt = int(showtimeId)
         
         url = f"https://databaseservice/databaseservice/bookingdetails/get_all_booked_seats_by_showtimeId/{showtimeIdInt}"
-        response = requests.get(url)
+        response = session.get(url)
 
         if response.status_code == 200:
             return response.json(), 200
