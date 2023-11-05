@@ -43,20 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     cvvFeedback.textContent = "Invalid CVV";
     cvvInput.parentNode.appendChild(cvvFeedback);
 
-    // Delete Credit Card Modal
-    const deleteButtons = document.querySelectorAll(
-      '.btn-danger[data-toggle="modal"]'
-    );
-    const deleteCardModal = document.getElementById("deleteCardModal");
-    const confirmDeleteCardButton = document.getElementById("confirmDeleteCard");
-    const deleteMessage = document.getElementById("deleteBody");
-
-    const dismissButtons = document.querySelectorAll(
-      '.close, .btn-secondary[data-dismiss="modal"]'
-    );
-
-    // Modify Credit Card Modal
-
     //////////////////////////////////////////////////////////////////////////
 
     form.addEventListener(
@@ -157,6 +143,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //////////////////////////////////////////////////////////////////////////
 
+    // Delete Credit Card Modal
+    const deleteButtons = document.querySelectorAll(
+      '.btn-danger[data-toggle="modal"]'
+    );
+    const deleteCardModal = document.getElementById("deleteCardModal");
+    const confirmDeleteCardButton = document.getElementById("confirmDeleteCard");
+    const deleteMessage = document.getElementById("deleteBody");
+
+    // dismiss modals
+    const dismissButtonsDel = document.querySelectorAll('.closeModal');
+
+    dismissButtonsDel.forEach((button) => {
+      button.addEventListener('click', function () {
+        console.log("dismissed");
+        deleteCardModal.style.display = "none";
+      });
+    });
+
     deleteButtons.forEach((button) => {
       button.addEventListener("click", async (event) => {
         // Show the deleteCardModal
@@ -168,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find the corresponding creditCardId based on the creditCardNumber from creditCardData
         const matchingCard = creditCardData.find((card) => card.creditCardNumber === creditCardNumber);
         
-        console.log(matchingCard);
+        console.log("inside matched", matchingCard);
 
         if (!matchingCard) {
           // Handle the case where a matching card is not found in creditCardData
@@ -183,11 +187,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create a creditCard object with the found creditCardId
         const creditCardId = matchingCard.creditCardId;
     
-        console.log(creditCardId);
+        console.log("after matched", creditCardId);
 
         const creditCardNo = JSON.stringify(creditCardId);
 
-        console.log(creditCardNo);
+        console.log("after JSON", creditCardNo);
+
+        const creditCardFinal = JSON.stringify({ creditCardId });
+
+        console.log("after final", creditCardFinal);
 
         // Add a confirm delete action
         confirmDeleteCardButton.addEventListener("click", async () => {
@@ -197,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
-            body: creditCardNo,
+            body: creditCardFinal,
           })
             .then((response) => {
               if (response.ok) {
@@ -211,7 +219,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       });
     });
+
+    // Modify Credit Card Modal
+    const modifyButtons = document.querySelectorAll('.btn-primary[data-toggle="modal"]');
+    const modifyCardModal = document.getElementById("modifyCardModal");
+
+    // dismiss modals
+    const dismissButtonsMod = document.querySelectorAll('.closeModalMod');
+
+    dismissButtonsMod.forEach((button) => {
+      button.addEventListener('click', function () {
+        console.log("dismissed");
+        modifyCardModal.style.display = "none";
+      });
+    });
+
+    modifyButtons.forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        modifyCardModal.style.display = "block";
     
+        // Retrieve the credit card information from the clicked button
+        const cardNumber = button.getAttribute("data-card-no");
+        const cardName = button.getAttribute("data-card-name");
+        const cardExpiry = button.getAttribute("data-card-expiry");
+        const cardCVV = button.getAttribute("data-card-cvv");
+    
+        // Select the input fields within the modal's body using the data-field-id attribute
+        const cardNumberInput = document.querySelector('input[data-field-id="cardNumber"]');
+        const cardNameInput = document.querySelector('input[data-field-id="cardName"]');
+        const cardExpiryInput = document.querySelector('input[data-field-id="cardExpiry"]');
+        const cardCVVInput = document.querySelector('input[data-field-id="cardCVV"]');
+    
+        // Update the values of the input fields with the retrieved information
+        cardNumberInput.value = cardNumber;
+        cardNameInput.value = cardName;
+        cardExpiryInput.value = cardExpiry;
+        cardCVVInput.value = cardCVV;
+      });
+    });
 
     //////////////////////////////////////////////////////////////////////////
 

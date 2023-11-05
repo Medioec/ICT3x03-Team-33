@@ -212,7 +212,7 @@ def delete_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
+        if owner_id and str(owner_id[0]) == str(userId): # uuid need to convert to string
             # If the user owns the credit card, delete it
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()

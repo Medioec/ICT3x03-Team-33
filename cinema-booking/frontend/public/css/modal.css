@@ -77,3 +77,7 @@
     opacity: 0.9;
   }
   
+  #saveCard{
+    width: max-content;
+    margin-left: 12px;
+  }

@@ -60,9 +60,6 @@ exports.getMemberBookingPage = async (req, res) => {
             showtimeArray.push(showtime);
         }
 
-        console.log(bookingHistory);
-        console.log(showtimeArray);
-
         return res.render('pages/memberbooking.ejs', { showtimeArray, bookingHistory, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -76,7 +73,6 @@ exports.getMemberProfilePage = async (req, res) => {
         const token = req.cookies.token;
 
         const creditCards = await paymentService.getAllCreditCards(token);
-        console.log(creditCards);
 
         return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
     } catch (error) {
@@ -120,10 +116,8 @@ exports.postCreditCard = async (req, res) => {
         if (creditCard.status === 200) {
             return res.status(200).json({ message: 'Credit Card added successfully' });
         } else if (creditCard.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
@@ -137,24 +131,16 @@ exports.deleteCreditCard = async (req, res) => {
         const token = req.cookies.token;
         const creditCardDetails = req.body; 
 
-        console.log(creditCardDetails);
+        console.log("controller", creditCardDetails);
 
-        // Ensure that the creditCardDetails object contains the necessary properties
-        if (!creditCardDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
-        }
-
-        // Delete the credit card
         const creditCard = await paymentService.deleteCreditCard(token, creditCardDetails);
 
         // handle response
         if (creditCard.status === 200) {
             return res.status(200).json({ message: 'Credit Card deleted successfully' });
         } else if (creditCard.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
 
@@ -180,10 +166,8 @@ exports.postGenerateBooking = async (req, res) => {
         if (booking.status === 201) {
             return res.status(201).json({ message: 'Booking generated successfully' });
         } else if (booking.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Bad Request - Invalid booking data' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
 
