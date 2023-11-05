@@ -20,6 +20,7 @@ services:
             - HTTPS_PORT=${HTTPS_PORT}
             - PROXY=1
             - MODSEC_RULE_ENGINE=On
+            - MODSEC_AUDIT_ENGINE=Off
             - ANOMALY_INBOUND=10
             - BASE_HOST=${BASE_HOST}
         restart: unless-stopped
@@ -37,8 +38,6 @@ services:
             - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
-        depends_on:
-            - identity
         restart: unless-stopped
 
     identity:
@@ -53,6 +52,7 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
             - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+            - EMAIL_SECRET_KEY=${EMAIL_SECRET_KEY}
         volumes:
             - ./cinema-booking/identity/logs:/logs
             - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
@@ -62,10 +62,7 @@ services:
             driver: "json-file"
             options:
                 max-size: "10m"
-                max-file: "20"
-        depends_on:
-            - database
-            - databaseservice
+                max-file: "20"\
         restart: unless-stopped
 
     movie:
@@ -82,9 +79,6 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
             - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     booking:
@@ -102,9 +96,6 @@ services:
             - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     payment:
@@ -122,9 +113,6 @@ services:
         environment:
             - PYTHONUNBUFFERED=1
             - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-        depends_on:
-            - database
-            - databaseservice
         restart: unless-stopped
 
     databaseservice:
@@ -153,8 +141,6 @@ services:
             options:
                 max-size: "10m"
                 max-file: "20"
-        depends_on:
-            - database
         restart: unless-stopped
 
     database:
@@ -193,9 +179,6 @@ services:
             - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
             - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
             - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
-        depends_on:
-            - identity
-            - booking
         restart: unless-stopped
 
     ofelia-scheduler:
@@ -234,8 +217,6 @@ services:
             - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
             - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
-        depends_on:
-            - database
 
 networks:
     internet-access:
