@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener(
       "submit",
       (event) => {
+        event.preventDefault();
         // Sanitize the input using DOMPurify before validation
         const sanitizedCreditCardNumber = DOMPurify.sanitize(
           creditCardNumberInput.value
@@ -69,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const creditCardData = JSON.stringify(formData);
         if (!form.checkValidity() || captchaState === false) {
-          event.preventDefault();
           event.stopPropagation();
           captchaFeedback.textContent = "Please complete the captcha!";
         } else {
@@ -86,10 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("Credit card added successfully");
                 window.location.reload();
               }
-            })
-
-            .catch((error) => {
-              console.error("Error occurred", error);
             });
         }
 
