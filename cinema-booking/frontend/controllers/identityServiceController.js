@@ -79,7 +79,7 @@ exports.postOTP = async (req, res) => {
             const data = await identityService.verifyOTP(token, req.body);
         
             if (data.status === 200) {
-                res.clearCookie('otpToken');
+                res.clearCookie('token');
 
                 json_response = await data.json();
                 const decodedToken = JSON.parse(atob(json_response.sessionToken.split('.')[1]));
@@ -88,7 +88,7 @@ exports.postOTP = async (req, res) => {
                 // get user role
                 const userRole = decodedToken.userRole;
 
-                res.cookie('otpToken', json_response.sessionToken, {
+                res.cookie('token', json_response.sessionToken, {
                     path: '/',
                     maxAge: expiryDelta,
                     httpOnly: true
