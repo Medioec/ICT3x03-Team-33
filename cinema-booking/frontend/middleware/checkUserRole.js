@@ -4,7 +4,7 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 // function to check if the user is logged in and has the required role to access the page
 function checkUserRole(requiredRole) {
-    return async (req, res, next) => {
+    return (req, res, next) => {
         try {
             // get cookie
             const token = req.cookies.token;
