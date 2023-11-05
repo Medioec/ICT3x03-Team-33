@@ -62,7 +62,7 @@ services:
             driver: "json-file"
             options:
                 max-size: "10m"
-                max-file: "20"\
+                max-file: "20"
         restart: unless-stopped
 
     movie:
