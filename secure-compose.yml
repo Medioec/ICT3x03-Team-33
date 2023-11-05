@@ -32,6 +32,7 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
+            - frontend-to-payment
         environment:
             - CAPTCHA_KEY=${CAPTCHA_KEY}
         volumes:
@@ -49,6 +50,7 @@ services:
             - frontend-to-identity
             - identity-to-payment
             - identity-to-databaseservice
+            - identity-to-email
         environment:
             - PYTHONUNBUFFERED=1
             - JWT_SECRET_KEY=${JWT_SECRET_KEY}
@@ -63,6 +65,27 @@ services:
             options:
                 max-size: "10m"
                 max-file: "20"
+        restart: unless-stopped
+    
+    email:
+        build:
+            context: ./cinema-booking
+            dockerfile: ./email/Dockerfile
+        networks:
+            - internet-access
+            - identity-to-email
+            - booking-to-email
+        environment:
+            PYTHONUNBUFFERED: 1
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            EMAIL_NAME: ${EMAIL_NAME}
+            EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+            HTTPS_PORT: ${HTTPS_PORT}
+            BASE_HOST: ${BASE_HOST}
+        volumes:
+            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
+            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
+            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         restart: unless-stopped
 
     movie:
@@ -89,6 +112,7 @@ services:
             - frontend-to-booking
             - booking-to-payment
             - booking-to-databaseservice
+            - booking-to-email
         environment:
             - PYTHONUNBUFFERED=1
             - JWT_SECRET_KEY=${JWT_SECRET_KEY}
@@ -103,6 +127,7 @@ services:
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
+            - frontend-to-payment
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
@@ -176,27 +201,6 @@ services:
             - postgres_container:/var/lib/postgresql/data
         restart: unless-stopped
 
-    email:
-        build:
-            context: ./cinema-booking
-            dockerfile: ./email/Dockerfile
-        networks:
-            - internet-access
-            - identity-to-email
-            - booking-to-email
-        environment:
-            PYTHONUNBUFFERED: 1
-            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-            EMAIL_NAME: ${EMAIL_NAME}
-            EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-            HTTPS_PORT: ${HTTPS_PORT}
-            BASE_HOST: ${BASE_HOST}
-        volumes:
-            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
-        restart: unless-stopped
-
     ofelia-scheduler:
         image: mcuadros/ofelia:v0.3.7
         networks:
@@ -247,6 +251,9 @@ networks:
         driver: bridge
         internal: true
     frontend-to-movie:
+        driver: bridge
+        internal: true
+    frontend-to-payment:
         driver: bridge
         internal: true
     booking-to-payment:
