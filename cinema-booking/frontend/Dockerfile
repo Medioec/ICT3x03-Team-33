@@ -13,7 +13,7 @@ RUN npm install
 # Copy the contents of the local frontend directory into the container
 COPY . .
 
-EXPOSE 443
+EXPOSE 8080
 
 # Start your application
 CMD ["npm", "start"]

@@ -124,17 +124,3 @@
   padding: 10px;
   color: red;
 }
-
-#ccRow, #ccCard{
-  margin: 5px 0px 5px 0px;
-}
-
-#captchaError, #makePaymentWarning{
-  color: red;
-  font-size: 0.8rem;
-  text-decoration: none;
-}
-
-#saveCard{
-  padding-left: 25px;
-}

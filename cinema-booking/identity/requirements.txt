@@ -8,5 +8,3 @@ requests==2.31.0
 Flask-JWT-Extended==4.5.3
 pycryptodome==3.19.0
 passlib==1.7.4
-zxcvbn-python ==4.4.24
-gunicorn==21.2.0

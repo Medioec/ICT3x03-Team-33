@@ -51,6 +51,7 @@ exports.getMemberBookingPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
         const token = req.cookies.token;
+        console.log(token);
 
         const bookingHistory = await bookingService.retrieveAllBookings(token);
         console.log(bookingHistory);
@@ -64,88 +65,43 @@ exports.getMemberBookingPage = async (req, res) => {
 exports.getMemberProfilePage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
-        const token = req.cookies.token;
 
-        const creditCards = await paymentService.getAllCreditCards(token);
-        console.log(creditCards);
-
-        return res.render('pages/memberprofile.ejs', { creditCards, loggedIn });
+        return res.render('pages/memberprofile.ejs', { loggedIn });
     } catch (error) {
-        console.error("Error in getMemberProfilePage:", error); // Log the error
         res.status(500).send('Internal Server Error');
     }
 };
 
-
 exports.getMemberPaymentPage = async (req, res) => {
     try {
         const loggedIn = req.loggedIn;
-        const token = req.cookies.token;
-
+        
         // seat & movie information selected by user passed over 
-        const seat = req.query.seat;        
+        const seats = req.query.seats;
         const showtimes = req.query.showtimeId;
         
         // necessary details 
         const showtimeDetails = await movieService.getShowtimeById(showtimes);
-        const creditCards = await paymentService.getAllCreditCards(token);
 
-        return res.render('pages/payment.ejs', {seat, showtimes, showtimeDetails, creditCards, loggedIn });
+        return res.render('pages/payment.ejs', {seats, showtimeDetails, loggedIn });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }
 };
 
 exports.postCreditCard = async (req, res) => {
-    try {
+    try{
         const token = req.cookies.token;
-        const creditCardDetails = req.body; 
-
-        // Ensure that the creditCardDetails object contains the necessary properties
-        if (!creditCardDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing credit card details' });
-        }
+        const creditCardDetails = req.body;
 
         const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
+        console.log(creditCard);
 
         if (creditCard.status === 200) {
-            return res.status(200).json({ message: 'Credit Card added successfully' });
-        } else if (creditCard.status === 400) {
-            // Handle a 400 Bad Request response
-            return res.status(400).json({ message: 'Bad Request - Invalid credit card data' });
-        } else {
-            // Handle other response status codes as needed
-            return res.status(500).json({ message: 'Internal Server Error' });
+            return res.status(200).json({'message': 'Credit Card added successfully'});
         }
-    } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error' });
     }
-};
-
-exports.postGenerateBooking = async (req, res) => {
-    try{
-
-        const token = req.cookies.token;
-        const bookingDetails = req.body;
-
-        // Ensure that the bookingDetails object contains the necessary properties
-        if (!bookingDetails) {
-            return res.status(400).json({ message: 'Bad Request - Missing booking details' });
-        }
-
-        const booking = await bookingService.generateBooking(token, bookingDetails);
-
-        if (booking.status === 200) {
-            return res.status(200).json({ message: 'Booking generated successfully' });
-        } else if (booking.status === 400) {
-            // Handle a 400 Bad Request response
-            return res.status(400).json({ message: 'Bad Request - Invalid booking data' });
-        } else {
-            // Handle other response status codes as needed
-            return res.status(500).json({ message: 'Internal Server Error' });
-        }
-
-    } catch(error){
+    catch(error){
         res.status(500).send('Internal Server Error');
     }
 };

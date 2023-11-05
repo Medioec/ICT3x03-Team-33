@@ -1,27 +1,24 @@
 version: '3.3'
 services:
     nginx-waf:
-        image: owasp/modsecurity-crs:nginx
+        build: ./nginx-waf/
         networks:
             - waf-to-frontend
         ports:
-            - '${HTTP_PORT}:80'
-            - '${HTTPS_PORT}:443'
+            - '${HTTP_PORT}'
+            - '${HTTPS_PORT}'
         volumes:
             - ./nginx-waf/data/nginx/templates/:/etc/nginx/templates/:ro
-            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/${BASE_HOST}/fullchain.pem:ro
-            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/${BASE_HOST}/privkey.pem:ro
-            - ./cert/certificates/nginx-waf-cert.pem:/etc/nginx/ssl/fullchain.pem:ro
-            - ./cert/certificates/nginx-waf-key.pem:/etc/nginx/ssl/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/etc/nginx/ssl/serverca.crt:ro
+            - ${LOCAL_SSL_CERT_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/fullchain.pem:ro
+            - ${LOCAL_SSL_KEY_PATH}:/etc/letsencrypt/live/3x03.redapplepie.com/privkey.pem:ro
         environment:
-            - HTTP_PORT=${HTTP_PORT}
-            - HTTPS_PORT=${HTTPS_PORT}
             - PROXY=1
+            - MODSEC_AUDIT_ENGINE=On
             - MODSEC_RULE_ENGINE=On
             - ANOMALY_INBOUND=10
-            - BASE_HOST=${BASE_HOST}
-        restart: unless-stopped
+            - HEALTH=${HEALTH}
+        restart: always
+        privileged: true
 
     frontend:
         build: ./cinema-booking/frontend
@@ -30,21 +27,15 @@ services:
             - frontend-to-identity
             - frontend-to-booking
             - frontend-to-movie
-            - frontend-to-payment
-        environment:
-            - CAPTCHA_KEY=${CAPTCHA_KEY}
-        volumes:
-            - ./cert/certificates/frontend-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/frontend-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${FRONTEND_PORT}"
         depends_on:
             - identity
-        restart: unless-stopped
 
+    # ports for services exposed to test the containers
+    # will remove ports once we implement the APIs
     identity:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./identity/Dockerfile
         networks:
@@ -60,9 +51,6 @@ services:
             - "${IDENTITY_PORT}"
         volumes:
             - ./cinema-booking/identity/logs:/logs
-            - ./cert/certificates/identity-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/identity-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:
@@ -71,10 +59,9 @@ services:
         depends_on:
             - database
             - databaseservice
-        restart: unless-stopped
 
     email:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./email/Dockerfile
         networks:
@@ -85,20 +72,14 @@ services:
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
             EMAIL_NAME: ${EMAIL_NAME}
             EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-            BASE_HOST: ${BASE_HOST}
-        volumes:
-            - ./cert/certificates/email-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/email-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${EMAIL_PORT}"
         depends_on:
             - identity
             - booking
-        restart: unless-stopped
 
     movie:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./movie/Dockerfile
         networks:
@@ -107,19 +88,14 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-        volumes:
-            - ./cert/certificates/movie-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/movie-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${MOVIE_PORT}"
         depends_on:
             - database
             - databaseservice
-        restart: unless-stopped
-
+    
     booking:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./booking/Dockerfile
         networks:
@@ -130,42 +106,31 @@ services:
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-        volumes:
-            - ./cert/certificates/booking-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/booking-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${BOOKING_PORT}"
         depends_on:
             - database
             - databaseservice
-        restart: unless-stopped
 
     payment:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./payment/Dockerfile
         networks:
-            - frontend-to-payment
             - identity-to-payment
             - booking-to-payment
             - payment-to-databaseservice
         environment:
             PYTHONUNBUFFERED: 1
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-        volumes:
-            - ./cert/certificates/payment-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/payment-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         ports:
             - "${PAYMENT_PORT}"
         depends_on:
             - database
             - databaseservice
-        restart: unless-stopped
 
     databaseservice:
-        build:
+        build: 
             context: ./cinema-booking
             dockerfile: ./databaseservice/Dockerfile
         networks:
@@ -184,9 +149,6 @@ services:
             - "${DBSERVICE_PORT}"
         volumes:
             - ./cinema-booking/databaseservice/logs:/logs
-            - ./cert/certificates/databaseservice-cert.pem:/app/fullchain.pem:ro
-            - ./cert/certificates/databaseservice-key.pem:/app/privkey.pem:ro
-            - ./cert/ca/ca-cert.pem:/app/ca-cert.pem:ro
         logging:
             driver: "json-file"
             options:
@@ -194,7 +156,6 @@ services:
                 max-file: "20"
         depends_on:
             - database
-        restart: unless-stopped
 
     database:
         build: ./cinema-booking/database
@@ -228,8 +189,7 @@ services:
             - postgres_container:/var/lib/postgresql/data
         ports:
             - "${DB_PORT}"
-        restart: unless-stopped
-
+    
     ofelia-scheduler:
         image: mcuadros/ofelia:v0.3.7
         networks:
@@ -241,9 +201,10 @@ services:
             - ofelia.enabled=true
         depends_on:
             - sessioncleaning
-
+           
     sessioncleaning:
-        build:
+        container_name: sessioncleaning
+        build: 
             context: ./cinema-booking
             dockerfile: ./sessioncleaning/Dockerfile
         networks:
@@ -265,46 +226,44 @@ services:
             - ofelia.enabled=true
             - ofelia.job-exec.sessioncleaning.schedule=0 0 2 * * *
             - ofelia.job-exec.sessioncleaning.no-overlap=true
-            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function
+            - ofelia.job-exec.sessioncleaning.command=python /app/app.py --run-function        
         depends_on:
             - database
 
 networks:
-    default:
-        external:
-            name: non-existent-network
-    waf-to-frontend:
-        driver: bridge
-    frontend-to-identity:
-        driver: bridge
-    frontend-to-booking:
-        driver: bridge
-    frontend-to-movie:
-        driver: bridge
-    frontend-to-payment:
-        driver: bridge
-    booking-to-payment:
-        driver: bridge
-    identity-to-payment:
-        driver: bridge
-    identity-to-email:
-        driver: bridge
-    booking-to-email:
-        driver: bridge
-    identity-to-databaseservice:
-        driver: bridge
-    movie-to-databaseservice:
-        driver: bridge
-    payment-to-databaseservice:
-        driver: bridge
-    booking-to-databaseservice:
-        driver: bridge
-    databaseservice-to-database:
-        driver: bridge
-    scheduler-to-sessioncleaning:
-        driver: bridge
-    sessioncleaning-to-database:
-        driver: bridge
+  default:
+    external:
+      name: non-existent-network
+  waf-to-frontend:
+    driver: bridge
+  frontend-to-identity:
+    driver: bridge
+  frontend-to-booking:
+    driver: bridge
+  frontend-to-movie:
+    driver: bridge
+  booking-to-payment:
+    driver: bridge
+  identity-to-payment:
+    driver: bridge
+  identity-to-email:
+    driver: bridge
+  booking-to-email:
+    driver: bridge
+  identity-to-databaseservice:
+    driver: bridge
+  movie-to-databaseservice:
+    driver: bridge
+  payment-to-databaseservice:
+    driver: bridge
+  booking-to-databaseservice:
+    driver: bridge
+  databaseservice-to-database:
+    driver: bridge
+  scheduler-to-sessioncleaning:
+    driver: bridge
+  sessioncleaning-to-database:
+    driver: bridge
 
 volumes:
-    postgres_container:
+  postgres_container:

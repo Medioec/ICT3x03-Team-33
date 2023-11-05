@@ -8,8 +8,6 @@
 const identityService = require('../models/identityServiceModel');
 const logger = require('../middleware/logger');
 
-const captchaKey = process.env.CAPTCHA_KEY
-
 exports.getLogin = (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
@@ -19,7 +17,7 @@ exports.getLogin = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('login.ejs', { loggedIn, captchaKey });
+    res.render('login.ejs', { loggedIn });
 };
 
 // if username and password valid -> verify OTP
@@ -54,7 +52,7 @@ exports.postLogin = async (req, res) => {
             return res.status(401).json({'status': 'fail', 'message': 'Login failed. Invalid credentials.' });
         }
     } catch (error) {
-        logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.ip + ': ' + error.message);
+        logger('info', 'Error while logging in user ' + req.body.username +  + ' from ' + req.socket.remoteAddress + ': ' + error.message);
         return res.status(500).json({'status': 'fail', 'message': 'Internal Server Error' });
     }
 };
@@ -128,7 +126,7 @@ exports.getRegister = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('register.ejs', { captchaKey });
+    res.render('register.ejs', { loggedIn });
 };
 
 exports.postRegister = async (req, res) => {
@@ -137,7 +135,7 @@ exports.postRegister = async (req, res) => {
 
         // if logged in, don't try to register
         if (loggedIn) {
-            return res.status(401).json({ message: 'Unauthorized request' });
+            return res.status(401).json({ message: 'Unauthorized request'});
         }
 
         const data = await identityService.registerRequest(req.body);
@@ -146,18 +144,14 @@ exports.postRegister = async (req, res) => {
             return res.status(data.status).json({ message: 'Registration successful' });
         } else {
             // If data includes a message, send that, otherwise send a generic error message
-            const jresponse = await data.json();
-            const message = jresponse.message || "An error occurred during registration";
-            return res.status(data.status).json({ 'message': message });
+            const message = data.message || 'An error occurred during registration';
+            return res.status(data.status).json({ message });
         }
-        
+
     } catch (error) {
-        // Send the error message from the catch block, if available
-        const message = error.message || 'Internal Server Error';
-        res.status(500).json({ 'message': message });
+        return res.status(500).json({ 'message': 'Internal Server Error' });
     }
 };
-
 
 exports.logout = async (req, res) => {
     try {

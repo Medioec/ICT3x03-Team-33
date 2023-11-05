@@ -22,8 +22,8 @@ COPY common/ /app
 # Copy app directory contents into the container at /app
 COPY booking/ /app
 
-# Make port 443 available to the world outside this container
-EXPOSE 443
+# Make port 80 available to the world outside this container
+EXPOSE 8083
 
 # Run your Flask app
-CMD gunicorn --conf gunicorn_conf.py wsgi:app
+CMD ["python", "app.py"]
