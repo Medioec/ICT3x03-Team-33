@@ -10,7 +10,6 @@ const modalCloseBtn = document.getElementById('modalCloseBtn');
 const modalCancelButton = document.getElementById('cancelButton');
 const loggedIn = checkoutButton.getAttribute('data-loggedin');
 
-// uncomment the following line to populate the UI with the cached selected seat ID
 populateUI();
 
 let ticketPrice = 10.50; // Assuming a default price per ticket
@@ -43,6 +42,17 @@ function populateUI() {
     }
 }
 
+// function for blocking out booked seats
+bookedSeats.forEach((bookedSeat) => {
+  const seatElement = document.getElementById(bookedSeat.seatId);
+  
+  if (seatElement) {
+    seatElement.classList.remove('seat');
+    seatElement.classList.add('seat-sold'); 
+  }
+});
+
+
 container.addEventListener('click', (e) => {
     if (
         e.target.classList.contains('seat') &&
@@ -66,7 +76,6 @@ container.addEventListener('click', (e) => {
 });
 
 
-// Add an event listener to the reset button
 const resetButton = document.getElementById('resetButton');
 resetButton.addEventListener('click', () => {
     const selectedSeat = container.querySelector('.seat.selected');

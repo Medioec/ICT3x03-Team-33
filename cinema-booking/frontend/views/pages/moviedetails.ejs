@@ -21,7 +21,11 @@
 
 <body>
   <!-- Navbar -->
-  <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+  <% if (loggedIn) { %>
+    <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
+  <% } else { %>
+    <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+  <% } %>
 
     <main>
           <section id="movieDetails">

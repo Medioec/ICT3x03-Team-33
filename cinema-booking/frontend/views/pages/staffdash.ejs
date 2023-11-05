@@ -26,7 +26,7 @@
         <div id="delete-modal" class="modal">
             <div class="modal-content" id="delete-modal-content">
                 <span class="close" id="close-delete-modal">&times;</span>
-                <h2 id="deleteHeader">Are you sure you want to delete this showtime?</h2>
+                <h2 id="deleteHeader">Are you sure you want to delete this movie?</h2> <!-- Change showtime to movie -->
                 <div class="row" id="modalRow">
                     <button id="confirm-delete" class="btn btn-danger">Delete</button>
                     <button id="cancel-delete" class="btn btn-secondary">Cancel</button>
@@ -38,14 +38,33 @@
         <div id="edit-modal" class="modal">
             <div class="modal-content" id="edit-modal-content">
                 <span class="close" id="close-edit-modal">&times;</span>
-                <h2>Modify Showtime</h2>
+                <h2>Edit Movie Details</h2>
+
+                <!-- Movie ID, which should not be editable, but display it to the user -->
                 <div class="row" id="modalRow">
-                    <input type="text" class="form-control" placeholder="Date" id="editShowDate">
+                    <input type="text" class="form-control" id="editMovieId" disabled>
+                </div>
+                
+                <div class="row" id="modalRow">
+                    <input type="text" class="form-control" placeholder="Title" id="editMovieTitle">
                 </div>
                 <div class="row" id="modalRow">
-                    <input type="text" class="form-control" placeholder="Time" id="editShowTime">
+                    <textarea class="form-control" placeholder="Synopsis" id="editMovieSynopsis"></textarea>
                 </div>
-                <p>Are you sure you want to edit this showtime?</p>
+                <div class="row" id="modalRow">
+                    <input type="text" class="form-control" placeholder="Genre" id="editMovieGenre">
+                </div>
+                <div class="row" id="modalRow">
+                    <input type="text" class="form-control" placeholder="Content Rating" id="editMovieContentRating">
+                </div>
+                <div class="row" id="modalRow">
+                    <input type="text" class="form-control" placeholder="Language" id="editMovieLanguage">
+                </div>
+                <div class="row" id="modalRow">
+                    <input type="text" class="form-control" placeholder="Subtitles" id="editMovieSubtitles">
+                </div>
+                
+                <p>Are you sure you want to edit the details for this movie?</p>
                 <div class="row" id="modalRow">
                     <button id="confirm-edit" class="btn btn-primary">Save Changes</button>
                     <button id="cancel-edit" class="btn btn-secondary">Cancel</button>
@@ -102,7 +121,7 @@
                                 </div>
                             </div>
                         </div>
-                        <% movies.forEach((movie) => { %>
+                        <% movies.forEach((movie, index) => { %>
                             <div class="container" id="movieContent">
                                 <div class="row" id="movieContentRow">
                                     <div class="col-md-1">
@@ -142,8 +161,16 @@
                                     </div>
                                     <div class="col-md-2">
                                         <div class="row">
-                                            <button id="editMovie" class="btn btn-primary">Edit</button>
-                                            <button id="deleteMovie" class="btn btn-danger">Delete</button>
+                                            <button 
+                                            id="editMovie<%= index %>" 
+                                            class="btn btn-primary editMovie">
+                                                Edit
+                                            </button> 
+                                            <button 
+                                            id="deleteMovie<%= index %>" 
+                                            class="btn btn-danger deleteMovie">
+                                                Delete
+                                            </button> 
                                         </div>
                                     </div>
                                 </div>

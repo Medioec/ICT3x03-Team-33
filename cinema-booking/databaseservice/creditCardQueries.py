@@ -190,7 +190,7 @@ def update_credit_card():
         else:
             # If the user does not own the credit card, reject the request with a 403 Forbidden response
             # Log the error
-            logger.error(f"Access denied: No permissions. userId: {userId}")
+            logger.error(f"Access denied: No permissions. userId: {newUserId}")
             return jsonify({"message": "Access denied: No permissions"}), 403
     except Exception as e:
         # Log the error
@@ -212,7 +212,7 @@ def delete_credit_card_by_id(userId, creditCardId):
         cursor.execute(select_owner_query, (creditCardId,))
         owner_id = cursor.fetchone()
 
-        if owner_id and str(owner_id[0]) == userId: # uuid need to convert to string
+        if owner_id and str(owner_id[0]) == str(userId): # uuid need to convert to string
             # If the user owns the credit card, delete it
             conn = psycopg2.connect(**db_config)
             cursor = conn.cursor()

@@ -29,5 +29,10 @@ router.post('/addcreditcard', isOTPVerified, checkUserRole(member_role), memberC
 // process booking 
 router.post('/processbooking', isOTPVerified, checkUserRole(member_role), memberController.postGenerateBooking);
 
+// add credit card
+router.delete('/deletecreditcard', isOTPVerified, checkUserRole(member_role), memberController.deleteCreditCard);
+
+// process booking 
+
 // Add other routes as needed
 module.exports = router;

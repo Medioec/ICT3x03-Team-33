@@ -16,6 +16,7 @@
 
   <link rel="stylesheet" href="/css/nav.css" />
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/modal.css" />
 </head>
 
 <body>
@@ -23,6 +24,66 @@
   <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
+
+  <!-- Modal for deleting a credit card -->
+  <div class="modal" id="deleteCardModal" tabindex="-1" role="dialog" aria-labelledby="deleteCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteCardModalLabel">Delete Credit Card</h5>
+          <button type="button" class="close closeModal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <a id="deleteBody">Are you sure you want to delete this credit card?</a>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary closeModal" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteCard">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal for modify a credit card -->
+  <div class="modal" id="modifyCardModal" tabindex="-1" role="dialog" aria-labelledby="modifyCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyCardModalLabel">Modify Credit Card</h5>
+          <button type="button" class="close closeModalMod" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="cardNumber">Card Number:</label>
+            <input type="text" class="form-control" id="cardNumber" name="cardNumber" required>
+          </div>
+          <div class="form-group">
+            <label for="cardName">Name on Card:</label>
+            <input type="text" class="form-control" id="cardName" name="cardName" required>
+          </div>
+          <div class="form-group">
+            <label for="cardExpiry">Expiry Date:</label>
+            <input type="text" class="form-control" id="cardExpiry" name="cardExpiry" required>
+          </div>
+          <div class="form-group">
+            <label for="modalCVV">CVV:</label>
+            <input type="text" class="form-control" id="modalCVV" name="modalCVV" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary closeModalMod" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="confirmModifyCard">Modify</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Container for credit cards -->
   <div class="container">
     
@@ -36,11 +97,23 @@
             <div class="col-md-4">
               <div class="card" id="ccCard">
                 <div class="card-body">
-                  <h5 class="card-title">Card Number: <%= card.creditCardNumber %></h5>
+                  <p class="card-title"> Card Number: <%= card.creditCardNumber %></p>
                   <p class="card-text">Name on Card: <%= card.creditCardName %></p>
                   <p class="card-text">Expiry Date: <%= card.creditCardExpiry %></p>
-                  <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCardModal" data-card-id="<%= card._id %>">Delete</button>
-                  <button class="btn btn-primary" data-toggle="modal" data-target="#modifyCardModal">Modify</button>
+                  <p class="card-text">CVV: <%= card.cvv %></p>
+                  
+                  <button class="btn btn-danger" data-toggle="modal" data-target="#deleteCardModal" 
+                    data-card-id="<%= card._id %>" data-card-number="<%= card.creditCardNumber %>">Delete</button>
+
+                  <button class="btn btn-primary" data-toggle="modal" data-target="#modifyCardModal" 
+                    data-card-id="<%= card._id %>" 
+                    data-card-number="<%= card.creditCardNumber %>"
+                    data-card-expiry="<%= card.creditCardName %>"
+                    data-card-name="<%= card.creditCardExpiry %>" 
+                    data-card-name="<%= card.cvv %>"
+                    >Modify
+                  </button>
+                
                 </div>
               </div>
             </div>
@@ -49,48 +122,6 @@
           <!-- if there are no existing credit cards -->
           <p>No existing credit cards.</p>
         <% } %>
-      </div>
-      
-      <!-- Modal for deleting a credit card -->
-      <div class="modal fade" id="deleteCardModal" tabindex="-1" role="dialog" aria-labelledby="deleteCardModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="deleteCardModalLabel">Delete Credit Card</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              Are you sure you want to delete this credit card?
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-danger" id="confirmDeleteCard">Delete</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Modal for modify a credit card -->
-      <div class="modal fade" id="modifyCardModal" tabindex="-1" role="dialog" aria-labelledby="modifyCardModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modifyCardModalLabel">Modify Credit Card</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <!-- Add form and input fields for modifying the credit card here -->
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="confirmModifyCard">Modify</button>
-            </div>
-          </div>
-        </div>
       </div>
       
       <div class="row" id="ccRow">
@@ -131,7 +162,7 @@
               </div>
               <a id="captchaError"></a>
             </div>
-                <div class="col-12" id="ccRow">
+                <div class="row" id="ccRow">
                   <button type="submit" class="btn btn-primary" id="saveCard">Save Card Information</button>
                 </div>
           </form>
@@ -144,6 +175,9 @@
     <%- include('../partial/footer'); %>
 
     <!-- Scripts -->
+    <script>  
+      window.creditCardData = <%- JSON.stringify(creditCards) %>;
+    </script>    
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="/js/memberprofile.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

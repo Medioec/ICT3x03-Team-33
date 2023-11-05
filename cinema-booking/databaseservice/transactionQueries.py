@@ -35,18 +35,18 @@ def create_transaction():
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        insert_query = "INSERT INTO Transaction (transactionId, creditCardId, transactionDateTime) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO Transactions (transactionId, creditCardId, transactionDateTime) VALUES (%s, %s, %s)"
         
         try:
             cursor.execute(insert_query, (transactionId, creditCardId, transactionDateTime))
-            transaction_id = cursor.fetchone()[0]
             conn.commit()
             cursor.close()
             conn.close()
 
             # Log the successful creation of a new transaction entry
-            logger.info(f"Transaction added successfully with new transactionId: {transaction_id}.")
-            return jsonify({"message": "Transaction added successfully", "transactionId": transaction_id}), 201
+            logger.info(f"Transaction added successfully with transactionId: {transactionId}.")
+            return jsonify({"message": "Transaction added successfully", "transactionId": transactionId}), 201
+
         except IntegrityError as e:
             # Handle the IntegrityError (duplicate insertion) and return an HTTP error 409
             conn.rollback()  # Rollback the transaction
@@ -70,7 +70,7 @@ def get_all_transactions_by_userId(userId):
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
 
-        select_query = "SELECT * FROM Transaction WHERE userId = %s"
+        select_query = "SELECT * FROM Transactions WHERE userId = %s"
         cursor.execute(select_query, (userId,))
         transactions = cursor.fetchone()
 

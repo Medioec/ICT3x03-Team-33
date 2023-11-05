@@ -69,9 +69,9 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	CREATE TABLE BookingDetails (
 		seatId VARCHAR(255) NOT NULL,
 		showtimeId INT NOT NULL,
-		userId UUID NOT NULL UNIQUE,
+		userId UUID NOT NULL,
 		transactionId UUID NOT NULL,
-		ticketId INT UNIQUE NOT NULL,
+		ticketId SERIAL UNIQUE NOT NULL,
 		ticketPriceId INT NOT NULL,
 		PRIMARY KEY(seatId, showtimeId)
 	);
@@ -85,7 +85,7 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	CREATE TABLE Transactions (
 		transactionId UUID PRIMARY KEY NOT NULL,
 		creditCardId INT NOT NULL,
-		transcationDateTime TIMESTAMP NOT NULL
+		transactionDateTime TIMESTAMP NOT NULL
 	);
 
 	ALTER TABLE UserSessions
@@ -119,10 +119,6 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	ALTER TABLE BookingDetails
 	ADD CONSTRAINT fk_booking_details_transactionId
 	FOREIGN KEY (transactionId) REFERENCES Transactions(transactionId);
-
-	ALTER TABLE Transactions
-	ADD CONSTRAINT fk_transaction_creditCardId
-	FOREIGN KEY (creditCardId) REFERENCES CreditCard(creditCardId);
 
 	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
 	VALUES (

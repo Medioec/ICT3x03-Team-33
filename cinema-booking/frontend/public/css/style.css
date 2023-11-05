@@ -138,3 +138,9 @@
 #saveCard{
   padding-left: 25px;
 }
+
+.cardSubheaders{
+  font-weight: 500;
+  color: black;
+  text-decoration: none;
+}

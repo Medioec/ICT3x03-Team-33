@@ -1,0 +1,83 @@
+/* Modal overlay */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Modal container */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 999;
+  }
+  
+  /* Modal content */
+  .modal-content {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+  }
+  
+  /* Modal header */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #343a40;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+    padding: 10px 20px;
+  }
+  
+  /* Modal title */
+  .modal-title {
+    font-size: 18px;
+  }
+  
+  /* Close button */
+  .close {
+    cursor: pointer;
+  }
+  
+  /* Modal body */
+  .modal-body {
+    padding: 20px;
+  }
+  
+  /* Modal footer */
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #ccc;
+    padding: 10px 20px;
+  }
+  
+  /* Buttons inside the modal footer */
+  .btn-secondary {
+    background: #ddd;
+    color: #333;
+  }
+  
+  .btn-danger {
+    background: #dc3545;
+    color: #fff;
+  }
+  
+  /* Button hover effect */
+  .btn-secondary:hover,
+  .btn-danger:hover {
+    opacity: 0.9;
+  }
+  
+  #saveCard{
+    width: max-content;
+    margin-left: 12px;
+  }

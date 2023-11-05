@@ -4,54 +4,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Bookings</title>
+  <title>All bookings</title>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
     integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <link rel="stylesheet" href="/css/nav.css" />
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body>
+  <!-- Navbar -->
+  <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
   <main>
-    <!-- Navbar -->
-    <% include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
 
     <!-- Container for booking history -->
     <div class="container mt-5">
       <h2>Booking History</h2>
       <div class="row mt-3">
-        <div class="col">Transaction ID</div>
-        <div class="col">Seat ID</div>
-        <div class="col">Showtime ID</div>
-        <div class="col">Ticket ID</div>
-        <div class="col">Ticket Price ID</div>
+        <% if (bookingHistory && bookingHistory.length > 0) { %>
+          <div class="card-deck">
+            <% const uniqueShowtimeIds = Array.from(new Set(bookingHistory.map(b => b.showtimeId))); %>
+            <% uniqueShowtimeIds.forEach(function(showtimeId) { %>
+              <div class="card mb-3">
+                <div class="card-body">
+                  <% const showtime = showtimeArray.find(s => s.showtimeId === showtimeId); %>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5 class="card-title">Transaction ID: <%= bookingHistory.find(b => b.showtimeId === showtimeId).transactionId %></h5>
+                      <p class="card-text"><a class="cardSubheaders">Showtime ID</a>: <%= showtimeId %></p>
+                      <p class="card-text"><a class="cardSubheaders">Cinema:</a> <%= showtime.cinemaName %></p>
+                      <p class="card-text"><a class="cardSubheaders">Movie:</a> <%= showtime.movieTitle %></p>
+                      <p class="card-text"><a class="cardSubheaders">Date:</a> <%= showtime.showDate %></p>
+                      <p class="card-text"><a class="cardSubheaders">Time:</a> <%= showtime.showTime %></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="card-text"><a class="cardSubheaders">Theater Number:</a> <%= showtime.theaterNumber %></p>
+                      <p class="card-text"><a class="cardSubheaders">Seat(s):</a></p>
+                      <% const seatIdsForShowtime = bookingHistory
+                        .filter(b => b.showtimeId === showtimeId)
+                        .map(b => b.ticketId)
+                        .sort((a, b) => {
+                          // Custom sorting logic
+                          const [aNumber, aAlpha] = a.match(/(\d+)([A-Z]*)/).slice(1);
+                          const [bNumber, bAlpha] = b.match(/(\d+)([A-Z]*)/).slice(1);
+
+                          // Sort by number first, then by alphabet
+                          if (aNumber - bNumber !== 0) {
+                            return aNumber - bNumber;
+                          } else {
+                            return aAlpha.localeCompare(bAlpha);
+                          }
+                        });
+
+                      seatIdsForShowtime.forEach(function(seatId) { %>
+                        <span><%= seatId %></span>
+                      <% }); %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <!-- if booking history is empty -->
+          <div class="row mt-3">
+            <div class="col">
+              No booking history available.
+            </div>
+          </div>
+        <% } %>
       </div>
-      <% bookingHistory.forEach(function(booking) { %>
-        <div class="row mt-3">
-          <div class="col">Transaction Id: <%= booking.transactionId %></div>
-          <div class="col">Seat: <%= booking.seatId %></div>
-          <div class="col">Showtime: <%= booking.showtimeId %></div>
-          <!-- join with showtimeDetails to get showtime information, for now leave it -->
-          <div class="col">Ticket Id: <%= booking.ticketId %></div>
-          <div class="col">Ticket Price: <%= booking.ticketPriceId %></div>
-        </div>
-      <% }); %>
     </div>
 
-    <!-- footer -->
-    <% include('../partial/footer'); %>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-  </main>
+</main>
+
+  <!-- footer -->
+  <%- include('../partial/footer'); %>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
 </html>
+
+
+
+

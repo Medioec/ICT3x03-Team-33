@@ -1,5 +1,6 @@
 // models
 const movieService = require('../models/movieServiceModel');
+const bookingService = require('../models/bookingServiceModel');
 
 exports.getHomePage = [async (req, res) => {
     var movies;
@@ -97,12 +98,14 @@ exports.getAllShowtimesPage = [async (req, res) => {
     try {
         // get all movies from movie service
         const showtimes = await movieService.getAllShowtimes();
+        const movies = await movieService.getAllMovies();
+        const cinemas = await movieService.getAllCinemas();
 
         // Get the loggedIn status from the request object
         const loggedIn = req.loggedIn;
 
         // Render the 'showtimes.ejs' page with the movie data and cinemaMapping
-        res.render('pages/showtimes.ejs', { showtimes, loggedIn });
+        res.render('pages/showtimes.ejs', { movies, cinemas, showtimes, loggedIn });
     } catch (error) {
         // Handle errors
         console.error("Error in getAllShowtimesPage:", error);
@@ -113,15 +116,17 @@ exports.getBookingForMoviePage = [async (req, res) => {
     try {
         const showtimeId = req.query.showtimeId;
         const showtimeDetails = await movieService.getShowtimeById(showtimeId);
+        let bookedSeats = await bookingService.retrieveAllBookedSeats(showtimeId);
 
-        // Get the loggedIn status from the request object
+        // if bookedSeats is empty or not defined return an empty array
+        if (!bookedSeats || bookedSeats.length === 0) {
+            bookedSeats = [];
+        }
+
         const loggedIn = req.loggedIn;
 
-        // Render the 'moviedetails.ejs' page with the movie data
-        res.render('pages/booking.ejs', { showtimeDetails, loggedIn });
+        res.render('pages/booking.ejs', { bookedSeats, showtimeDetails, loggedIn });
     } catch (error) {
-        // Handle errors
         console.error("Error in getBookingForMoviePage:", error);
-        // res.status(500).send('Internal Server Error: ' + error.message);
     }
 }];

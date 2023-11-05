@@ -20,61 +20,70 @@
 
     <body>
         <!-- Navbar -->
-        <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+        <% if (loggedIn) { %>
+          <%- include('../partial/membernavbar.ejs', { loggedIn: loggedIn }) %>
+        <% } else { %>
+          <%- include('../partial/navbar.ejs', { loggedIn: loggedIn }) %>
+        <% } %>
 
         <div class="container">
-            <% const groupedData = {}; %>
-          
-            <% showtimes.forEach((showtime) => { %>
-              <% const showDate = showtime.showDate;
-              const cinemaId = showtime.cinemaId;
-              const movieId = showtime.movieId;
-              const showTime = showtime.showTime;
-            
-              if (!groupedData[showDate]) {
-                groupedData[showDate] = {};
+          <% const groupedShowtimesByCinema = {}; %>
+        
+          <% showtimes.forEach(function(showtime) { %>
+            <% const cinemaId = showtime.cinemaId;
+            const movieId = showtime.movieId;
+            const cinemaName = cinemas.find((cinema) => cinema.cinemaId === cinemaId)?.cinemaName;
+            const title = movies.find((movie) => movie.movieId === movieId)?.title;
+        
+            if (cinemaName && title) {
+              if (!groupedShowtimesByCinema[cinemaName]) {
+                groupedShowtimesByCinema[cinemaName] = {
+                  showDate: showtime.showDate,
+                  titles: {},
+                };
               }
-            
-              if (!groupedData[showDate][cinemaId]) {
-                groupedData[showDate][cinemaId] = {};
+        
+              if (!groupedShowtimesByCinema[cinemaName].titles[title]) {
+                groupedShowtimesByCinema[cinemaName].titles[title] = [];
               }
-            
-              if (!groupedData[showDate][cinemaId][movieId]) {
-                groupedData[showDate][cinemaId][movieId] = [];
-              }
-            
-              groupedData[showDate][cinemaId][movieId].push({ showTime, showtimeId: showtime.showtimeId });
-              %>
-            <% }); %>
-          
-            <% Object.keys(groupedData).forEach((showDate) => { %>
-              <h2>Showing all showtimes for: <%= showDate %></h2>
-              <% Object.keys(groupedData[showDate]).forEach((cinemaId) => { %>
-                <div class="row" id="cinemaRow">
-                  <h2 class="showcase-heading">Cinema ID: <%= cinemaId %></h2>
-                  <% Object.keys(groupedData[showDate][cinemaId]).forEach((movieId) => { %>
-                    <div class="row" id="showtimeRow">
-                      <div class="col-md-2 dateTab">
-                        <h1>Movie ID: <%= movieId %></h1>
-                      </div>
-                      <div class="col-md-8 dateTab">
-                        <% groupedData[showDate][cinemaId][movieId].sort((a, b) => {
-                          // Custom sort function to arrange showTime slots chronologically
-                          const aDate = new Date(`2000-01-01 ${a.showTime}`);
-                          const bDate = new Date(`2000-01-01 ${b.showTime}`);
-                          return aDate - bDate;
-                        }).forEach((show) => { %>
-                          <a class="btn btn-primary" href="/booking?showtimeId=<%= show.showtimeId %>" role="button"><%= show.showTime %></a>
-                        <% }); %>
-                      </div>
-                    </div>
-                  <% }); %>
+        
+              groupedShowtimesByCinema[cinemaName].titles[title].push({
+                showtimeId: showtime.showtimeId,
+                cinemaName: cinemaName,
+                title: title,
+                showDate: showtime.showDate,
+                showTime: showtime.showTime,
+              });
+            }
+            %>
+          <% }); %>
+        
+          <!-- Display the grouped showtimes by cinemaName -->
+          <% Object.keys(groupedShowtimesByCinema).forEach(function(cinemaName) { %>
+            <h2><%= cinemaName %></h2>
+            <h2 class="showcase-heading">Showing all movies for: <%= groupedShowtimesByCinema[cinemaName].showDate %></h3>
+              <% Object.keys(groupedShowtimesByCinema[cinemaName].titles).forEach(function(title) { %>
+              <div class="row" id="showtimeRow">
+                <div class="col-md-2 dateTab">
+                  <h1><%= title %></h1>
                 </div>
-              <% }); %>
-            <% }); %>
-          </div>
-          
+                <div class="col-md-8 dateTab">
 
+                  <% const sortedShowtimes = groupedShowtimesByCinema[cinemaName].titles[title].sort(function(a, b) {
+                    const aDate = new Date(`2000-01-01 ${a.showTime}`);
+                    const bDate = new Date(`2000-01-01 ${b.showTime}`);
+                    return aDate - bDate;
+                  }); %>
+                  <% sortedShowtimes.forEach(function(showtime) { %>
+                      <a class="btn btn-primary" href="/booking?showtimeId=<%= showtime.showtimeId %>" role="button"><%= showtime.showTime %></a>
+                  <% }); %>
+
+                </div>
+              </div>
+              <% }); %>
+          <% }); %>
+        </div>                
+            
     </body>
 
 </main>
