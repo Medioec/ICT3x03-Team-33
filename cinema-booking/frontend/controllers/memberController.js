@@ -1,6 +1,7 @@
 const movieService = require('../models/movieServiceModel');
 const bookingService = require('../models/bookingServiceModel');
 const paymentService = require('../models/paymentServiceModel');
+const identityService = require('../models/identityServiceModel');
 
 exports.getMembersHomePage = async (req, res) => {
     try {
@@ -189,3 +190,22 @@ exports.postGenerateBooking = async (req, res) => {
     }
 };
 
+exports.verifyAccount = async (req, res) => {
+    try { 
+        const token = req.query.token;
+
+        // verify if the link is valid
+        const response = await identityService.verifyMemberActivationToken(token);
+
+        if (response.status != 200){
+            return res.status(403).send('Unauthorized Access');
+        }
+        
+        // successful verification, show success page
+        res.status(200).send('Account successfully verified!');
+
+    } catch (error) {
+        // Handle errors
+        return res.status(500).send('Internal Server Error');
+    }   
+};

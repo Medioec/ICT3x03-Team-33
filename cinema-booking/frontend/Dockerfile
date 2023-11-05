@@ -13,7 +13,9 @@ RUN npm install
 # Copy the contents of the local frontend directory into the container
 COPY . .
 
-EXPOSE 8080
+EXPOSE 443
+# Build your application
+RUN npm run build
 
 # Start your application
 CMD ["npm", "start"]

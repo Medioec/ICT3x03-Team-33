@@ -5,12 +5,19 @@ import os
 import requests
 import booking_utils
 
-app = Flask(__name__)  
+app = Flask(__name__)
 CORS(app)
 
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
+
+# required for tls e.g. use session.get(url) to make request instead
+session = requests.Session()
+client_cert = ('/app/fullchain.pem', '/app/privkey.pem')
+ca_cert = '/app/ca-cert.pem'
+session.cert = client_cert
+session.verify = ca_cert
 
 #####   throw error when JWT token is not valid     #####
 @jwt.unauthorized_loader
@@ -30,7 +37,7 @@ def generateBooking():
     
     # use sessionId to get userId from db
     requestData = {"sessionId": sessionId}    
-    response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
     if response.status_code != 200:
         return jsonify({"message": "Database error", "status": 500}), 500
     userId = response.json()["userId"]
@@ -54,10 +61,10 @@ def generateBooking():
         "userId": userId,
         "creditCardId": creditCardId
     }
-
-    url = f"http://payment:8084/makePayment"
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 201:
+    
+    url = f"https://paymentservice/makePayment"
+    response = session.post(url, json=data)
+    if response.status_code != 200:
         if response.status_code == 400:
             return jsonify({"message": "Bad request: Invalid credit card", "status": 409}), 400
         elif response.status_code == 403:
@@ -79,8 +86,8 @@ def generateBooking():
         }
         
         # Create booking with databaseservice 
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails/generate_booking_details"
-        response = requests.post(url, json=data)
+        url = f"https://databaseservice/databaseservice/bookingdetails/generate_booking_details"
+        response = session.post(url, json=data)
         if response.status_code == 201:
             return jsonify({"message": "Booking created successfully", "status": 201}), 201    
         elif response.status_code == 409:
@@ -105,13 +112,13 @@ def retrieveOneBooking(ticketId):
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         userId = response.json()["userId"]
         
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
-        response = requests.get(url)
+        url = f"https://databaseservice/databaseservice/bookingdetails/get_booking_details_by_id/{userId}/{ticketId}"
+        response = session.get(url)
 
         if response.status_code == 404:
             return jsonify({"message": "Booking not found"}), 404
@@ -153,14 +160,14 @@ def retrieveAllBookings():
         
         # use sessionId to get userId from db
         requestData = {"sessionId": sessionId}    
-        response = requests.post("http://databaseservice:8085/databaseservice/usersessions/get_user_session", json=requestData)
+        response = session.post("https://databaseservice/databaseservice/usersessions/get_user_session", json=requestData)
         if response.status_code != 200:
             return jsonify({"message": "Database error"}), 500
         
         userId = response.json()["userId"]
         
-        url = f"http://databaseservice:8085/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
-        response = requests.get(url)
+        url = f"https://databaseservice/databaseservice/bookingdetails/get_all_bookings_by_userId/{userId}"
+        response = session.get(url)
 
         if response.status_code == 200:
             return response.json(), 200

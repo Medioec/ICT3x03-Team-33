@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
           body: JSON.stringify(data),
         })
         .then(response => {
-          console.log("client response status code: ", response.status);
           return response.json(); // Parse response as JSON
         })
         .then(data => {
@@ -61,16 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("error-message").textContent = data.message;
             throw new Error(data.message);
           }
-          console.log("client response: ", data.userRole);
-      
-          switch (data.userRole) {
-            case "member":
-              window.location.href = "/member";
-              break;
-      
-            case "staff":
-              window.location.href = "/staff";
-              break;
+
+          else if (data.status === 'success') {
+            window.location.href = "/otp";
           }
         })
         .catch(error => {

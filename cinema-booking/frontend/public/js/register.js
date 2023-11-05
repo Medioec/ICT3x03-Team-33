@@ -1,3 +1,6 @@
+// Make the onSuccess function globally accessible
+window.onSuccess = onSuccess;
+
 // Define a function to check if all registration fields and the form are valid
 function checkRegistrationFields() {
   const $emailInput = $("#email");
@@ -68,26 +71,30 @@ document.addEventListener("DOMContentLoaded", function () {
         password: password
       };
 
-      if (grecaptcha.getResponse()) { // Check if reCAPTCHA is completed
-        await fetch("/registerRequest", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(data),
-        })
-        .then(response => 
-        {
-          // redirect to login if registration successful
+      if (grecaptcha.getResponse()) {
+        try {
+          const response = await fetch("/registerRequest", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify(data),
+          });
+  
           if (response.ok) {
             window.location.href = "/login";
+          } else {
+            // Handle non-200 responses
+            const errorData = await response.json();
+            document.getElementById("error-message").textContent = errorData.message;
           }
           return response.json();
-        })
-        .then(data => {
-          document.getElementById("error-message").textContent = data.message;
-        });
+        }
+        catch (error) {
+          // Handle network errors or issues parsing the response
+          document.getElementById("error-message").textContent = "An error occurred. Please try again.";
+        }
       } else {
         document.getElementById("error-message").textContent = "Please complete the reCAPTCHA.";
       }
@@ -168,3 +175,38 @@ document.addEventListener("DOMContentLoaded", function () {
     return passwordPattern.test(value);
   }, "Please provide a valid password.");
 })(jQuery);
+
+
+import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
+import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
+import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
+// Set up the zxcvbn options with the language package and dictionary
+const options = {
+  translations: zxcvbnEnPackage.translations,
+  graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  dictionary: {
+    ...zxcvbnCommonPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary
+  },
+};
+zxcvbnOptions.setOptions(options);
+// Add an event listener to the password input field
+document.getElementById('userPassword').addEventListener('input', function(event) {
+  const passwordInput = event.target;
+  
+  const passwordStrengthResult = zxcvbn(passwordInput.value);
+  const strengthMeter = document.getElementById('password-strength-meter');
+  const strengthBar = document.getElementById('password-strength-bar');
+
+  if (strengthMeter) {
+    const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    strengthMeter.textContent = `Strength: ${strengthText[passwordStrengthResult.score]}`;
+
+    // Update the width of the bar based on the score
+    if (strengthBar) {
+      strengthBar.style.width = `${(passwordStrengthResult.score + 1) * 20}%`;
+      // Set the color based on the score
+      strengthBar.style.backgroundColor = ['#ff3e36', '#ff691f', '#ffda36', '#0be881', '#05c46b'][passwordStrengthResult.score];
+    }
+  }
+});

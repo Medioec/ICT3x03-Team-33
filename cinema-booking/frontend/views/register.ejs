@@ -49,23 +49,18 @@
             <i class="bi bi-eye"></i>
           </span>
           <input class="form-control" name="userPassword" id="userPassword" type="password" placeholder="" />
-          <span class="lighting"></span>
+          <div id="password-strength-container">
+            <div id="password-strength-bar"></div>
+          </div>
+          <p id="password-strength-meter">Strength: </p>
+          <span class="lighting"></span>           
         </div>
 
         <div class="recaptcha-error">
-          <!-- uncomment below if testing on 3x03.redapplepie.com -->
-          <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LcPUOAoAAAAAOU1Zy_KJVlo5Osn4EtA9eNT1sd1"
-            data-callback="onSuccess" data-action="action"></div> -->
-            
-          <!-- uncomment below if testing on stg-3x03.redapplepie.com -->
-          <!-- <div id="recaptcha" class="g-recaptcha" data-sitekey="6LeVl-coAAAAAE9CkECF9qgWWfLP1aAhjgrbTPbJ"
-            data-callback="onSuccess" data-action="action"></div> -->
-
-          <!-- uncomment below if testing on localhost -->
-          <div id="recaptcha" class="g-recaptcha" data-sitekey="6LdDtsooAAAAAHj_xBabr_6QUfmu3cUnSSQSnKTP"
+          <div id="recaptcha" class="g-recaptcha" data-sitekey="<%= captchaKey %>"
             data-callback="onSuccess" data-action="action"></div>
         </div>
-
+        
         <button type="submit" id="register-button" disabled>Register</button>
 
       </form>
@@ -81,8 +76,7 @@
   </div>
 
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-  <script src="/js/register.js"></script>
+  <script src="/bundle.js"></script>
   <script src="/js/passwordtoggle.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
 </body>

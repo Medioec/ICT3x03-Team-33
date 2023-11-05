@@ -14,7 +14,9 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 		userRole VARCHAR(255) NOT NULL,
 		isUserBanned BOOLEAN NOT NULL DEFAULT FALSE,
 		activationLink VARCHAR(255),
-		isLinkUsed BOOLEAN DEFAULT FALSE
+		isLinkUsed BOOLEAN DEFAULT FALSE,
+		otp VARCHAR(255),
+		otpExpiryTimestamp VARCHAR(255)
 	);
 
 	CREATE TABLE UserSessions (

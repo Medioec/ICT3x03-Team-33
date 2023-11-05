@@ -54,7 +54,7 @@ def create_user_session():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in create_user_session: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of create session     #####
 
 
@@ -103,14 +103,14 @@ def get_user_session():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_user_session: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of create session     #####
 
-##### Retrieves userId, password hash and user role from database #####
-@user_sessions_bp.route('/get_userId_hash_role', methods=['POST'])
+##### Retrieves userId, password hash, user role and link status from database #####
+@user_sessions_bp.route('/get_userId_hash_role_linkUsed', methods=['POST'])
 def get_userId_hash_role():
     # Log the getting user pwhash and role
-    logger.info(f"Getting user pwhash and role started.")
+    logger.info(f"Getting user pwhash, role and link used started.")
     try:
         # Get data from the request
         data = request.get_json()
@@ -121,7 +121,7 @@ def get_userId_hash_role():
         cursor = conn.cursor()
 
         # Construct the SQL query to retrieve the password hash and user role using username
-        select_data_query = "SELECT userId, passwordHash, userRole FROM CinemaUser WHERE username = %s "
+        select_data_query = "SELECT userId, passwordHash, userRole, isLinkUsed FROM CinemaUser WHERE username = %s "
         cursor.execute(select_data_query, (username,))
         data_result = cursor.fetchall()
 
@@ -132,15 +132,16 @@ def get_userId_hash_role():
         # Separate the data into two attributes in a JSON response
         if data_result:
             # Assuming there's one result
-            userId, passwordHash, userRole = data_result[0]
+            userId, passwordHash, userRole, isLinkUsed = data_result[0]
             response_data = {
                 "userId": userId,
                 "passwordHash": passwordHash,
-                "userRole": userRole
+                "userRole": userRole,
+                "isLinkUsed": isLinkUsed
             }
             
             # log the successful retrieval of a user pwhash and role
-            logger.info(f"User pwhash and role retrieved successfully. username: {username}")
+            logger.info(f"User pwhash, role and linked used retrieved successfully. username: {username}")
             return jsonify(response_data), 200
         else:
             # User does not exist
@@ -150,8 +151,8 @@ def get_userId_hash_role():
     except Exception as e:
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
-        logger.error(f"Error in get_userId_hash_role: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Error in get_userId_hash_role_linkStatus: {str(e)}")
+        return jsonify({"message": str(e)}), 500
 #####   End of pw hash retrieval   #####
 
 ##### Updates private key and expiry timestamp into database #####
@@ -166,7 +167,7 @@ def update_timestamp():
         newExpiryTimestamp = data['expiryTimestamp']
         
         if sessionId is None or newExpiryTimestamp is None:
-            return jsonify({"error": "Missing data in the request"}), 400
+            return jsonify({"message": "Missing data in the request"}), 400
 
         # Connect to the database
         conn = psycopg2.connect(**db_config)
@@ -185,18 +186,18 @@ def update_timestamp():
             # Session does not exist
             # log the error
             logger.error(f"Session not found. sessionId: {sessionId}")
-            return jsonify({"error": "Session not found"}), 404
+            return jsonify({"message": "Session not found"}), 404
         else:
             conn.close()
             # log the successful update of timestamp
             logger.info(f"Timestamp updated successfully. sessionId: {sessionId}")
             return jsonify({"message": "Session updated successfully"}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of updating keys and expiry   #####
 
 ##### Store encryption key associated with SessionID, for testing purpose, almost duplicate of user session #####
-@user_sessions_bp.route('/store_key_in_database', methods=['POST'])
+@user_sessions_bp.route('/store_key_in_database', methods=['PUT'])
 def store_key_in_database():
     # Log the storing of key in db
     logger.info(f"Storing key in db started.")
@@ -212,8 +213,11 @@ def store_key_in_database():
         # Connect to the database
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
-        insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus, encryptionKey) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus, encryptionKey))
+        # insert_query = "INSERT INTO usersessions (sessionId, userId, expiryTimestamp, currStatus, encryptionKey) VALUES (%s, %s, %s, %s, %s)"
+        # cursor.execute(insert_query, (sessionId, userId, expiryTimestamp, currStatus, encryptionKey))
+
+        update_query = "UPDATE usersessions SET expiryTimestamp = %s, currStatus = %s, encryptionKey = %s WHERE sessionId = %s"
+        cursor.execute(update_query, (expiryTimestamp, currStatus, encryptionKey, sessionId))
         conn.commit()
         cursor.close()
         conn.close()
@@ -230,7 +234,7 @@ def store_key_in_database():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in store_key_in_database: {str(e)}")
-        return jsonify({"error": str(e),
+        return jsonify({"message": str(e),
                         "message":"Database Error"}), 500
 ##### End of Store encryption key associated with SessionID #####    
 
@@ -280,7 +284,7 @@ def delete_session_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in delete_session_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of delete user session by ID     #####
 
 #####     Update a user session status by its ID     #####
@@ -331,7 +335,7 @@ def update_session_status_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in update_session_status_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####     End of update user session status by ID     #####
 
 ##### Retrieves user role based on user ID #####
@@ -378,5 +382,56 @@ def get_role_by_id():
         # Return HTTP 500 Internal Server Error for any unexpected errors
         # Log the error
         logger.error(f"Error in get_role_by_id: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
 #####   End of user role by user ID retrieval   #####
+
+##### Retrieves currStatus based on session ID #####
+@user_sessions_bp.route('/get_userId_status_by_sessionId', methods=['POST'])
+def get_userId_status_by_sessionId():
+    # Log the getting current status
+    logger.info(f"Getting current status started.")
+    try:
+        # Get data from the request
+        data = request.get_json()
+        sessionId = data['sessionId']
+
+        # Connect to the database
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Construct the SQL query to retrieve the userId and current status using sessionId
+        select_data_query = "SELECT userId, currStatus FROM usersessions WHERE sessionId = %s "
+        cursor.execute(select_data_query, (sessionId,))
+        data_result = cursor.fetchall()
+
+        # Close the cursor and the database connection
+        cursor.close()
+        conn.close()
+
+        # Separate the data into two attributes in a JSON response
+        if data_result:
+            print(data_result)
+            # Assuming there's one result
+            userId, currStatus = data_result[0]
+
+            response_data = {
+                "userId": userId,
+                "currStatus": currStatus
+            }
+            
+            # log the successful retrieval of a current status and userId
+            logger.info(f"Current status and user id retrieved successfully. currStatus: {currStatus}")
+            return jsonify(response_data), 200
+        
+        else:
+            # User does not exist
+            # log the error
+            logger.error(f"Session not found. sessionId: {sessionId}")
+            return jsonify({"message": "No data found"}), 404
+        
+    except Exception as e:
+        # Return HTTP 500 Internal Server Error for any unexpected errors
+        # Log the error
+        logger.error(f"Error in get_userId_status_by_sessionId: {str(e)}")
+        return jsonify({"message": str(e)}), 500
+#####   End of currStatus based on session ID retrieval  #####

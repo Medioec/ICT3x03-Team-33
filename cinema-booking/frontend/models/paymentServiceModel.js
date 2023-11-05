@@ -1,5 +1,9 @@
+// Required for https, set agent: httpsAgent in fetch
+const httpsAgent = require('../middleware/httpsAgent');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 async function makePayment(token, paymentData) {
-    const response = await fetch("http://payment:8084/makePayment", {
+    const response = await fetch("https://payment/makePayment", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -7,6 +11,7 @@ async function makePayment(token, paymentData) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(paymentData),
+        agent: httpsAgent
     });
 
     const responseData = await response.json();
@@ -14,7 +19,7 @@ async function makePayment(token, paymentData) {
 }
 
 async function addCreditCard(token, creditCardData) {
-    const response = await fetch("http://payment:8084/addCreditCard", {
+    const response = await fetch("https://payment/addCreditCard", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -22,6 +27,7 @@ async function addCreditCard(token, creditCardData) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(creditCardData),
+        agent: httpsAgent
     });
 
     if (response.status === 201) {
@@ -39,7 +45,7 @@ async function getOneCreditCard(token, creditCardId) {
         creditCardId: creditCardId
     };
     
-    const response = await fetch("http://payment:8084/getOneCreditCard", {
+    const response = await fetch("https://payment/getOneCreditCard", {
         method: "POST",
         headers: {
             "Accept": "application/json",
@@ -47,6 +53,7 @@ async function getOneCreditCard(token, creditCardId) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(requestData),
+        agent: httpsAgent
     });
 
     const responseData = await response.json();
@@ -55,13 +62,14 @@ async function getOneCreditCard(token, creditCardId) {
 
 async function getAllCreditCards(token) {
     try {
-        const response = await fetch("http://payment:8084/getAllCreditCards", {
+        const response = await fetch("https://payment/getAllCreditCards", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
+            agent: httpsAgent
         });
         const responseData = await response.json();
         return responseData;
@@ -72,7 +80,7 @@ async function getAllCreditCards(token) {
 }
 
 async function updateOneCreditCard(token, creditCardData) {
-    const response = await fetch("http://payment:8084/updateOneCreditCard", {
+    const response = await fetch("https://payment/updateOneCreditCard", {
         method: "PUT",
         headers: {
             "Accept": "application/json",
@@ -80,6 +88,7 @@ async function updateOneCreditCard(token, creditCardData) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(creditCardData),
+        agent: httpsAgent
     });
 
     const responseData = await response.json();
@@ -88,7 +97,7 @@ async function updateOneCreditCard(token, creditCardData) {
 
 async function deleteCreditCard(token, creditSent) {
 
-    const response = await fetch("http://payment:8084/deleteCreditCard", {
+    const response = await fetch("https://payment/deleteCreditCard", {
         method: "DELETE",
         headers: {
             "Accept": "application/json",
@@ -96,6 +105,7 @@ async function deleteCreditCard(token, creditSent) {
             "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(creditSent),
+        agent: httpsAgent
     });
 
     if (response.status === 200) {

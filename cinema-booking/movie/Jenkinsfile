@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Setup') {
+            steps {
+                script {
+                    // Set up your environment here
+                    // Example:
+                    sh 'python3 -m venv venv'
+                    sh '. venv/bin/activate'
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                script {
+                    // Run linters here
+                    // Example:
+                    sh 'flake8 app.py'
+                    sh 'flask8 user_utils.py'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run your tests here
+                    // Example:
+                    sh 'python -m unittest test_app.py'
+                    sh 'python -m unittest test_user_utils.py'
+                }
+            }
+        }
+    }
+}
