@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener(
       "submit",
       (event) => {
+        event.preventDefault();
         // Sanitize the input using DOMPurify before validation
         const sanitizedCreditCardNumber = DOMPurify.sanitize(
           creditCardNumberInput.value
@@ -175,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deleteMessage = document.getElementById("deleteBody");
         deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardId}?`;
     
-        const creditCardFinal = JSON.stringify({ creditCardNumber });
+        const creditCardFinal = JSON.stringify({ creditCardId: creditCardId });
 
         console.log("after final", creditCardFinal);
 
