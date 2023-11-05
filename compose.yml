@@ -19,6 +19,7 @@ services:
             - HTTPS_PORT=${HTTPS_PORT}
             - PROXY=1
             - MODSEC_RULE_ENGINE=On
+            - MODSEC_AUDIT_ENGINE=Off
             - ANOMALY_INBOUND=10
             - BASE_HOST=${BASE_HOST}
         restart: unless-stopped

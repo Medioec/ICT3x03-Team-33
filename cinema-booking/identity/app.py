@@ -147,13 +147,13 @@ def register():
                 "activation_link": activation_link,
                 "username": username
     }
-    response = requests.post("https://email/send_member_activation_email", json=requestData) 
+    response = session.post("https://email/send_member_activation_email", json=requestData) 
 
     # if email unsuccessful, delete user from db so admin can try again
     if response.status_code != 200:
         # delete user from db
         data = {"userId": userId}
-        delete_response = requests.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
+        delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
 
         try:
             logger.error(f"Registration failed with username {username}, email {email}, role {role}. Error during registration: {response.json()['message']}")
@@ -195,7 +195,7 @@ def login():
 
     # get password hash and role from db
     requestData = {"username": username}
-    response = requests.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
 
     print("getting password hash", response.status_code)
 
@@ -243,7 +243,7 @@ def login():
     requestData = {"username": username,
                    "otp": otp,
                    "otpExpiryTimestamp": otpExpiryTimestamp}
-    response = requests.put("https://databaseservice/databaseservice/user/set_otp_by_username", json=requestData)
+    response = session.put("https://databaseservice/databaseservice/user/set_otp_by_username", json=requestData)
     if response.status_code != 200:
         # log otp insertion failure
         logger.error(f"OTP insertion for {username} failed. Error: {response.json()['message']}")
@@ -255,7 +255,7 @@ def login():
                 "otp": otp,
                 "username": username
     }
-    response = requests.post("https://email/send_otp", json=requestData)
+    response = session.post("https://email/send_otp", json=requestData)
     if response.status_code != 200:
         # log otp email failure
         logger.error(f"Email sending of OTP to {username} failed. Error: {response.json()['message']}")
@@ -285,7 +285,7 @@ def login():
                    "userId": userId,
                    "expiryTimestamp": expirationTimestamp,
                    "currStatus": "unverified"}
-    response = requests.post("https://databaseservice/databaseservice/usersessions/create_user_session", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/create_user_session", json=requestData)
 
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
@@ -313,7 +313,7 @@ def verify_otp():
     
     # get currStatus from db
     requestData = {"sessionId": sessionId}
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
     if response.status_code != 200:
         logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
         return jsonify({"message": "Invalid session"}), 403
@@ -338,7 +338,7 @@ def verify_otp():
     # get otp and expiry timestamp from db
     userId = response.json()["userId"]
     requestData = {"userId": userId}
-    response =  requests.post("https://databaseservice/databaseservice/user/get_user_details_by_id", json=requestData)
+    response =  session.post("https://databaseservice/databaseservice/user/get_user_details_by_id", json=requestData)
     if response.status_code != 200:
         # log otp retrieval failure
         logger.error(f"OTP retrieval failed. Error: {response.json()['message']}")
@@ -417,8 +417,8 @@ def verify_otp():
         "currStatus": "active",
         #"encrypted_dbHash": encrypted_dbHash  # Store the encrypted hash
     }
-    #response = requests.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
-    response = requests.put("https://databaseservice/databaseservice/usersessions/store_key_in_database", json=requestData)
+    #response = session.post("http://databaseservice:8085/databaseservice/usersessions/create_user_session", json=requestData)
+    response = session.put("https://databaseservice/databaseservice/usersessions/store_key_in_database", json=requestData)
 
     # get error message from response if insert unsuccessful
     if response.status_code != 201:
@@ -489,7 +489,7 @@ def basicAuth():
 
     # get currStatus from db
     requestData = {"sessionId": sessionId}
-    response = requests.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
+    response = session.post("https://databaseservice/databaseservice/usersessions/get_userId_status_by_sessionId", json=requestData)
     if response.status_code != 200:
         logger.error(f"Authentication failed due to session not found Error: {response.json()['message']}")
         return jsonify({"message": "Invalid session"}), 403
@@ -537,7 +537,7 @@ def enhancedAuth():
 
             # check that the user role in the db matches the user role in the token
             requestData = {"userId": userId}
-            response = requests.post("https://databaseservice/databaseservice/usersessions/get_role_by_id", json=requestData)    
+            response = session.post("https://databaseservice/databaseservice/usersessions/get_role_by_id", json=requestData)    
             dbRole = response.json()["userRole"]
 
             if role != dbRole:
@@ -605,7 +605,7 @@ def create_staff():
             "userRole": role
         }
 
-        response = requests.post("https://databaseservice/databaseservice/user/add_staff", json=data)
+        response = session.post("https://databaseservice/databaseservice/user/add_staff", json=data)
         if response.status_code != 201:
             return jsonify({"message": "Database insert error"}), 500
 
@@ -615,12 +615,12 @@ def create_staff():
                     "activation_link": activation_link,
                     "username": username
         }
-        response = requests.post("https://email/send_staff_activation_email", json=requestData) 
+        response = session.post("https://email/send_staff_activation_email", json=requestData) 
 
         if response.status_code != 200:
             # delete user from db
             data = {"userId": userId}
-            delete_response = requests.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
+            delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
 
             return jsonify({"message": "Error occurred"}), 500
         
@@ -671,7 +671,7 @@ def create_staff():
                 "activationLink": activation_link,
             }
             
-            response = requests.post("https://databaseservice/databaseservice/user/add_staff", json=data)
+            response = session.post("https://databaseservice/databaseservice/user/add_staff", json=data)
             if response.status_code != 201:
                 return jsonify({"message": "Database insert error"}), 500
 
@@ -681,12 +681,12 @@ def create_staff():
                         "activation_link": activation_link,
                         "username": username
             }
-            response = requests.post("https://email/send_staff_activation_email", json=requestData) 
+            response = session.post("https://email/send_staff_activation_email", json=requestData) 
 
             if response.status_code != 200:
                 # delete user from db
                 data = {"userId": userId}
-                delete_response = requests.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
+                delete_response = session.delete("https://databaseservice/databaseservice/user/delete_user", json=data)
 
                 print("delete_response", delete_response)
 
@@ -714,7 +714,7 @@ def activate_staff_account(token):
 
         # if activation link is valid, double check against user info in db
         requestData = {"username": username}
-        response = requests.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
+        response = session.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
         
         if response.status_code !=200:
             return jsonify({"message": "Error occurred"}), 500
@@ -749,7 +749,7 @@ def staff_set_password(token):
         
         # if activation link is valid, double check against user info in db
         requestData = {"username": username}
-        response = requests.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
+        response = session.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
         
         if response.status_code !=200:
             return jsonify({"message": "Error occurred"}), 500
@@ -782,7 +782,7 @@ def staff_set_password(token):
                 "passwordHash": hash,
                 "isLinkUsed": True
             }
-            response = requests.put("https://databaseservice/databaseservice/user/update_password_linkUsed_by_username", json=data)
+            response = session.put("https://databaseservice/databaseservice/user/update_password_linkUsed_by_username", json=data)
 
             # if database error
             if response.status_code != 200:
@@ -813,7 +813,7 @@ def activate_member_account(token):
 
         # if activation link is valid, double check against user info in db
         requestData = {"username": username}
-        response = requests.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
+        response = session.post("https://databaseservice/databaseservice/user/get_user_details", json=requestData)
         
         if response.status_code !=200:
             return jsonify({"message": "Error occurred"}), 500
@@ -829,7 +829,7 @@ def activate_member_account(token):
                 "username": username,
                 "isLinkUsed": True
             }
-            response = requests.put("https://databaseservice/databaseservice/user/update_linkUsed_by_username", json=data)
+            response = session.put("https://databaseservice/databaseservice/user/update_linkUsed_by_username", json=data)
             # if database error
             if response.status_code != 200:
                 return jsonify({"message": "Database update error"}), 500

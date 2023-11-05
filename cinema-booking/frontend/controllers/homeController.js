@@ -2,18 +2,23 @@
 const movieService = require('../models/movieServiceModel');
 
 exports.getHomePage = [async (req, res) => {
+    var movies;
+    var showtimes;
+    var cinemas;
+    const loggedIn = req.loggedIn;
     try {
-        const loggedIn = req.loggedIn;
-
         // Get all movies and showtimes
-        const movies = await movieService.getAllMovies();
-        const showtimes = await movieService.getAllShowtimes();
-        const cinemas = await movieService.getAllCinemas();
-
-        return res.render('index.ejs', { movies, cinemas, showtimes, loggedIn });
+        movies = await movieService.getAllMovies();
+        showtimes = await movieService.getAllShowtimes();
+        cinemas = await movieService.getAllCinemas();
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        console.log("Internal Server Error");
+        movies = null;
+        showtimes = null;
+        cinemas = null;
     }
+        return res.render('index.ejs', { movies, cinemas, showtimes, loggedIn });
+
 }];
 
 

@@ -174,34 +174,34 @@ document.addEventListener("DOMContentLoaded", function () {
 })(jQuery);
 
 
-import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
-import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
-import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
-// Set up the zxcvbn options with the language package and dictionary
-const options = {
-  translations: zxcvbnEnPackage.translations,
-  graphs: zxcvbnCommonPackage.adjacencyGraphs,
-  dictionary: {
-    ...zxcvbnCommonPackage.dictionary,
-    ...zxcvbnEnPackage.dictionary
-  },
-};
-zxcvbnOptions.setOptions(options);
-// Add an event listener to the password input field
-document.getElementById('userPassword').addEventListener('input', function(event) {
-  const passwordInput = event.target;
-  const passwordStrengthResult = zxcvbn(passwordInput.value);
-  const strengthMeter = document.getElementById('password-strength-meter');
-  const strengthBar = document.getElementById('password-strength-bar');
-  if (strengthMeter) {
-    const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-    strengthMeter.textContent = `Strength: ${strengthText[passwordStrengthResult.score]}`;
+// import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
+// import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
+// import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
+// // Set up the zxcvbn options with the language package and dictionary
+// const options = {
+//   translations: zxcvbnEnPackage.translations,
+//   graphs: zxcvbnCommonPackage.adjacencyGraphs,
+//   dictionary: {
+//     ...zxcvbnCommonPackage.dictionary,
+//     ...zxcvbnEnPackage.dictionary
+//   },
+// };
+// zxcvbnOptions.setOptions(options);
+// // Add an event listener to the password input field
+// document.getElementById('userPassword').addEventListener('input', function(event) {
+//   const passwordInput = event.target;
+//   const passwordStrengthResult = zxcvbn(passwordInput.value);
+//   const strengthMeter = document.getElementById('password-strength-meter');
+//   const strengthBar = document.getElementById('password-strength-bar');
+//   if (strengthMeter) {
+//     const strengthText = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+//     strengthMeter.textContent = `Strength: ${strengthText[passwordStrengthResult.score]}`;
     
-    // Update the width of the bar based on the score
-    if (strengthBar) {
-      strengthBar.style.width = `${(passwordStrengthResult.score + 1) * 20}%`;
-      // Set the color based on the score
-      strengthBar.style.backgroundColor = ['#ff3e36', '#ff691f', '#ffda36', '#0be881', '#05c46b'][passwordStrengthResult.score];
-    }
-  }
-});
+//     // Update the width of the bar based on the score
+//     if (strengthBar) {
+//       strengthBar.style.width = `${(passwordStrengthResult.score + 1) * 20}%`;
+//       // Set the color based on the score
+//       strengthBar.style.backgroundColor = ['#ff3e36', '#ff691f', '#ffda36', '#0be881', '#05c46b'][passwordStrengthResult.score];
+//     }
+//   }
+// });

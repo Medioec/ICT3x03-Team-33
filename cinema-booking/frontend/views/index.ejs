@@ -36,11 +36,15 @@
               Select a Movie
             </button>
             <ul class="dropdown-menu">
+              <% if (locals.movies) { %>
               <% movies.forEach((movie) => { %>
                 <li>
                   <a class="dropdown-item" data-movie-id="<%= movie.movieId %>"><%= movie.title %></a>
                 </li>
               <% }); %>
+              <% } else { %>
+                <p>Internal Server Error</p>
+              <% }; %>
             </ul>
           </div>
           
@@ -49,11 +53,15 @@
               Select a Cinema
             </button>
             <ul class="dropdown-menu">
+              <% if (locals.cinemas) { %>
               <% cinemas.forEach((cinema) => { %>
                 <li>
                   <a class="dropdown-item" data-cinema-name="<%= cinema %>"><%= cinema.cinemaName %></a>
                 </li>
               <% }); %>
+              <% } else { %>
+                <p>Internal Server Error</p>
+              <% }; %>
             </ul>
           </div>          
           
@@ -84,7 +92,7 @@
       <div class="container">
         <div class="row">
           <h2 class="showcase-heading">All Movies</h2>
-          
+          <% if (locals.movies) { %>
           <% movies.forEach((movie) => { %>
           <div class="col-lg-3 col-md-4 col-sm-6 col-12">
             <div class="showcase-box">
@@ -97,6 +105,9 @@
             </div>
             <h3 class="movieTitle"><%= movie.title %></h3></div>
           <% }); %>
+          <% } else { %>
+            <p>Internal Server Error</p>
+          <% }; %>
         </div>
       </div>
     </section>
@@ -104,12 +115,13 @@
   </main>
     <!-- footer -->
     <%- include('./partial/footer'); %>
-
+    <% if (locals.movies && locals.showtimes && locals.cinemas){ %>
     <script>
       window.moviesData = <%- JSON.stringify(movies) %>;
       window.showtimeData = <%- JSON.stringify(showtimes) %>;
       window.cinemaData = <%- JSON.stringify(cinemas) %>;
     </script>
+    <% }; %>
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>

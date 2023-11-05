@@ -128,7 +128,7 @@ exports.getRegister = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('register.ejs', { captchaKey });
+    res.render('register.ejs', { loggedIn, captchaKey });
 };
 
 exports.postRegister = async (req, res) => {

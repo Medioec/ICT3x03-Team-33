@@ -93,7 +93,7 @@ def validatePassword(password):
 
     # Regular expression pattern check
     # ensure that password is 12 - 32 characters 
-    return (12 <= len(password) <= 32)
+    return (12 <= len(password) <= 32), ""
 
 # generate uuid for inserting into db
 def generateUUID():
