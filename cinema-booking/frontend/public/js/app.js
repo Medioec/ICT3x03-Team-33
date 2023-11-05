@@ -11,6 +11,34 @@ document.addEventListener("DOMContentLoaded", function () {
     timingSelected: false,
   };
 
+  let cinemaData;
+  let moviesData; 
+  let showtimeData;
+
+  getAllMovies()
+  .then(data => {
+    moviesData = data;
+  })
+  .catch(error => {
+    console.error('Error fetching movie data:', error);
+  });
+
+  getAllCinemas()
+  .then(data => {
+    cinemaData = data;
+  })
+  .catch(error => {
+    console.error('Error fetching cinema data:', error);
+  });
+
+  getAllShowtimes()
+  .then(data => {
+    showtimeData = data;
+  })
+  .catch(error => {
+    console.error('Error fetching showtime data:', error);
+  });
+
   function enableTimingDropdown() {
     if (dropdownFlags.cinemaSelected && dropdownFlags.movieSelected) {
       updateTimingDropdown();
@@ -207,3 +235,75 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateTimingDropdown();
 });
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+                      // API CALLS FOR QUICK BUY TO DYNAMICALLY POPULATE TIMESLOT //
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function getAllCinemas() {
+  try {
+      const response = await fetch('/getAllCinemas', {
+          method: 'GET',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          }
+      });
+
+      if (!response.ok) {
+          console.error('Response not OK. Status:', response.status);
+          throw new Error('Failed to get all cinemas');
+      }
+
+      return response.json();
+  } catch (error) {
+      console.error('Error in getAllCinemas:', error);
+      throw error;
+  }
+}
+
+async function getAllMovies(){
+  try {
+      const response = await fetch('/getAllMovies', {
+          method: 'GET',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          }
+      });
+
+      if (!response.ok) {
+          console.error('Response not OK. Status:', response.status);
+          throw new Error('Failed to get all movies');
+      }
+
+      return response.json();
+  } catch (error) {
+      console.error('Error in getAllMovies:', error);
+      throw error;
+  }
+}
+
+async function getAllShowtimes(){
+  try {
+      const response = await fetch('/getAllShowtimes', {
+          method: 'GET',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          }
+      });
+
+      if (!response.ok) {
+          console.error('Response not OK. Status:', response.status);
+          throw new Error('Failed to get all movies');
+      }
+
+      return response.json();
+  } catch (error) {
+      console.error('Error in getAllShowtimes:', error);
+      throw error;
+  }
+}
+
+

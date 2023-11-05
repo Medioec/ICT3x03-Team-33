@@ -164,6 +164,33 @@ exports.deleteCreditCard = async (req, res) => {
 };
 
 
+exports.modifyCreditCard = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        const creditCardDetails = req.body; 
+
+        console.log(creditCardDetails);
+
+        if (!creditCardDetails) {
+            return res.status(400).json({ message: 'Internal Server Error' });
+        }
+
+        // Delete the credit card
+        const creditCard = await paymentService.deleteCreditCard(token, creditCardDetails);
+
+        if (creditCard.status === 200) {
+            return res.status(200).json({ message: 'Credit Card deleted successfully' });
+        } else if (creditCard.status === 400) {
+            return res.status(400).json({ message: 'Internal Server Error' });
+        } else {
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
 exports.postGenerateBooking = async (req, res) => {
     try{
 

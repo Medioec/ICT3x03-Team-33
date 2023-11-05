@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then((response) => {
               if (response.ok) {
                 alert("Credit card added successfully");
-                window.location.href = "/memberprofile";
+                window.location.reload();
               }
             })
 
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then((response) => {
               if (response.ok) {
                 alert("Credit card deleted successfully");
-                window.location.href = "/memberprofile";
+                window.location.reload();
               }
             })
             .catch((error) => {
@@ -249,12 +249,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const cardName = button.getAttribute("data-card-name");
         const cardExpiry = button.getAttribute("data-card-expiry");
         const cardCVV = button.getAttribute("data-card-cvv");
+
+        console.log("card number", cardNumber);
+        console.log("card name", cardName);
+        console.log("card expiry", cardExpiry);
+        console.log("card cvv", cardCVV);
     
         // Select the input fields within the modal's body using the data-field-id attribute
         const cardNumberInput = document.querySelector('input[data-field-id="cardNumber"]');
         const cardNameInput = document.querySelector('input[data-field-id="cardName"]');
         const cardExpiryInput = document.querySelector('input[data-field-id="cardExpiry"]');
         const cardCVVInput = document.querySelector('input[data-field-id="cardCVV"]');
+
+        console.log("card number input", cardNumberInput);
+        console.log("card name input", cardNameInput);
+        console.log("card expiry input", cardExpiryInput);
+        console.log("card cvv input", cardCVVInput);
     
         // Update the values of the input fields with the retrieved information
         cardNumberInput.value = cardNumber;

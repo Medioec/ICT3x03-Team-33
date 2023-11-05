@@ -20,5 +20,14 @@ router.get('/allshowtimes', isOTPVerified, checkLoggedIn, homeController.getAllS
 // seat selection for selected movie
 router.get('/booking', isOTPVerified, checkLoggedIn, homeController.getBookingForMoviePage);
 
+// get all movies
+router.get('/getAllMovies', checkHeaders, homeController.getAllMovies);
+
+// get all cinemas
+router.get('/getAllCinemas', checkHeaders, homeController.getAllCinemas);
+
+// get all showtimes
+router.get('/getAllShowtimes', checkHeaders, homeController.getAllShowtimes);
+
 // Add other routes as needed
 module.exports = router;

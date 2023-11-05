@@ -312,7 +312,7 @@ def getShowtimeById(showtime_id):
 @app.route('/getAllCinemas', methods=["GET"])
 def getAllCinemas():
     try:
-        url = f"https://databaseservice:8085/databaseservice/cinemas/get_all_cinemas"
+        url = f"https://databaseservice/databaseservice/cinemas/get_all_cinemas"
         response = session.get(url)
         
         if response.status_code == 200:
