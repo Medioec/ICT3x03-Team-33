@@ -22,32 +22,48 @@
 
   <main>
 
-  <!-- Container for booking history -->
+    <!-- Container for booking history -->
     <div class="container mt-5">
       <h2>Booking History</h2>
       <div class="row mt-3">
         <% if (bookingHistory && bookingHistory.length > 0) { %>
           <div class="card-deck">
-            <% bookingHistory.forEach(function(booking) { %>
+            <% const uniqueShowtimeIds = Array.from(new Set(bookingHistory.map(b => b.showtimeId))); %>
+            <% uniqueShowtimeIds.forEach(function(showtimeId) { %>
               <div class="card mb-3">
                 <div class="card-body">
-                  <h5 class="card-title">Transaction ID: <%= booking.transactionId %></h5>
+                  <% const showtime = showtimeArray.find(s => s.showtimeId === showtimeId); %>
                   <div class="row">
                     <div class="col-md-6">
-                      <p class="card-text">Seat ID: <%= booking.ticketId %></p>
-                      <p class="card-text">Showtime ID: <%= booking.showtimeId %></p>
+                      <h5 class="card-title">Transaction ID: <%= bookingHistory.find(b => b.showtimeId === showtimeId).transactionId %></h5>
+                      <p class="card-text"><a class="cardSubheaders">Showtime ID</a>: <%= showtimeId %></p>
+                      <p class="card-text"><a class="cardSubheaders">Cinema:</a> <%= showtime.cinemaName %></p>
+                      <p class="card-text"><a class="cardSubheaders">Movie:</a> <%= showtime.movieTitle %></p>
+                      <p class="card-text"><a class="cardSubheaders">Date:</a> <%= showtime.showDate %></p>
+                      <p class="card-text"><a class="cardSubheaders">Time:</a> <%= showtime.showTime %></p>
                     </div>
-                    <!-- Extracted data from showtimeArray -->
                     <div class="col-md-6">
-                    <% showtimeArray.forEach(function(showtime) { %>
-                      <% if (showtime.showtimeId === booking.showtimeId) { %>
-                        <p class="card-text">Cinema Name: <%= showtime.cinemaName %></p>
-                        <p class="card-text">Movie Title: <%= showtime.movieTitle %></p>
-                        <p class="card-text">Date: <%= showtime.showDate %></p>
-                        <p class="card-text">Time: <%= showtime.showTime %></p>
-                        <p class="card-text">Theater Number: <%= showtime.theaterNumber %></p>
-                      <% } %>
-                    <% }); %>
+                      <p class="card-text"><a class="cardSubheaders">Theater Number:</a> <%= showtime.theaterNumber %></p>
+                      <p class="card-text"><a class="cardSubheaders">Seat(s):</a></p>
+                      <% const seatIdsForShowtime = bookingHistory
+                        .filter(b => b.showtimeId === showtimeId)
+                        .map(b => b.ticketId)
+                        .sort((a, b) => {
+                          // Custom sorting logic
+                          const [aNumber, aAlpha] = a.match(/(\d+)([A-Z]*)/).slice(1);
+                          const [bNumber, bAlpha] = b.match(/(\d+)([A-Z]*)/).slice(1);
+
+                          // Sort by number first, then by alphabet
+                          if (aNumber - bNumber !== 0) {
+                            return aNumber - bNumber;
+                          } else {
+                            return aAlpha.localeCompare(bAlpha);
+                          }
+                        });
+
+                      seatIdsForShowtime.forEach(function(seatId) { %>
+                        <span><%= seatId %></span>
+                      <% }); %>
                     </div>
                   </div>
                 </div>
@@ -65,12 +81,14 @@
       </div>
     </div>
 
-  </main>
-    <!-- footer -->
-    <%- include('../partial/footer'); %>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</main>
+
+  <!-- footer -->
+  <%- include('../partial/footer'); %>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
