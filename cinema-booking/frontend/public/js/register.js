@@ -1,3 +1,6 @@
+// Make the onSuccess function globally accessible
+window.onSuccess = onSuccess;
+
 // Define a function to check if all registration fields and the form are valid
 function checkRegistrationFields() {
   const $emailInput = $("#email");
