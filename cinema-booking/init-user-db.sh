@@ -120,31 +120,36 @@ psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" <<-EOSQL
 	ADD CONSTRAINT fk_booking_details_transactionId
 	FOREIGN KEY (transactionId) REFERENCES Transactions(transactionId);
 
-	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole, isLinkUsed)
 	VALUES (
 		'$ADMIN_ID', 
 		'$ADMIN_EMAIL', 
 		'$ADMIN_USERNAME', 
 		'$ADMIN_PASSWORDHASH', 
-		'$ADMIN_USERROLE'
+		'$ADMIN_USERROLE',
+		'TRUE'
+
 	);
 
-	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole, isLinkUsed)
 	VALUES (
 		'$STAFF_ID',
 		'$STAFF_EMAIL',
 		'$STAFF_USERNAME',
 		'$STAFF_PASSWORDHASH',
-		'$STAFF_USERROLE'
+		'$STAFF_USERROLE',
+		'TRUE'
+
 	);
 
-	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole)
+	INSERT INTO CinemaUser (userId, email, username, passwordHash, userRole, isLinkUsed)
 	VALUES (
 		'$MEMBER_ID',
 		'$MEMBER_EMAIL',
 		'$MEMBER_USERNAME',
 		'$MEMBER_PASSWORDHASH',
-		'$MEMBER_USERROLE'
+		'$MEMBER_USERROLE',
+		'TRUE'
 	);
 
 	SELECT * FROM CinemaUser;

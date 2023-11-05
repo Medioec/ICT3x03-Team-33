@@ -14,6 +14,7 @@ CORS(app)
 sender_email = os.getenv("EMAIL_NAME")
 sender_password = os.getenv("EMAIL_PASSWORD")
 base_host = os.getenv("BASE_HOST")
+https_port = os.getenv("HTTPS_PORT")
 
 ############################## SEND STAFF ACTIVATION LINK #########################################
 @app.route("/send_staff_activation_email", methods=["POST"])
@@ -25,7 +26,7 @@ def send_staff_activation_email():
     activation_link = data["activation_link"]
 
     # Create activation link
-    activation_link = f'https://{base_host}/activate?token={activation_link}'
+    activation_link = f'https://{base_host}:{https_port}/activate?token={activation_link}'
     print("activation link: {}".format(activation_link))
 
     # create email
@@ -88,7 +89,7 @@ def send_member_activation_email():
     activation_link = data["activation_link"]
 
     # TODO: replace with actual url in production
-    activation_link = f'https://{base_host}/verify?token={activation_link}'
+    activation_link = f'https://{base_host}:{https_port}/verify?token={activation_link}'
 
     # create email
     subject = "Activate Your CineGo Account Now!"

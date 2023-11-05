@@ -1,6 +1,8 @@
 // models
 const adminService = require('../models/adminServiceModel');
 
+const captchaKey = process.env.CAPTCHA_KEY;
+
 exports.getStaffAccountCreationPage = (req, res) => {
     // Get the loggedIn status from the request object
     const loggedIn = req.loggedIn;
@@ -10,7 +12,7 @@ exports.getStaffAccountCreationPage = (req, res) => {
         return res.redirect('/');
     }
 
-    res.render('pages/admincreatestaff.ejs', {loggedIn});
+    res.render('pages/admincreatestaff.ejs', {loggedIn, captchaKey});
 };
 
 exports.createStaffAccount = async (req, res) => {
