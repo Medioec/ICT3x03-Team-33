@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener(
       "submit",
       (event) => {
-        event.preventDefault();
         // Sanitize the input using DOMPurify before validation
         const sanitizedCreditCardNumber = DOMPurify.sanitize(
           creditCardNumberInput.value
@@ -70,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const creditCardData = JSON.stringify(formData);
         if (!form.checkValidity() || captchaState === false) {
+          event.preventDefault();
           event.stopPropagation();
           captchaFeedback.textContent = "Please complete the captcha!";
         } else {
@@ -86,6 +86,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert("Credit card added successfully");
                 window.location.reload();
               }
+            })
+
+            .catch((error) => {
+              console.error("Error occurred", error);
             });
         }
 
@@ -163,24 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteCardModal.style.display = "block";
     
         // Retrieve the credit card number from the clicked button
-        const creditCardNumber = button.getAttribute("data-card-number");
-    
-        // Find the corresponding creditCardId based on the creditCardNumber from creditCardData
-        const matchingCard = creditCardData.find((card) => card.creditCardNumber === creditCardNumber);
-        
-        if (!matchingCard) {
-          // Handle the case where a matching card is not found in creditCardData
-          console.error("Matching card not found in creditCardData");
-          return;
-        }
+        const creditCardNumber = button.getAttribute("data-card-id");
+        console.log("credit card number", creditCardNumber)
     
         // Display a confirmation message in the modal
         const deleteMessage = document.getElementById("deleteBody");
         deleteMessage.textContent = `Are you sure you want to delete the credit card with number ${creditCardNumber}?`;
     
-        const creditCardId = matchingCard.creditCardId;
-  
-        const creditCardFinal = JSON.stringify({ creditCardId });
+        const creditCardFinal = JSON.stringify({ creditCardNumber });
 
         console.log("after final", creditCardFinal);
 
@@ -222,37 +216,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     modifyButtons.forEach((button) => {
       button.addEventListener("click", async (event) => {
+        const cardId = button.getAttribute("data-card-id");
+        const cardNumber = button.getAttribute("data-card-number");
+        const cardExpiry = button.getAttribute("data-card-expiry");
+        const cardName = button.getAttribute("data-card-name");
+        const cardCVV = button.getAttribute("data-card-cvv");
+    
+        document.getElementById("cardId").value = cardId;
+        document.getElementById("cardNumber").value = cardNumber;
+        document.getElementById("cardName").value = cardName;
+        document.getElementById("cardExpiry").value = cardExpiry;
+        document.getElementById("modalCVV").value = cardCVV;
+    
         modifyCardModal.style.display = "block";
     
-        // Retrieve the credit card information from the clicked button
-        const cardNumber = button.getAttribute("data-card-no");
-        const cardName = button.getAttribute("data-card-name");
-        const cardExpiry = button.getAttribute("data-card-expiry");
-        const cardCVV = button.getAttribute("data-card-cvv");
-
-        console.log("card number", cardNumber);
-        console.log("card name", cardName);
-        console.log("card expiry", cardExpiry);
-        console.log("card cvv", cardCVV);
+        document.getElementById("confirmModifyCard").addEventListener("click", async (e) => {
+          e.preventDefault();
     
-        // Select the input fields within the modal's body using the data-field-id attribute
-        const cardNumberInput = document.querySelector('input[data-field-id="cardNumber"]');
-        const cardNameInput = document.querySelector('input[data-field-id="cardName"]');
-        const cardExpiryInput = document.querySelector('input[data-field-id="cardExpiry"]');
-        const cardCVVInput = document.querySelector('input[data-field-id="cardCVV"]');
-
-        console.log("card number input", cardNumberInput);
-        console.log("card name input", cardNameInput);
-        console.log("card expiry input", cardExpiryInput);
-        console.log("card cvv input", cardCVVInput);
+          const modifiedCardData = {
+            creditCardId: cardId,
+            creditCardNumber: document.getElementById("cardNumber").value,
+            creditCardName: document.getElementById("cardName").value,
+            creditCardExpiry: document.getElementById("cardExpiry").value,
+            cvv: document.getElementById("modalCVV").value,
+          };
     
-        // Update the values of the input fields with the retrieved information
-        cardNumberInput.value = cardNumber;
-        cardNameInput.value = cardName;
-        cardExpiryInput.value = cardExpiry;
-        cardCVVInput.value = cardCVV;
+          try {
+            const response = await fetch("/modifycreditcard", {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              body: JSON.stringify(modifiedCardData), // Ensure data is sent as JSON
+            });
+    
+            if (response.ok) {
+              alert("Credit card modified successfully");
+              modifyCardModal.style.display = "none"; // Close the modal
+              window.location.reload(); // Reload the page
+            } else {
+              // Handle the case where the request was not successful (e.g., display an error message)
+              console.error("Error occurred. Status: " + response.status);
+            }
+          } catch (error) {
+            // Handle network or fetch-related errors
+            console.error("Error occurred", error);
+          }
+        });
       });
-    });
+    });    
+
 
     //////////////////////////////////////////////////////////////////////////
 

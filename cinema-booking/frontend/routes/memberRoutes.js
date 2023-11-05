@@ -33,7 +33,7 @@ router.post('/processbooking', isOTPVerified, checkUserRole(member_role), member
 router.delete('/deletecreditcard', isOTPVerified, checkUserRole(member_role), memberController.deleteCreditCard);
 
 // modify credit card
-router.delete('/modifycreditcard', isOTPVerified, checkUserRole(member_role), memberController.modifyCreditCard);
+router.put('/modifycreditcard', isOTPVerified, checkUserRole(member_role), memberController.modifyCreditCard);
 
 // Add other routes as needed
 module.exports = router;
