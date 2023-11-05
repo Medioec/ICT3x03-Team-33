@@ -61,10 +61,7 @@ exports.getMemberBookingPage = async (req, res) => {
                 const showtime = await movieService.getShowtimeById(booking.showtimeId);
                 // Find the corresponding cinema for this showtime
                 const cinema = cinemas.find((cinema) => cinema.cinemaId === showtime.cinemaId);
-                
-                // Attach cinema information to the showtime
                 showtime.cinema = cinema;
-
                 showtimeArray.push(showtime);
             }
 
@@ -125,13 +122,11 @@ exports.postCreditCard = async (req, res) => {
 
         const creditCard = await paymentService.addCreditCard(token, creditCardDetails);
 
-        if (creditCard.status === 200) {
-            return res.status(200).json({ message: 'Credit Card added successfully' });
+        if (creditCard.status === 201) {
+            return res.status(201).json({ message: 'Credit Card added successfully' });
         } else if (creditCard.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Internal Server Error' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
     } catch (error) {
@@ -147,7 +142,6 @@ exports.deleteCreditCard = async (req, res) => {
 
         console.log(creditCardDetails);
 
-        // Ensure that the creditCardDetails object contains the necessary properties
         if (!creditCardDetails) {
             return res.status(400).json({ message: 'Internal Server Error' });
         }
@@ -155,14 +149,11 @@ exports.deleteCreditCard = async (req, res) => {
         // Delete the credit card
         const creditCard = await paymentService.deleteCreditCard(token, creditCardDetails);
 
-        // handle response
         if (creditCard.status === 200) {
             return res.status(200).json({ message: 'Credit Card deleted successfully' });
         } else if (creditCard.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Internal Server Error' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
 
@@ -188,10 +179,8 @@ exports.postGenerateBooking = async (req, res) => {
         if (booking.status === 201) {
             return res.status(201).json({ message: 'Booking generated successfully' });
         } else if (booking.status === 400) {
-            // Handle a 400 Bad Request response
             return res.status(400).json({ message: 'Internal Server Error' });
         } else {
-            // Handle other response status codes as needed
             return res.status(500).json({ message: 'Internal Server Error' });
         }
 

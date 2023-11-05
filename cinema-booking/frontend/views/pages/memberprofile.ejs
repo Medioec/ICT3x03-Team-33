@@ -57,29 +57,31 @@
           </button>
         </div>
 
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="cardNumber">Card Number:</label>
-            <input type="text" class="form-control" id="cardNumber" name="cardNumber" required>
+        <form id="modifyCC">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="cardNumber">Card Number:</label>
+              <input type="text" class="form-control" id="cardNumber" name="cardNumber" required>
+            </div>
+            <div class="form-group">
+              <label for="cardName">Name on Card:</label>
+              <input type="text" class="form-control" id="cardName" name="cardName" required>
+            </div>
+            <div class="form-group">
+              <label for="cardExpiry">Expiry Date:</label>
+              <input type="text" class="form-control" id="cardExpiry" name="cardExpiry" required>
+            </div>
+            <div class="form-group">
+              <label for="modalCVV">CVV:</label>
+              <input type="text" class="form-control" id="modalCVV" name="modalCVV" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="cardName">Name on Card:</label>
-            <input type="text" class="form-control" id="cardName" name="cardName" required>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary closeModalMod" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="confirmModifyCard">Modify</button>
           </div>
-          <div class="form-group">
-            <label for="cardExpiry">Expiry Date:</label>
-            <input type="text" class="form-control" id="cardExpiry" name="cardExpiry" required>
-          </div>
-          <div class="form-group">
-            <label for="modalCVV">CVV:</label>
-            <input type="text" class="form-control" id="modalCVV" name="modalCVV" required>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary closeModalMod" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="confirmModifyCard">Modify</button>
-        </div>
+        </form>
+        
       </div>
     </div>
   </div>
@@ -126,7 +128,7 @@
       
       <div class="row" id="ccRow">
         <h2>Add new credit card</h2>
-        <form class="row g-3 needs-validation" novalidate>
+        <form class="row g-3 needs-validation" id="addNewCC" novalidate>
           <div class="row" id="ccRow">
             <div class="col-md-6">
               <label for="creditCardNumber" class="form-label">Card Number</label>

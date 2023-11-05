@@ -24,7 +24,7 @@ async function addCreditCard(token, creditCardData) {
         body: JSON.stringify(creditCardData),
     });
 
-    if (response.status === 200) {
+    if (response.status === 201) {
         return response;
     } else if (response.status === 400) {
         throw new Error('Bad Request - Invalid credit card data');

@@ -1,10 +1,10 @@
 // Define the onSuccess function to handle the captcha callback
 function onSuccess() {
-    if (grecaptcha.getResponse()) {
-        captchaState = true;
-        console.log(captchaState);
-        captchaFeedback.textContent = '';
-    }
+  if (grecaptcha.getResponse()) {
+      captchaState = true;
+      console.log(captchaState);
+      captchaFeedback.textContent = '';
+  }
 }
 
 let captchaState = false;
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
       'use strict';
     
       const form = document.querySelector('.needs-validation');
+      // const form = document.getElementById('addNewCC');
       // Hide the form initially
       form.style.display = 'none';
 
@@ -74,6 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
       //////////////////////////////////////////////////////////////////////////
 
       form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
           // Sanitize the input using DOMPurify before validation
           const sanitizedCreditCardNumber = DOMPurify.sanitize(creditCardNumberInput.value);
           const sanitizedCreditCardName = DOMPurify.sanitize(creditCardNameInput.value);
@@ -88,12 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             const creditCardData = JSON.stringify(formData);
           
-            if (!form.checkValidity() || captchaState === false) {
-              event.preventDefault();
-              event.stopPropagation();
-              captchaFeedback.textContent = 'Please complete the captcha!';
-          }
-          else{       
+          if (!form.checkValidity() || captchaState === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            captchaFeedback.textContent = 'Please complete the captcha!';
+          } else{       
               fetch("/addcreditcard", {
               method: "POST", 
               headers: {
@@ -106,14 +108,11 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(response => {
               if (response.ok) {
                 alert('Credit card added successfully');
-                // Construct the URL with selected seat ID and showtime ID as query parameters
-                const paymentURL = `/payment?seat=${encodeURIComponent(seat)}&showtimeId=${encodeURIComponent(showtimes)}`;
-                // Navigate to the payment page with selected seat ID and showtime ID as query parameters
-                window.location.href = paymentURL;
+                window.location.reload();
               }
           })
-      
           .catch(error => {
+              alert('Error occurred');
               console.error('Error occurred', error);
           });}
 
