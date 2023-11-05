@@ -191,7 +191,7 @@ zxcvbnOptions.setOptions(options);
 document.getElementById('userPassword').addEventListener('input', function(event) {
   const passwordInput = event.target;
   
-  const passwordStrengthResult = zxcvbn(passwordInput.value, options);
+  const passwordStrengthResult = zxcvbn(passwordInput.value);
   const strengthMeter = document.getElementById('password-strength-meter');
   const strengthBar = document.getElementById('password-strength-bar');
 
